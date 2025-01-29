@@ -2,6 +2,8 @@ import pyModeS as pms
 import base64
 from enum import Enum
 from collections import defaultdict
+import preprocess.airport_constants as ac
+from datetime import datetime
 
 class MessageType(Enum):
     ALTITUDE = "ALTITUDE"
@@ -12,19 +14,24 @@ class MessageType(Enum):
 
 class Decoder:
     
-    MAP_DF = defaultdict(lambda: MessageType.NONE, {  
-        4: MessageType.ALTITUDE,
-        5: MessageType.IDENTITY,
-        17: MessageType.ADS_B,
-        18: MessageType.ADS_B,
-        20: MessageType.MODE_S,
-        21: MessageType.MODE_S
+    MAP_DF = defaultdict(lambda: [MessageType.NONE], {  
+        4: [MessageType.ALTITUDE],
+        5: [MessageType.IDENTITY],
+        17: [MessageType.ADS_B],
+        18: [MessageType.ADS_B],
+        20: [MessageType.MODE_S, MessageType.ALTITUDE],
+        21: [MessageType.MODE_S, MessageType.IDENTITY]
     })
 
+    
     @staticmethod
-    def processMessage(msg):
+    def processMessage(msg, tsKafka):
         
         data = {}
+
+        # Procesa el timestamp
+        data["Timestamp (kafka)"] = tsKafka
+        data["Timestamp (date)"] = Decoder.kafkaToDate(tsKafka) 
         
         # Transforma el mensaje a hexadecimal
         msgHex = Decoder.base64toHex(msg)
@@ -43,13 +50,23 @@ class Decoder:
         
         msgType = Decoder.MAP_DF[data["Downlink Format"]]
         
-        if msgType == MessageType.ADS_B:
-            data.update(Decoder.processADS_B(msgHex))
+        if MessageType.ADS_B in msgType:
+            data.update(Decoder.processADS_B(msgHex, downlinkFormat))
             
-        elif msgType == MessageType.MODE_S:
+        if MessageType.MODE_S in msgType:
             data.update(Decoder.processMODE_S(msgHex))
+
+        if MessageType.ALTITUDE in msgType:
+            data.update(Decoder.processALTITUDE(msgHex))
+
+        if MessageType.IDENTITY in msgType:
+            data.update(Decoder.processIDENTITY(msgHex))
             
         return data
+    
+    @staticmethod
+    def kafkaToDate(tsKafka):
+        return datetime.fromtimestamp(tsKafka / 1000)
         
     @staticmethod
     def base64toHex(msg):
@@ -64,7 +81,15 @@ class Decoder:
         return pms.df(msg)
     
     @staticmethod
-    def processADS_B(msg):
+    def processALTITUDE(msg):
+        return {"Altitude (ft)": pms.common.altcode(msg)}
+    
+    @staticmethod
+    def processIDENTITY(msg):
+        return {"Squawk code": pms.common.idcode(msg)}
+    
+    @staticmethod
+    def processADS_B(msg, df):
         
         data = {}
         
@@ -88,19 +113,22 @@ class Decoder:
         
         elif 5 <= typecode <= 22:
             
-            # FIXME: No sé cómo funciona todavía
-
-            # Typecode 5-8 (surface), 9-18 (airborne, barometric height), and 20-22 (airborne, GNSS height)
+            lat_ref, lon_ref = ac.RADAR_POSITION
+            
+            # Typecode 5-8 (surface)
+            if 5 <= typecode <= 8:
+                data["Surface velocity"] = pms.adsb.surface_velocity(msg)
+            
+            # Typecode 9-18 (airborne, barometric height), and 20-22 (airborne, GNSS height)
             # pms.adsb.position(msg_even, msg_odd, t_even, t_odd, lat_ref=None, lon_ref=None)
             # pms.adsb.airborne_position(msg_even, msg_odd, t_even, t_odd)
             # pms.adsb.surface_position(msg_even, msg_odd, t_even, t_odd, lat_ref, lon_ref)
-            # pms.adsb.surface_velocity(msg)
+            
+            data["Position with ref (RADAR)"] = pms.adsb.position_with_ref(msg, lat_ref, lon_ref)
+            data["Airborne position with ref (RADAR)"] = pms.adsb.airborne_position_with_ref(msg, lat_ref, lon_ref)
+            data["Surface position with ref (RADAR)"] = pms.adsb.surface_position_with_ref(msg, lat_ref, lon_ref)
 
-            # pms.adsb.position_with_ref(msg, lat_ref, lon_ref)
-            # pms.adsb.airborne_position_with_ref(msg, lat_ref, lon_ref)
-            # pms.adsb.surface_position_with_ref(msg, lat_ref, lon_ref)
-
-            data["Altitude"] = pms.adsb.altitude(msg)
+            data["Altitude (ft)"] = pms.adsb.altitude(msg)
 
         return data
     
