@@ -23,6 +23,18 @@ class Decoder:
         21: [MessageType.MODE_S, MessageType.IDENTITY]
     })
 
+    MAP_CA = defaultdict(lambda: None, {
+        4: "on-ground",
+        5: "airborne"
+    })
+    
+    MAP_FS = defaultdict(lambda: None, {
+        0: "airborne",
+        1: "on-ground",
+        2: "airborne",
+        3: "on-ground"
+    })
+
     
     @staticmethod
     def processMessage(msg, tsKafka):
@@ -49,17 +61,19 @@ class Decoder:
         # - Información dependiente del DF -
         
         msgType = Decoder.MAP_DF[data["Downlink Format"]]
+
+        data["Flight status"] = Decoder.getFlightStatus(msgHex, msgType)
         
-        if MessageType.ADS_B in msgType:
-            data.update(Decoder.processADS_B(msgHex, downlinkFormat))
+        if Decoder.isADS_B(msgType):
+            data.update(Decoder.processADS_B(msgHex))
             
-        if MessageType.MODE_S in msgType:
+        if Decoder.isMODE_S(msgType):
             data.update(Decoder.processMODE_S(msgHex))
 
-        if MessageType.ALTITUDE in msgType:
+        if Decoder.isALTITUDE(msgType):
             data.update(Decoder.processALTITUDE(msgHex))
 
-        if MessageType.IDENTITY in msgType:
+        if Decoder.isIDENTITY(msgType):
             data.update(Decoder.processIDENTITY(msgHex))
             
         return data
@@ -81,6 +95,22 @@ class Decoder:
         return pms.df(msg)
     
     @staticmethod
+    def isIDENTITY(msgType):
+        return MessageType.IDENTITY in msgType
+    
+    @staticmethod
+    def isALTITUDE(msgType):
+        return MessageType.ALTITUDE in msgType
+    
+    @staticmethod
+    def isADS_B(msgType):
+        return MessageType.MODE_S in msgType
+    
+    @staticmethod
+    def isMODE_S(msgType):
+        return MessageType.MODE_S in msgType
+    
+    @staticmethod
     def processALTITUDE(msg):
         return {"Altitude (ft)": pms.common.altcode(msg)}
     
@@ -89,7 +119,23 @@ class Decoder:
         return {"Squawk code": pms.common.idcode(msg)}
     
     @staticmethod
-    def processADS_B(msg, df):
+    def getFlightStatus(msgHex, msgType):
+
+        byteData = bytes.fromhex(msgHex)
+        status_byte = byteData[4]
+
+        if Decoder.isIDENTITY(msgType) or Decoder.isALTITUDE(msgType) or Decoder.isMODE_S(msgType):
+            fs = (status_byte >> 5) & 0b111  # bits 5-7
+            return Decoder.MAP_FS[fs]
+        
+        elif Decoder.isADS_B(msgType):
+            ca = (status_byte >> 5) & 0b111  # bits 5-7
+            return Decoder.MAP_CA[ca]
+        
+        return None
+
+    @staticmethod
+    def processADS_B(msg):
         
         data = {}
         
@@ -120,10 +166,6 @@ class Decoder:
                 data["Surface velocity"] = pms.adsb.surface_velocity(msg)
             
             # Typecode 9-18 (airborne, barometric height), and 20-22 (airborne, GNSS height)
-            # pms.adsb.position(msg_even, msg_odd, t_even, t_odd, lat_ref=None, lon_ref=None)
-            # pms.adsb.airborne_position(msg_even, msg_odd, t_even, t_odd)
-            # pms.adsb.surface_position(msg_even, msg_odd, t_even, t_odd, lat_ref, lon_ref)
-            
             data["Position with ref (RADAR)"] = pms.adsb.position_with_ref(msg, lat_ref, lon_ref)
             data["Airborne position with ref (RADAR)"] = pms.adsb.airborne_position_with_ref(msg, lat_ref, lon_ref)
             data["Surface position with ref (RADAR)"] = pms.adsb.surface_position_with_ref(msg, lat_ref, lon_ref)
