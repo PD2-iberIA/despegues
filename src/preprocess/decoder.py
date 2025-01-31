@@ -35,24 +35,7 @@ class Decoder:
         3: "on-ground"
     })
 
-    ICAO_WTC_MAP = {
-        (4, 1): "L (Light)",
-        (4, 2): "M (Medium)",
-        (4, 3): "M (Medium)",
-        (4, 5): "H (Heavy) / J (Super)"
-    }
-
-    @staticmethod
-    def getWakeTurbulenceCategory(msg):
-        """
-        Devuelve la categoría de turbulencia de estela (ICAO WTC) 
-        basada en la combinación de Typecode (TC) y Category (CA).
-        """
-        typecode = pms.adsb.typecode(msg)
-        category = pms.adsb.category(msg)
-
-        return Decoder.ICAO_WTC_MAP.get((typecode, category), "Desconocido")
-
+    
     @staticmethod
     def processMessage(msg, tsKafka):
         
@@ -162,8 +145,6 @@ class Decoder:
             return {}
         
         data["Typecode"] = typecode
-        data["Wake Turbulence Category (ICAO WTC)"] = Decoder.getWakeTurbulenceCategory(msg)
-
         
         if typecode <= 4:
             data["Callsign"] = pms.adsb.callsign(msg)
