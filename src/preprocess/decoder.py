@@ -35,7 +35,38 @@ class Decoder:
         3: "on-ground"
     })
 
-    
+    MAP_WTC = {
+        (4, 1): "Light",
+        (4, 2): "Medium 1",
+        (4, 3): "Medium 2",
+        (4, 5): "Heavy",
+    }
+
+    MAP_AIRCRAFT_CATEGORY = {
+    (1, 'ANY'): 'Reserved',
+    (0, 0): 'No category information',
+    (2, 1): 'Surface emergency vehicle',
+    (2, 3): 'Surface service vehicle',
+    (2, 4): 'Ground obstruction',
+    (2, 5): 'Ground obstruction',
+    (2, 6): 'Ground obstruction',
+    (2, 7): 'Ground obstruction',
+    (3, 1): 'Glider, sailplane',
+    (3, 2): 'Lighter-than-air',
+    (3, 3): 'Parachutist, skydiver',
+    (3, 4): 'Ultralight, hang-glider, paraglider',
+    (3, 5): 'Reserved',
+    (3, 6): 'Unmanned aerial vehicle',
+    (3, 7): 'Space or transatmospheric vehicle',
+    (4, 1): 'Light (less than 7000 kg)',
+    (4, 2): 'Medium 1 (between 7000 kg and 34000 kg)',
+    (4, 3): 'Medium 2 (between 34000 kg to 136000 kg)',
+    (4, 4): 'High vortex aircraft',
+    (4, 5): 'Heavy (larger than 136000 kg)',
+    (4, 6): 'High performance (>5 g acceleration) and high speed (>400 kt)',
+    (4, 7): 'Rotorcraft',
+    }
+
     @staticmethod
     def processMessage(msg, tsKafka):
         
@@ -63,6 +94,7 @@ class Decoder:
         msgType = Decoder.MAP_DF[data["Downlink Format"]]
 
         data["Flight status"] = Decoder.getFlightStatus(msgHex, msgType)
+
         
         if Decoder.isADS_B(msgType):
             data.update(Decoder.processADS_B(msgHex))
@@ -133,6 +165,16 @@ class Decoder:
             return Decoder.MAP_CA[ca]
         
         return None
+    
+    @staticmethod
+    def getWakeTurbulenceCategory(msg):
+        msgHex = Decoder.base64toHex(msg)
+        byteData = bytes.fromhex(msgHex)  
+
+        typecode = pms.adsb.typecode(msg)
+        status_byte = byteData[4]  
+        ca = (status_byte >> 5) & 0b111  # Bits 6-8
+        return Decoder.MAP_AIRCRAFT_CATEGORY.get((typecode, ca))
 
     @staticmethod
     def processADS_B(msg):
@@ -145,9 +187,12 @@ class Decoder:
             return {}
         
         data["Typecode"] = typecode
+        data['TurbulenceCategory']=Decoder.getWakeTurbulenceCategory(msg)
+
         
         if typecode <= 4:
             data["Callsign"] = pms.adsb.callsign(msg)
+
         
         elif typecode == 19:
             
