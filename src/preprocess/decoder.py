@@ -47,7 +47,7 @@ class Decoder:
     }
 
     MAP_AIRCRAFT_CATEGORY = {
-        (1, 'ANY'): 'Reserved',
+        (1, 0): 'Reserved',
         (0, 0): 'No category information',
         (2, 1): 'Surface emergency vehicle',
         (2, 3): 'Surface service vehicle',
@@ -178,6 +178,8 @@ class Decoder:
         typecode = pms.adsb.typecode(msg)
         status_byte = byteData[4]  
         ca = (status_byte >> 5) & 0b111  # Bits 6-8
+        if typecode == 1:
+            ca = 0
         return Decoder.MAP_AIRCRAFT_CATEGORY.get((typecode, ca))
 
     @staticmethod
