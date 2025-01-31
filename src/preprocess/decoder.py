@@ -4,6 +4,7 @@ from enum import Enum
 from collections import defaultdict
 import preprocess.airport_constants as ac
 from datetime import datetime
+from preprocess.utilities import separateCoordinates
 
 class MessageType(Enum):
     ALTITUDE = "ALTITUDE"
@@ -14,6 +15,9 @@ class MessageType(Enum):
 
 class Decoder:
     
+    ON_GROUND = "on-ground"
+    AIRBORNE = "airborne"
+    
     MAP_DF = defaultdict(lambda: [MessageType.NONE], {  
         4: [MessageType.ALTITUDE],
         5: [MessageType.IDENTITY],
@@ -23,16 +27,16 @@ class Decoder:
         21: [MessageType.MODE_S, MessageType.IDENTITY]
     })
 
-    MAP_CA = defaultdict(lambda: None, {
-        4: "on-ground",
-        5: "airborne"
+    MAP_CA = defaultdict(lambda: float('nan'), {
+        4: ON_GROUND,
+        5: AIRBORNE
     })
     
-    MAP_FS = defaultdict(lambda: None, {
-        0: "airborne",
-        1: "on-ground",
-        2: "airborne",
-        3: "on-ground"
+    MAP_FS = defaultdict(lambda: float('nan'), {
+        0: AIRBORNE,
+        1: ON_GROUND,
+        2: AIRBORNE,
+        3: ON_GROUND
     })
 
     MAP_WTC = {
@@ -43,28 +47,28 @@ class Decoder:
     }
 
     MAP_AIRCRAFT_CATEGORY = {
-    (1, 'ANY'): 'Reserved',
-    (0, 0): 'No category information',
-    (2, 1): 'Surface emergency vehicle',
-    (2, 3): 'Surface service vehicle',
-    (2, 4): 'Ground obstruction',
-    (2, 5): 'Ground obstruction',
-    (2, 6): 'Ground obstruction',
-    (2, 7): 'Ground obstruction',
-    (3, 1): 'Glider, sailplane',
-    (3, 2): 'Lighter-than-air',
-    (3, 3): 'Parachutist, skydiver',
-    (3, 4): 'Ultralight, hang-glider, paraglider',
-    (3, 5): 'Reserved',
-    (3, 6): 'Unmanned aerial vehicle',
-    (3, 7): 'Space or transatmospheric vehicle',
-    (4, 1): 'Light (less than 7000 kg)',
-    (4, 2): 'Medium 1 (between 7000 kg and 34000 kg)',
-    (4, 3): 'Medium 2 (between 34000 kg to 136000 kg)',
-    (4, 4): 'High vortex aircraft',
-    (4, 5): 'Heavy (larger than 136000 kg)',
-    (4, 6): 'High performance (>5 g acceleration) and high speed (>400 kt)',
-    (4, 7): 'Rotorcraft',
+        (1, 'ANY'): 'Reserved',
+        (0, 0): 'No category information',
+        (2, 1): 'Surface emergency vehicle',
+        (2, 3): 'Surface service vehicle',
+        (2, 4): 'Ground obstruction',
+        (2, 5): 'Ground obstruction',
+        (2, 6): 'Ground obstruction',
+        (2, 7): 'Ground obstruction',
+        (3, 1): 'Glider, sailplane',
+        (3, 2): 'Lighter-than-air',
+        (3, 3): 'Parachutist, skydiver',
+        (3, 4): 'Ultralight, hang-glider, paraglider',
+        (3, 5): 'Reserved',
+        (3, 6): 'Unmanned aerial vehicle',
+        (3, 7): 'Space or transatmospheric vehicle',
+        (4, 1): 'Light (less than 7000 kg)',
+        (4, 2): 'Medium 1 (between 7000 kg and 34000 kg)',
+        (4, 3): 'Medium 2 (between 34000 kg to 136000 kg)',
+        (4, 4): 'High vortex aircraft',
+        (4, 5): 'Heavy (larger than 136000 kg)',
+        (4, 6): 'High performance (>5 g acceleration) and high speed (>400 kt)',
+        (4, 7): 'Rotorcraft',
     }
 
     @staticmethod
@@ -187,7 +191,7 @@ class Decoder:
             return {}
         
         data["Typecode"] = typecode
-        data['TurbulenceCategory']=Decoder.getWakeTurbulenceCategory(msg)
+        data['TurbulenceCategory'] = Decoder.getWakeTurbulenceCategory(msg)
 
         
         if typecode <= 4:
@@ -205,18 +209,22 @@ class Decoder:
         elif 5 <= typecode <= 22:
             
             lat_ref, lon_ref = ac.RADAR_POSITION
+
+            # Works with both airbone and surface position messages
+
+            posRef = pms.adsb.position_with_ref(msg, lat_ref, lon_ref)
+            data["Position with ref (RADAR)"] = posRef
+            data.update(separateCoordinates(posRef))
             
             # Typecode 5-8 (surface)
             if 5 <= typecode <= 8:
                 data["Surface velocity"] = pms.adsb.surface_velocity(msg)
-            
-            # Works with both airbone and surface position messages
-            data["Position with ref (RADAR)"] = pms.adsb.position_with_ref(msg, lat_ref, lon_ref)
-            # data["Airborne position with ref (RADAR)"] = pms.adsb.airborne_position_with_ref(msg, lat_ref, lon_ref)
-            # data["Surface position with ref (RADAR)"] = pms.adsb.surface_position_with_ref(msg, lat_ref, lon_ref)
+                if pms.adsb.surface_position_with_ref(msg, lat_ref, lon_ref):
+                    data["Flight status"] = Decoder.ON_GROUND
+            elif pms.adsb.airborne_position_with_ref(msg, lat_ref, lon_ref):
+                data["Flight status"] = Decoder.AIRBORNE
 
             data["Altitude (ft)"] = pms.adsb.altitude(msg)
-
         return data
     
     @staticmethod
