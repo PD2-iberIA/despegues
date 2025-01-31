@@ -165,10 +165,10 @@ class Decoder:
             if 5 <= typecode <= 8:
                 data["Surface velocity"] = pms.adsb.surface_velocity(msg)
             
-            # Typecode 9-18 (airborne, barometric height), and 20-22 (airborne, GNSS height)
+            # Works with both airbone and surface position messages
             data["Position with ref (RADAR)"] = pms.adsb.position_with_ref(msg, lat_ref, lon_ref)
-            data["Airborne position with ref (RADAR)"] = pms.adsb.airborne_position_with_ref(msg, lat_ref, lon_ref)
-            data["Surface position with ref (RADAR)"] = pms.adsb.surface_position_with_ref(msg, lat_ref, lon_ref)
+            # data["Airborne position with ref (RADAR)"] = pms.adsb.airborne_position_with_ref(msg, lat_ref, lon_ref)
+            # data["Surface position with ref (RADAR)"] = pms.adsb.surface_position_with_ref(msg, lat_ref, lon_ref)
 
             data["Altitude (ft)"] = pms.adsb.altitude(msg)
 
