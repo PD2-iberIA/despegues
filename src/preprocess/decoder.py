@@ -104,7 +104,7 @@ class Decoder:
     
     @staticmethod
     def isADS_B(msgType):
-        return MessageType.MODE_S in msgType
+        return MessageType.ADS_B in msgType
     
     @staticmethod
     def isMODE_S(msgType):
