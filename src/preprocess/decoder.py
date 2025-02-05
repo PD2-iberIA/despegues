@@ -203,10 +203,10 @@ class Decoder:
         elif typecode == 19:
             
             # Handles both surface & airborne messages
-            data["Velocity"] = pms.adsb.velocity(msg)            
-            data["Speed heading"] = pms.adsb.speed_heading(msg)  
-            
-            data["Airborne velocity"] = pms.adsb.airborne_velocity(msg)
+            data["Velocity"] = pms.adsb.velocity(msg)           
+            data["Speed heading"] = pms.adsb.speed_heading(msg)
+
+            data["Flight status"] = Decoder.AIRBORNE 
         
         elif 5 <= typecode <= 22:
             
@@ -220,7 +220,7 @@ class Decoder:
             
             # Typecode 5-8 (surface)
             if 5 <= typecode <= 8:
-                data["Surface velocity"] = pms.adsb.surface_velocity(msg)
+                data["Velocity"] = pms.adsb.velocity(msg)
                 if pms.adsb.surface_position_with_ref(msg, lat_ref, lon_ref):
                     data["Flight status"] = Decoder.ON_GROUND
             elif pms.adsb.airborne_position_with_ref(msg, lat_ref, lon_ref):
