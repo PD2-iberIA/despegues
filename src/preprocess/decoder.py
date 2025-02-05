@@ -4,7 +4,7 @@ from enum import Enum
 from collections import defaultdict
 import preprocess.airport_constants as ac
 from datetime import datetime
-from preprocess.utilities import separateCoordinates
+from preprocess.utilities import separateCoordinates, separateVelocity, processStaticAirTemperature
 
 class MessageType(Enum):
     ALTITUDE = "ALTITUDE"
@@ -203,10 +203,11 @@ class Decoder:
         elif typecode == 19:
             
             # Handles both surface & airborne messages
-            data["Velocity"] = pms.adsb.velocity(msg)           
+            velocity = pms.adsb.velocity(msg)
+            data.update(separateVelocity(velocity))    
             data["Speed heading"] = pms.adsb.speed_heading(msg)
 
-            data["Flight status"] = Decoder.AIRBORNE 
+            data["Flight status"] = Decoder.AIRBORNE
         
         elif 5 <= typecode <= 22:
             
@@ -220,7 +221,8 @@ class Decoder:
             
             # Typecode 5-8 (surface)
             if 5 <= typecode <= 8:
-                data["Velocity"] = pms.adsb.velocity(msg)
+                velocity = pms.adsb.velocity(msg)
+                data.update(separateVelocity(velocity))
                 if pms.adsb.surface_position_with_ref(msg, lat_ref, lon_ref):
                     data["Flight status"] = Decoder.ON_GROUND
             elif pms.adsb.airborne_position_with_ref(msg, lat_ref, lon_ref):
@@ -258,7 +260,8 @@ class Decoder:
         # BDS 4,4
         if pms.bds.bds44.is44(msg):
             data["Wind speed (kt) and direction (true) (deg)"] = pms.commb.wind44(msg)
-            data["Static air temperature (C)"] = pms.commb.temp44(msg)
+            sat = pms.commb.temp44(msg)
+            data["Static air temperature (C)"] = processStaticAirTemperature(sat)
             data["Average static pressure (hPa)"] = pms.commb.p44(msg)
             data["Humidity (%)"] = pms.commb.hum44(msg)
         
@@ -269,7 +272,8 @@ class Decoder:
             data["Microburst level (0-3)"] = pms.commb.mb45(msg)
             data["Icing level (0-3)"] = pms.commb.ic45(msg)
             data["Wake vortex level (0-3)"] = pms.commb.wv45(msg)
-            data["Static air temperature (C)"] = pms.commb.temp45(msg)
+            sat = pms.commb.temp45(msg)
+            data["Static air temperature (C)"] = processStaticAirTemperature(sat)
             data["Average static pressure (hPa)"] = pms.commb.p45(msg)
             data["Radio height (ft)"] = pms.commb.rh45(msg)
 
