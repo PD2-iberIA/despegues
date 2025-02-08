@@ -6,7 +6,10 @@ def separateCoordinates(coord):
 
 def separateVelocity(velocity):
     """Separa los elementos de la tupla devuelta por la función `pms.adsb.velocity()`"""
-    return {'Speed': velocity[0], 'Angle': velocity[1], 'Vertical rate': velocity[2], 'Speed type': velocity[3]}
+    if velocity is None:
+        return {'Speed': None, 'Angle': None, 'Vertical rate': None, 'Speed type':None}
+    else:
+        return {'Speed': velocity[0], 'Angle': velocity[1], 'Vertical rate': velocity[2], 'Speed type': velocity[3]}
 
 def processStaticAirTemperature(temperature):
     """Si la temperatura obtenida es una tupla de ceros se establece como nula ya que se trata de un error de inconsistencia.
