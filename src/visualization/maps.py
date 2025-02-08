@@ -45,8 +45,10 @@ class Maps:
 
     @staticmethod
     def getRadarMarker():
+
+        icon = folium.CustomIcon("./custom_icons/radar_icon.png", icon_size=(30,30))
         return folium.Marker(
                 location=[ac.RADAR_POSITION[0], ac.RADAR_POSITION[1]],
                 popup="RADAR",
-                icon=folium.Icon(icon='star'),
+                icon=icon,
             )
