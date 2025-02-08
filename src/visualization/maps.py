@@ -7,6 +7,17 @@ class Maps:
     """Clase encargada de generar mapas"""
 
     @staticmethod
+    def getTitleHTML(title):
+        return f'''
+        <div style="position: fixed; 
+                    bottom: 50px; left: 50%; transform: translateX(-50%); width: auto; 
+                    background-color: black; opacity: 0.7; z-index: 9999; 
+                    border-radius: 5px; padding: 10px; font-size: 14px; color: white; text-align: center;">
+            <strong>{title}</strong>
+        </div>
+        '''
+
+    @staticmethod
     def getRadarMarker():
 
         icon = folium.CustomIcon("./custom_icons/radar_icon.png", icon_size=(30,30))
@@ -67,18 +78,20 @@ class Maps:
 
         return m
 
+
+
     @staticmethod
-    def positionsScatterMap(df):
+    def positionsScatterMap(df, title="Flight Status Scatter Map"):
         """
         Genera un Scatter Map.
     
         Parámetros:
         df (pandas.DataFrame): Dataframe con las siguientes columnas: "ICAO", "lat", "lon", "Flight status"
-    
+        title (string): Título del mapa
+        
         Retorna:
         folium.map: Scatter Map
         """
-
         center = [ac.RADAR_POSITION[0], ac.RADAR_POSITION[1]]
         
         # Creamos el mapa
@@ -129,5 +142,8 @@ class Maps:
         </div>
         '''
         m.get_root().html.add_child(folium.Element(legend_html))
+
+        # - Título -
+        m.get_root().html.add_child(folium.Element(Maps.getTitleHTML(title)))
         
         return m
