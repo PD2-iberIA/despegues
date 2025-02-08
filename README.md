@@ -1,3 +1,5 @@
+<img src="img/logo.jpg" alt="Logo de avión" width="75" style="border-radius: 10px;"/>
+
 # DESPEGUES
 
 <code> GIDIA - Proyecto de datos II </code>
