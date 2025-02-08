@@ -2,9 +2,9 @@ import pyModeS as pms
 import base64
 from enum import Enum
 from collections import defaultdict
-import preprocess.airport_constants as ac
 from datetime import datetime
-from preprocess.utilities import separateCoordinates, separateVelocity, processStaticAirTemperature
+import airport_constants as ac
+from utilities import separateCoordinates, separateVelocity, processStaticAirTemperature
 
 class MessageType(Enum):
     ALTITUDE = "ALTITUDE"

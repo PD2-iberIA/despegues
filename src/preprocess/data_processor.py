@@ -1,4 +1,4 @@
-import preprocess.airport_constants as ac
+import airport_constants as ac
 import math
 
 # Radio de la Tierra (km)

@@ -1,6 +1,6 @@
 import tarfile
 import pandas as pd
-from preprocess.decoder import Decoder
+from decoder import Decoder
 
 class Reader:
 
