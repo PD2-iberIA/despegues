@@ -2,9 +2,36 @@ import folium
 import preprocess.airport_constants as ac
 from folium.plugins import HeatMapWithTime
 from folium.plugins import MarkerCluster
+import movingpandas as mpd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
+import geopy.distance
+import re
 
 class Maps:
     """Clase encargada de generar mapas"""
+
+    CATEGORY_COLORS = {
+        'Reserved': 'grey',
+        'No category information': 'lightgrey',
+        'Surface emergency vehicle': 'red',
+        'Surface service vehicle': 'blue',
+        'Ground obstruction': 'orange',
+        'Glider, sailplane': 'green',
+        'Lighter-than-air': 'purple',
+        'Parachutist, skydiver': 'yellow',
+        'Ultralight, hang-glider, paraglider': 'pink',
+        'Unmanned aerial vehicle': 'cyan',
+        'Space or transatmospheric vehicle': 'brown',
+        'Light (less than 7000 kg)': 'lightgreen',
+        'Medium 1 (between 7000 kg and 34000 kg)': 'lightblue',
+        'Medium 2 (between 34000 kg to 136000 kg)': 'lime',
+        'High vortex aircraft': 'magenta',
+        'Heavy (larger than 136000 kg)': 'black',
+        'High performance (>5 g acceleration) and high speed (>400 kt)': 'darkblue',
+        'Rotorcraft': 'darkgreen',
+    }
 
     @staticmethod
     def getTitleHTML(title):
@@ -20,7 +47,7 @@ class Maps:
     @staticmethod
     def getRadarMarker():
 
-        icon = folium.CustomIcon("./custom_icons/radar_icon.png", icon_size=(30,30))
+        icon = folium.CustomIcon("./visualization/custom_icons/radar_icon.png", icon_size=(30,30))
         return folium.Marker(
                 location=[ac.RADAR_POSITION[0], ac.RADAR_POSITION[1]],
                 popup="RADAR",
@@ -147,3 +174,112 @@ class Maps:
         m.get_root().html.add_child(folium.Element(Maps.getTitleHTML(title)))
         
         return m
+
+
+    @staticmethod
+    def trajectoriesMap(df):
+        """
+        Genera un mapa con las trayectorias clasificadas por avión y tipo de vuelo
+    
+        Parámetros:
+        df (pandas.DataFrame): Dataframe con las siguientes columnas: "Timestamp (date)", "lat", "lon", "ICAO", "Callsign", "TurbulenceCategory"
+    
+        Retorna:
+        folium.map: Mapa con las trayectorias
+        """
+        
+        center = [ac.RADAR_POSITION[0], ac.RADAR_POSITION[1]]
+    
+        # Creamos el mapa
+        m = folium.Map(location=center, tiles="Cartodb Positron", zoom_start=13)
+    
+        # Grupos de capas
+        group1 = MarkerCluster(name="Locations").add_to(m)
+        group2 = folium.FeatureGroup("Take-offs").add_to(m)
+        group3 = folium.FeatureGroup("Landings").add_to(m)
+        group4 = folium.FeatureGroup("Other flights").add_to(m)
+        
+        # Marcadores
+        Maps.getRadarMarker().add_to(group1)
+        rwMarkers = Maps.getRunwayMarkers()
+        for mk in rwMarkers:
+            mk.add_to(group1)
+
+        # Generamos las trayectorias
+        trajs = mpd.TrajectoryCollection(
+            df,
+            traj_id_col="Callsign",
+            obj_id_col="ICAO",
+            t="Timestamp (date)",
+            x="lon",
+            y="lat"
+        )
+
+        # Generalizamos las trayectorias (submuestreo)
+        TOLERANCE = 3 # cuanto más grande menos puntos hay
+        generalized_trajs = mpd.TopDownTimeRatioGeneralizer(trajs).generalize(tolerance=TOLERANCE)
+
+        # Umbral de proximidad a la antena (para clasificar despegues y aterrizajes)
+        PROXIMITY_THRESHOLD = 10 # en km
+        
+        # Recorremos las trayectorias
+        for traj in generalized_trajs:
+
+            # Primer y último punto
+            first_point = traj.df.iloc[0]
+            last_point = traj.df.iloc[-1]
+
+            # Primera y última posición
+            lon_first, lat_first = first_point['geometry'].x, first_point['geometry'].y
+            lon_last, lat_last = last_point['geometry'].x, last_point['geometry'].y
+
+            dist_first = geopy.distance.distance(ac.RADAR_POSITION, (lat_first, lon_first)).km
+            dist_last = geopy.distance.distance(ac.RADAR_POSITION, (lat_last, lon_last)).km
+            
+            # Dibujamos la trayectoria y la clasificamos
+            if dist_first < PROXIMITY_THRESHOLD:  
+                traj.explore(m=group2, color=Maps.CATEGORY_COLORS[first_point["TurbulenceCategory"]])
+                group = group2
+            elif dist_last < PROXIMITY_THRESHOLD:
+                traj.explore(m=group3, color=Maps.CATEGORY_COLORS[first_point["TurbulenceCategory"]])
+                group = group3
+            else:
+                traj.explore(m=group4, color=Maps.CATEGORY_COLORS[first_point["TurbulenceCategory"]])
+                group = group4
+
+            # Dibujamos un círculo al final de la trayectoria para indicar sentido
+            folium.Circle(
+                location=[lat_last, lon_last],
+                radius=120,
+                color="black",
+                fill=True,
+                fill_color=Maps.CATEGORY_COLORS[first_point["TurbulenceCategory"]],
+                opacity=0.5
+            ).add_to(group)
+
+
+        folium.LayerControl().add_to(m)
+
+        # - Leyenda -
+        
+        legend_html = '''
+            <div style="position: fixed; 
+                        bottom: 50px; right: 50px; width: 225px; height: 370px; 
+                        background-color: black; opacity: 0.7; z-index: 9999; 
+                        border-radius: 5px; padding: 10px; font-size: 12px; color: white;">
+                <strong>Aircraft Categories</strong><br>
+        '''
+                
+        def remove_parentheses(text):
+            return re.sub(r'\(.*?\)', '', text).strip()
+
+        for category, color in Maps.CATEGORY_COLORS.items():
+            clean_category = remove_parentheses(category) 
+            legend_html += f'<i style="background-color: {color}; width: 10px; height: 10px; display: inline-block; border-radius: 50%; margin-top: 3px;"></i> {clean_category}<br>'
+        
+        legend_html += '</div>'
+
+        m.get_root().html.add_child(folium.Element(legend_html))
+            
+        return m
+

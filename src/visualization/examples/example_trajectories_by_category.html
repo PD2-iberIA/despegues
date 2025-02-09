@@ -1,0 +1,2410 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_e2b4e5c8fe03df530044c3da455330ac {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+        
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/leaflet.markercluster.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/MarkerCluster.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/MarkerCluster.Default.css"/>
+    
+                    <style>
+                        .foliumtooltip {
+                            
+                        }
+                       .foliumtooltip table{
+                            margin: auto;
+                        }
+                        .foliumtooltip tr{
+                            text-align: left;
+                        }
+                        .foliumtooltip th{
+                            padding: 2px; padding-right: 8px;
+                        }
+                    </style>
+            
+    
+                    <style>
+                        .foliumtooltip {
+                            
+                        }
+                       .foliumtooltip table{
+                            margin: auto;
+                        }
+                        .foliumtooltip tr{
+                            text-align: left;
+                        }
+                        .foliumtooltip th{
+                            padding: 2px; padding-right: 8px;
+                        }
+                    </style>
+            
+    
+                    <style>
+                        .foliumtooltip {
+                            
+                        }
+                       .foliumtooltip table{
+                            margin: auto;
+                        }
+                        .foliumtooltip tr{
+                            text-align: left;
+                        }
+                        .foliumtooltip th{
+                            padding: 2px; padding-right: 8px;
+                        }
+                    </style>
+            
+    
+                    <style>
+                        .foliumtooltip {
+                            
+                        }
+                       .foliumtooltip table{
+                            margin: auto;
+                        }
+                        .foliumtooltip tr{
+                            text-align: left;
+                        }
+                        .foliumtooltip th{
+                            padding: 2px; padding-right: 8px;
+                        }
+                    </style>
+            
+    
+                    <style>
+                        .foliumtooltip {
+                            
+                        }
+                       .foliumtooltip table{
+                            margin: auto;
+                        }
+                        .foliumtooltip tr{
+                            text-align: left;
+                        }
+                        .foliumtooltip th{
+                            padding: 2px; padding-right: 8px;
+                        }
+                    </style>
+            
+    
+                    <style>
+                        .foliumtooltip {
+                            
+                        }
+                       .foliumtooltip table{
+                            margin: auto;
+                        }
+                        .foliumtooltip tr{
+                            text-align: left;
+                        }
+                        .foliumtooltip th{
+                            padding: 2px; padding-right: 8px;
+                        }
+                    </style>
+            
+    
+                    <style>
+                        .foliumtooltip {
+                            
+                        }
+                       .foliumtooltip table{
+                            margin: auto;
+                        }
+                        .foliumtooltip tr{
+                            text-align: left;
+                        }
+                        .foliumtooltip th{
+                            padding: 2px; padding-right: 8px;
+                        }
+                    </style>
+            
+    
+                    <style>
+                        .foliumtooltip {
+                            
+                        }
+                       .foliumtooltip table{
+                            margin: auto;
+                        }
+                        .foliumtooltip tr{
+                            text-align: left;
+                        }
+                        .foliumtooltip th{
+                            padding: 2px; padding-right: 8px;
+                        }
+                    </style>
+            
+    
+                    <style>
+                        .foliumtooltip {
+                            
+                        }
+                       .foliumtooltip table{
+                            margin: auto;
+                        }
+                        .foliumtooltip tr{
+                            text-align: left;
+                        }
+                        .foliumtooltip th{
+                            padding: 2px; padding-right: 8px;
+                        }
+                    </style>
+            
+    
+                    <style>
+                        .foliumtooltip {
+                            
+                        }
+                       .foliumtooltip table{
+                            margin: auto;
+                        }
+                        .foliumtooltip tr{
+                            text-align: left;
+                        }
+                        .foliumtooltip th{
+                            padding: 2px; padding-right: 8px;
+                        }
+                    </style>
+            
+    
+                    <style>
+                        .foliumtooltip {
+                            
+                        }
+                       .foliumtooltip table{
+                            margin: auto;
+                        }
+                        .foliumtooltip tr{
+                            text-align: left;
+                        }
+                        .foliumtooltip th{
+                            padding: 2px; padding-right: 8px;
+                        }
+                    </style>
+            
+    
+                    <style>
+                        .foliumtooltip {
+                            
+                        }
+                       .foliumtooltip table{
+                            margin: auto;
+                        }
+                        .foliumtooltip tr{
+                            text-align: left;
+                        }
+                        .foliumtooltip th{
+                            padding: 2px; padding-right: 8px;
+                        }
+                    </style>
+            
+    
+                    <style>
+                        .foliumtooltip {
+                            
+                        }
+                       .foliumtooltip table{
+                            margin: auto;
+                        }
+                        .foliumtooltip tr{
+                            text-align: left;
+                        }
+                        .foliumtooltip th{
+                            padding: 2px; padding-right: 8px;
+                        }
+                    </style>
+            
+    
+                    <style>
+                        .foliumtooltip {
+                            
+                        }
+                       .foliumtooltip table{
+                            margin: auto;
+                        }
+                        .foliumtooltip tr{
+                            text-align: left;
+                        }
+                        .foliumtooltip th{
+                            padding: 2px; padding-right: 8px;
+                        }
+                    </style>
+            
+    
+                    <style>
+                        .foliumtooltip {
+                            
+                        }
+                       .foliumtooltip table{
+                            margin: auto;
+                        }
+                        .foliumtooltip tr{
+                            text-align: left;
+                        }
+                        .foliumtooltip th{
+                            padding: 2px; padding-right: 8px;
+                        }
+                    </style>
+            
+    
+                    <style>
+                        .foliumtooltip {
+                            
+                        }
+                       .foliumtooltip table{
+                            margin: auto;
+                        }
+                        .foliumtooltip tr{
+                            text-align: left;
+                        }
+                        .foliumtooltip th{
+                            padding: 2px; padding-right: 8px;
+                        }
+                    </style>
+            
+    
+                    <style>
+                        .foliumtooltip {
+                            
+                        }
+                       .foliumtooltip table{
+                            margin: auto;
+                        }
+                        .foliumtooltip tr{
+                            text-align: left;
+                        }
+                        .foliumtooltip th{
+                            padding: 2px; padding-right: 8px;
+                        }
+                    </style>
+            
+    
+                    <style>
+                        .foliumtooltip {
+                            
+                        }
+                       .foliumtooltip table{
+                            margin: auto;
+                        }
+                        .foliumtooltip tr{
+                            text-align: left;
+                        }
+                        .foliumtooltip th{
+                            padding: 2px; padding-right: 8px;
+                        }
+                    </style>
+            
+    
+                    <style>
+                        .foliumtooltip {
+                            
+                        }
+                       .foliumtooltip table{
+                            margin: auto;
+                        }
+                        .foliumtooltip tr{
+                            text-align: left;
+                        }
+                        .foliumtooltip th{
+                            padding: 2px; padding-right: 8px;
+                        }
+                    </style>
+            
+    
+                    <style>
+                        .foliumtooltip {
+                            
+                        }
+                       .foliumtooltip table{
+                            margin: auto;
+                        }
+                        .foliumtooltip tr{
+                            text-align: left;
+                        }
+                        .foliumtooltip th{
+                            padding: 2px; padding-right: 8px;
+                        }
+                    </style>
+            
+</head>
+<body>
+    
+    
+            <div style="position: fixed; 
+                        bottom: 50px; right: 50px; width: 225px; height: 370px; 
+                        background-color: black; opacity: 0.7; z-index: 9999; 
+                        border-radius: 5px; padding: 10px; font-size: 12px; color: white;">
+                <strong>Aircraft Categories</strong><br>
+        <i style="background-color: grey; width: 10px; height: 10px; display: inline-block; border-radius: 50%; margin-top: 3px;"></i> Reserved<br><i style="background-color: lightgrey; width: 10px; height: 10px; display: inline-block; border-radius: 50%; margin-top: 3px;"></i> No category information<br><i style="background-color: red; width: 10px; height: 10px; display: inline-block; border-radius: 50%; margin-top: 3px;"></i> Surface emergency vehicle<br><i style="background-color: blue; width: 10px; height: 10px; display: inline-block; border-radius: 50%; margin-top: 3px;"></i> Surface service vehicle<br><i style="background-color: orange; width: 10px; height: 10px; display: inline-block; border-radius: 50%; margin-top: 3px;"></i> Ground obstruction<br><i style="background-color: green; width: 10px; height: 10px; display: inline-block; border-radius: 50%; margin-top: 3px;"></i> Glider, sailplane<br><i style="background-color: purple; width: 10px; height: 10px; display: inline-block; border-radius: 50%; margin-top: 3px;"></i> Lighter-than-air<br><i style="background-color: yellow; width: 10px; height: 10px; display: inline-block; border-radius: 50%; margin-top: 3px;"></i> Parachutist, skydiver<br><i style="background-color: pink; width: 10px; height: 10px; display: inline-block; border-radius: 50%; margin-top: 3px;"></i> Ultralight, hang-glider, paraglider<br><i style="background-color: cyan; width: 10px; height: 10px; display: inline-block; border-radius: 50%; margin-top: 3px;"></i> Unmanned aerial vehicle<br><i style="background-color: brown; width: 10px; height: 10px; display: inline-block; border-radius: 50%; margin-top: 3px;"></i> Space or transatmospheric vehicle<br><i style="background-color: lightgreen; width: 10px; height: 10px; display: inline-block; border-radius: 50%; margin-top: 3px;"></i> Light<br><i style="background-color: lightblue; width: 10px; height: 10px; display: inline-block; border-radius: 50%; margin-top: 3px;"></i> Medium 1<br><i style="background-color: lime; width: 10px; height: 10px; display: inline-block; border-radius: 50%; margin-top: 3px;"></i> Medium 2<br><i style="background-color: magenta; width: 10px; height: 10px; display: inline-block; border-radius: 50%; margin-top: 3px;"></i> High vortex aircraft<br><i style="background-color: black; width: 10px; height: 10px; display: inline-block; border-radius: 50%; margin-top: 3px;"></i> Heavy<br><i style="background-color: darkblue; width: 10px; height: 10px; display: inline-block; border-radius: 50%; margin-top: 3px;"></i> High performance  and high speed<br><i style="background-color: darkgreen; width: 10px; height: 10px; display: inline-block; border-radius: 50%; margin-top: 3px;"></i> Rotorcraft<br></div>
+    
+            <div class="folium-map" id="map_e2b4e5c8fe03df530044c3da455330ac" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_e2b4e5c8fe03df530044c3da455330ac = L.map(
+                "map_e2b4e5c8fe03df530044c3da455330ac",
+                {
+                    center: [40.51, -3.53],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 13,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_8e0592609957ac605cca0cc7d9b5b7ff = L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 20,
+  "maxNativeZoom": 20,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"https://carto.com/attributions\"\u003eCARTO\u003c/a\u003e",
+  "subdomains": "abcd",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_8e0592609957ac605cca0cc7d9b5b7ff.addTo(map_e2b4e5c8fe03df530044c3da455330ac);
+        
+    
+            var marker_cluster_5247cf0514bdc6f28da6a4d0e1d9b80f = L.markerClusterGroup(
+                {
+}
+            );
+        
+    
+            var marker_79998a1f10d42037530d8c8da99d29b0 = L.marker(
+                [40.51, -3.53],
+                {
+}
+            ).addTo(marker_cluster_5247cf0514bdc6f28da6a4d0e1d9b80f);
+        
+    
+        var custom_icon_f924b34b58e75e443f2c30d7df627b9d = L.icon({
+  "iconUrl": "data:image/png;base64,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",
+  "iconSize": [30, 30],
+});
+        marker_79998a1f10d42037530d8c8da99d29b0.setIcon(custom_icon_f924b34b58e75e443f2c30d7df627b9d);
+        
+    
+        var popup_3286729ae7a27b3c7df078119f5f06fb = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_4c714833eaf5484bb195848aa4cf2b87 = $(`<div id="html_4c714833eaf5484bb195848aa4cf2b87" style="width: 100.0%; height: 100.0%;">RADAR</div>`)[0];
+                popup_3286729ae7a27b3c7df078119f5f06fb.setContent(html_4c714833eaf5484bb195848aa4cf2b87);
+            
+        
+
+        marker_79998a1f10d42037530d8c8da99d29b0.bindPopup(popup_3286729ae7a27b3c7df078119f5f06fb)
+        ;
+
+        
+    
+    
+            var marker_26e58e61b99248f2db9479686de79242 = L.marker(
+                [40.463, -3.554],
+                {
+}
+            ).addTo(marker_cluster_5247cf0514bdc6f28da6a4d0e1d9b80f);
+        
+    
+        var custom_icon_9570c56409b7d05536b78b661f6abdbf = L.icon({
+  "iconUrl": "data:image/png;base64,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",
+  "iconSize": [40, 40],
+});
+        marker_26e58e61b99248f2db9479686de79242.setIcon(custom_icon_9570c56409b7d05536b78b661f6abdbf);
+        
+    
+        var popup_bbdc84678955dec696c45a6fdc195568 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_61e3780a83f7bd3ac2f848cb30794cc3 = $(`<div id="html_61e3780a83f7bd3ac2f848cb30794cc3" style="width: 100.0%; height: 100.0%;">RUNWAY 1</div>`)[0];
+                popup_bbdc84678955dec696c45a6fdc195568.setContent(html_61e3780a83f7bd3ac2f848cb30794cc3);
+            
+        
+
+        marker_26e58e61b99248f2db9479686de79242.bindPopup(popup_bbdc84678955dec696c45a6fdc195568)
+        ;
+
+        
+    
+    
+            var marker_b748b6f8e5aefdef0e2128fd79e2fc81 = L.marker(
+                [40.473, -3.536],
+                {
+}
+            ).addTo(marker_cluster_5247cf0514bdc6f28da6a4d0e1d9b80f);
+        
+    
+        var custom_icon_22feb2862b647205325f1026a44527e6 = L.icon({
+  "iconUrl": "data:image/png;base64,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",
+  "iconSize": [40, 40],
+});
+        marker_b748b6f8e5aefdef0e2128fd79e2fc81.setIcon(custom_icon_22feb2862b647205325f1026a44527e6);
+        
+    
+        var popup_d1d7d2081d88ac1285074710c7f1e127 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_a6d4e01ec0099b650121f312d094bd51 = $(`<div id="html_a6d4e01ec0099b650121f312d094bd51" style="width: 100.0%; height: 100.0%;">RUNWAY 2</div>`)[0];
+                popup_d1d7d2081d88ac1285074710c7f1e127.setContent(html_a6d4e01ec0099b650121f312d094bd51);
+            
+        
+
+        marker_b748b6f8e5aefdef0e2128fd79e2fc81.bindPopup(popup_d1d7d2081d88ac1285074710c7f1e127)
+        ;
+
+        
+    
+    
+            var marker_da8f17b47d35208c1bb4e804211bbc36 = L.marker(
+                [40.507, -3.574],
+                {
+}
+            ).addTo(marker_cluster_5247cf0514bdc6f28da6a4d0e1d9b80f);
+        
+    
+        var custom_icon_ddcba7f674011cb3512f70b5e42ce89b = L.icon({
+  "iconUrl": "data:image/png;base64,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",
+  "iconSize": [40, 40],
+});
+        marker_da8f17b47d35208c1bb4e804211bbc36.setIcon(custom_icon_ddcba7f674011cb3512f70b5e42ce89b);
+        
+    
+        var popup_f5d6d8a39bfdeba5282fda24b992a13f = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_b3e2f7e3dc26f1ae6b149e3dc5ddaed9 = $(`<div id="html_b3e2f7e3dc26f1ae6b149e3dc5ddaed9" style="width: 100.0%; height: 100.0%;">RUNWAY 3</div>`)[0];
+                popup_f5d6d8a39bfdeba5282fda24b992a13f.setContent(html_b3e2f7e3dc26f1ae6b149e3dc5ddaed9);
+            
+        
+
+        marker_da8f17b47d35208c1bb4e804211bbc36.bindPopup(popup_f5d6d8a39bfdeba5282fda24b992a13f)
+        ;
+
+        
+    
+    
+            var marker_07d75626541a625eaf80ceeefd787a28 = L.marker(
+                [40.507, -3.559],
+                {
+}
+            ).addTo(marker_cluster_5247cf0514bdc6f28da6a4d0e1d9b80f);
+        
+    
+        var custom_icon_06820ab81dcc3baf0b4337c707f9faaf = L.icon({
+  "iconUrl": "data:image/png;base64,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",
+  "iconSize": [40, 40],
+});
+        marker_07d75626541a625eaf80ceeefd787a28.setIcon(custom_icon_06820ab81dcc3baf0b4337c707f9faaf);
+        
+    
+        var popup_be34c98ffa143ccc6e59b2d3a92a761a = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_2de90555a44b7707697a215faf8c9ae3 = $(`<div id="html_2de90555a44b7707697a215faf8c9ae3" style="width: 100.0%; height: 100.0%;">RUNWAY 4</div>`)[0];
+                popup_be34c98ffa143ccc6e59b2d3a92a761a.setContent(html_2de90555a44b7707697a215faf8c9ae3);
+            
+        
+
+        marker_07d75626541a625eaf80ceeefd787a28.bindPopup(popup_be34c98ffa143ccc6e59b2d3a92a761a)
+        ;
+
+        
+    
+    
+            marker_cluster_5247cf0514bdc6f28da6a4d0e1d9b80f.addTo(map_e2b4e5c8fe03df530044c3da455330ac);
+        
+    
+            var feature_group_89a2bff4f51fee91c94f82dd9097f284 = L.featureGroup(
+                {
+}
+            );
+        
+    
+        function geo_json_e12a6b1bd95e7b18ae608adb285018ad_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "black", "fillColor": "black", "fillOpacity": 0.5, "weight": 2};
+            }
+        }
+        function geo_json_e12a6b1bd95e7b18ae608adb285018ad_highlighter(feature) {
+            switch(feature.id) {
+                default:
+                    return {"fillOpacity": 0.75};
+            }
+        }
+        function geo_json_e12a6b1bd95e7b18ae608adb285018ad_pointToLayer(feature, latlng) {
+            var opts = {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3};
+            
+            let style = geo_json_e12a6b1bd95e7b18ae608adb285018ad_styler(feature)
+            Object.assign(opts, style)
+            
+            return new L.CircleMarker(latlng, opts)
+        }
+
+        function geo_json_e12a6b1bd95e7b18ae608adb285018ad_onEachFeature(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                            geo_json_e12a6b1bd95e7b18ae608adb285018ad.resetStyle(e.target);
+                    }
+                },
+                mouseover: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                        const highlightStyle = geo_json_e12a6b1bd95e7b18ae608adb285018ad_highlighter(e.target.feature)
+                        e.target.setStyle(highlightStyle);
+                    }
+                },
+            });
+        };
+        var geo_json_e12a6b1bd95e7b18ae608adb285018ad = L.geoJson(null, {
+                onEachFeature: geo_json_e12a6b1bd95e7b18ae608adb285018ad_onEachFeature,
+            
+                style: geo_json_e12a6b1bd95e7b18ae608adb285018ad_styler,
+                pointToLayer: geo_json_e12a6b1bd95e7b18ae608adb285018ad_pointToLayer,
+            ...{
+}
+        });
+
+        function geo_json_e12a6b1bd95e7b18ae608adb285018ad_add (data) {
+            geo_json_e12a6b1bd95e7b18ae608adb285018ad
+                .addData(data);
+        }
+            geo_json_e12a6b1bd95e7b18ae608adb285018ad_add({"bbox": [-7.269127887228261, 39.18663024902344, -3.574614091352983, 40.49844515525688], "features": [{"bbox": [-7.269127887228261, 39.18663024902344, -3.574614091352983, 40.49844515525688], "geometry": {"coordinates": [[-3.574614091352983, 40.49844515525688], [-7.269127887228261, 39.18663024902344]], "type": "LineString"}, "id": "0", "properties": {"Callsign": "AEA023__", "Flight status": "airborne", "ICAO": "347604", "TurbulenceCategory": "Heavy (larger than 136000 kg)", "__folium_color": "black", "prev_t": "2024-12-01 01:50:51.492", "t": "2024-12-01 02:23:01.054"}, "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+    geo_json_e12a6b1bd95e7b18ae608adb285018ad.bindTooltip(
+    function(layer){
+    let div = L.DomUtil.create('div');
+    
+    let handleObject = feature=>typeof(feature)=='object' ? JSON.stringify(feature) : feature;
+    let fields = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let aliases = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let table = '<table>' +
+        String(
+        fields.map(
+        (v,i)=>
+        `<tr>
+            <th>${aliases[i]}</th>
+            
+            <td>${handleObject(layer.feature.properties[v])}</td>
+        </tr>`).join(''))
+    +'</table>';
+    div.innerHTML=table;
+    
+    return div
+    }
+    ,{
+  "sticky": true,
+  "className": "foliumtooltip",
+});
+                     
+    
+            geo_json_e12a6b1bd95e7b18ae608adb285018ad.addTo(feature_group_89a2bff4f51fee91c94f82dd9097f284);
+        
+    
+            var circle_0409d652bf23ed420c6b29164c4e315a = L.circle(
+                [39.18663024902344, -7.269127887228261],
+                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "black", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 0.5, "radius": 120, "stroke": true, "weight": 3}
+            ).addTo(feature_group_89a2bff4f51fee91c94f82dd9097f284);
+        
+    
+        function geo_json_7ca2583e12343901d71ac7ea6fe78491_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "black", "fillColor": "black", "fillOpacity": 0.5, "weight": 2};
+            }
+        }
+        function geo_json_7ca2583e12343901d71ac7ea6fe78491_highlighter(feature) {
+            switch(feature.id) {
+                default:
+                    return {"fillOpacity": 0.75};
+            }
+        }
+        function geo_json_7ca2583e12343901d71ac7ea6fe78491_pointToLayer(feature, latlng) {
+            var opts = {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3};
+            
+            let style = geo_json_7ca2583e12343901d71ac7ea6fe78491_styler(feature)
+            Object.assign(opts, style)
+            
+            return new L.CircleMarker(latlng, opts)
+        }
+
+        function geo_json_7ca2583e12343901d71ac7ea6fe78491_onEachFeature(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                            geo_json_7ca2583e12343901d71ac7ea6fe78491.resetStyle(e.target);
+                    }
+                },
+                mouseover: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                        const highlightStyle = geo_json_7ca2583e12343901d71ac7ea6fe78491_highlighter(e.target.feature)
+                        e.target.setStyle(highlightStyle);
+                    }
+                },
+            });
+        };
+        var geo_json_7ca2583e12343901d71ac7ea6fe78491 = L.geoJson(null, {
+                onEachFeature: geo_json_7ca2583e12343901d71ac7ea6fe78491_onEachFeature,
+            
+                style: geo_json_7ca2583e12343901d71ac7ea6fe78491_styler,
+                pointToLayer: geo_json_7ca2583e12343901d71ac7ea6fe78491_pointToLayer,
+            ...{
+}
+        });
+
+        function geo_json_7ca2583e12343901d71ac7ea6fe78491_add (data) {
+            geo_json_7ca2583e12343901d71ac7ea6fe78491
+                .addData(data);
+        }
+            geo_json_7ca2583e12343901d71ac7ea6fe78491_add({"bbox": [-3.59136962890625, 40.49908447265625, -3.59136961890625, 40.49908448265625], "features": [{"bbox": [-3.59136962890625, 40.49908447265625, -3.59136961890625, 40.49908448265625], "geometry": {"coordinates": [[-3.59136962890625, 40.49908447265625], [-3.59136961890625, 40.49908448265625]], "type": "LineString"}, "id": "0", "properties": {"Callsign": "ANE82FC_", "Flight status": "airborne", "ICAO": "343650", "TurbulenceCategory": "Heavy (larger than 136000 kg)", "__folium_color": "black", "prev_t": "2024-12-01 01:28:56.840", "t": "2024-12-01 02:02:55.097"}, "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+    geo_json_7ca2583e12343901d71ac7ea6fe78491.bindTooltip(
+    function(layer){
+    let div = L.DomUtil.create('div');
+    
+    let handleObject = feature=>typeof(feature)=='object' ? JSON.stringify(feature) : feature;
+    let fields = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let aliases = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let table = '<table>' +
+        String(
+        fields.map(
+        (v,i)=>
+        `<tr>
+            <th>${aliases[i]}</th>
+            
+            <td>${handleObject(layer.feature.properties[v])}</td>
+        </tr>`).join(''))
+    +'</table>';
+    div.innerHTML=table;
+    
+    return div
+    }
+    ,{
+  "sticky": true,
+  "className": "foliumtooltip",
+});
+                     
+    
+            geo_json_7ca2583e12343901d71ac7ea6fe78491.addTo(feature_group_89a2bff4f51fee91c94f82dd9097f284);
+        
+    
+            var circle_16e0a022f399a11e70760dae2f39edbf = L.circle(
+                [40.49908447265625, -3.59136962890625],
+                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "black", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 0.5, "radius": 120, "stroke": true, "weight": 3}
+            ).addTo(feature_group_89a2bff4f51fee91c94f82dd9097f284);
+        
+    
+        function geo_json_efd54284ac8193952fb28bdc13a1c0fa_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "magenta", "fillColor": "magenta", "fillOpacity": 0.5, "weight": 2};
+            }
+        }
+        function geo_json_efd54284ac8193952fb28bdc13a1c0fa_highlighter(feature) {
+            switch(feature.id) {
+                default:
+                    return {"fillOpacity": 0.75};
+            }
+        }
+        function geo_json_efd54284ac8193952fb28bdc13a1c0fa_pointToLayer(feature, latlng) {
+            var opts = {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3};
+            
+            let style = geo_json_efd54284ac8193952fb28bdc13a1c0fa_styler(feature)
+            Object.assign(opts, style)
+            
+            return new L.CircleMarker(latlng, opts)
+        }
+
+        function geo_json_efd54284ac8193952fb28bdc13a1c0fa_onEachFeature(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                            geo_json_efd54284ac8193952fb28bdc13a1c0fa.resetStyle(e.target);
+                    }
+                },
+                mouseover: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                        const highlightStyle = geo_json_efd54284ac8193952fb28bdc13a1c0fa_highlighter(e.target.feature)
+                        e.target.setStyle(highlightStyle);
+                    }
+                },
+            });
+        };
+        var geo_json_efd54284ac8193952fb28bdc13a1c0fa = L.geoJson(null, {
+                onEachFeature: geo_json_efd54284ac8193952fb28bdc13a1c0fa_onEachFeature,
+            
+                style: geo_json_efd54284ac8193952fb28bdc13a1c0fa_styler,
+                pointToLayer: geo_json_efd54284ac8193952fb28bdc13a1c0fa_pointToLayer,
+            ...{
+}
+        });
+
+        function geo_json_efd54284ac8193952fb28bdc13a1c0fa_add (data) {
+            geo_json_efd54284ac8193952fb28bdc13a1c0fa
+                .addData(data);
+        }
+            geo_json_efd54284ac8193952fb28bdc13a1c0fa_add({"bbox": [-7.1858348017153535, 39.532745361328125, -3.57464599609375, 40.49766540527344], "features": [{"bbox": [-7.1858348017153535, 39.532745361328125, -3.57464599609375, 40.49766540527344], "geometry": {"coordinates": [[-3.57464599609375, 40.49766540527344], [-7.1858348017153535, 39.532745361328125]], "type": "LineString"}, "id": "0", "properties": {"Callsign": "LPE2485_", "Flight status": "airborne", "ICAO": "E8044F", "TurbulenceCategory": "High vortex aircraft", "__folium_color": "magenta", "prev_t": "2024-12-01 01:00:59.134", "t": "2024-12-01 01:30:41.444"}, "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+    geo_json_efd54284ac8193952fb28bdc13a1c0fa.bindTooltip(
+    function(layer){
+    let div = L.DomUtil.create('div');
+    
+    let handleObject = feature=>typeof(feature)=='object' ? JSON.stringify(feature) : feature;
+    let fields = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let aliases = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let table = '<table>' +
+        String(
+        fields.map(
+        (v,i)=>
+        `<tr>
+            <th>${aliases[i]}</th>
+            
+            <td>${handleObject(layer.feature.properties[v])}</td>
+        </tr>`).join(''))
+    +'</table>';
+    div.innerHTML=table;
+    
+    return div
+    }
+    ,{
+  "sticky": true,
+  "className": "foliumtooltip",
+});
+                     
+    
+            geo_json_efd54284ac8193952fb28bdc13a1c0fa.addTo(feature_group_89a2bff4f51fee91c94f82dd9097f284);
+        
+    
+            var circle_05b1cacaad2b55dfcf2e43421fb85cf4 = L.circle(
+                [39.532745361328125, -7.1858348017153535],
+                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "magenta", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 0.5, "radius": 120, "stroke": true, "weight": 3}
+            ).addTo(feature_group_89a2bff4f51fee91c94f82dd9097f284);
+        
+    
+            feature_group_89a2bff4f51fee91c94f82dd9097f284.addTo(map_e2b4e5c8fe03df530044c3da455330ac);
+        
+    
+            var feature_group_82950aa792dd7d3474c56c2237c6690a = L.featureGroup(
+                {
+}
+            );
+        
+    
+        function geo_json_ba04572ed7a68a8634d84ae7f2fdf1c5_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "black", "fillColor": "black", "fillOpacity": 0.5, "weight": 2};
+            }
+        }
+        function geo_json_ba04572ed7a68a8634d84ae7f2fdf1c5_highlighter(feature) {
+            switch(feature.id) {
+                default:
+                    return {"fillOpacity": 0.75};
+            }
+        }
+        function geo_json_ba04572ed7a68a8634d84ae7f2fdf1c5_pointToLayer(feature, latlng) {
+            var opts = {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3};
+            
+            let style = geo_json_ba04572ed7a68a8634d84ae7f2fdf1c5_styler(feature)
+            Object.assign(opts, style)
+            
+            return new L.CircleMarker(latlng, opts)
+        }
+
+        function geo_json_ba04572ed7a68a8634d84ae7f2fdf1c5_onEachFeature(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                            geo_json_ba04572ed7a68a8634d84ae7f2fdf1c5.resetStyle(e.target);
+                    }
+                },
+                mouseover: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                        const highlightStyle = geo_json_ba04572ed7a68a8634d84ae7f2fdf1c5_highlighter(e.target.feature)
+                        e.target.setStyle(highlightStyle);
+                    }
+                },
+            });
+        };
+        var geo_json_ba04572ed7a68a8634d84ae7f2fdf1c5 = L.geoJson(null, {
+                onEachFeature: geo_json_ba04572ed7a68a8634d84ae7f2fdf1c5_onEachFeature,
+            
+                style: geo_json_ba04572ed7a68a8634d84ae7f2fdf1c5_styler,
+                pointToLayer: geo_json_ba04572ed7a68a8634d84ae7f2fdf1c5_pointToLayer,
+            ...{
+}
+        });
+
+        function geo_json_ba04572ed7a68a8634d84ae7f2fdf1c5_add (data) {
+            geo_json_ba04572ed7a68a8634d84ae7f2fdf1c5
+                .addData(data);
+        }
+            geo_json_ba04572ed7a68a8634d84ae7f2fdf1c5_add({"bbox": [-3.548459139737216, 39.995086669921875, -1.69189453125, 40.48568984209481], "features": [{"bbox": [-3.548459139737216, 39.995086669921875, -1.69189453125, 40.48568984209481], "geometry": {"coordinates": [[-1.69189453125, 39.995086669921875], [-3.548459139737216, 40.48568984209481]], "type": "LineString"}, "id": "0", "properties": {"Callsign": "AZG997__", "Flight status": "airborne", "ICAO": "4246A3", "TurbulenceCategory": "Heavy (larger than 136000 kg)", "__folium_color": "black", "prev_t": "2024-12-01 01:42:30.143", "t": "2024-12-01 02:01:31.199"}, "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+    geo_json_ba04572ed7a68a8634d84ae7f2fdf1c5.bindTooltip(
+    function(layer){
+    let div = L.DomUtil.create('div');
+    
+    let handleObject = feature=>typeof(feature)=='object' ? JSON.stringify(feature) : feature;
+    let fields = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let aliases = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let table = '<table>' +
+        String(
+        fields.map(
+        (v,i)=>
+        `<tr>
+            <th>${aliases[i]}</th>
+            
+            <td>${handleObject(layer.feature.properties[v])}</td>
+        </tr>`).join(''))
+    +'</table>';
+    div.innerHTML=table;
+    
+    return div
+    }
+    ,{
+  "sticky": true,
+  "className": "foliumtooltip",
+});
+                     
+    
+            geo_json_ba04572ed7a68a8634d84ae7f2fdf1c5.addTo(feature_group_82950aa792dd7d3474c56c2237c6690a);
+        
+    
+            var circle_7a61e1e3874b4b05a93cdfb927ad7903 = L.circle(
+                [40.48568984209481, -3.548459139737216],
+                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "black", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 0.5, "radius": 120, "stroke": true, "weight": 3}
+            ).addTo(feature_group_82950aa792dd7d3474c56c2237c6690a);
+        
+    
+        function geo_json_1ac8ec05841b1c9cd2ea476ecf3142fd_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "lightgreen", "fillColor": "lightgreen", "fillOpacity": 0.5, "weight": 2};
+            }
+        }
+        function geo_json_1ac8ec05841b1c9cd2ea476ecf3142fd_highlighter(feature) {
+            switch(feature.id) {
+                default:
+                    return {"fillOpacity": 0.75};
+            }
+        }
+        function geo_json_1ac8ec05841b1c9cd2ea476ecf3142fd_pointToLayer(feature, latlng) {
+            var opts = {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3};
+            
+            let style = geo_json_1ac8ec05841b1c9cd2ea476ecf3142fd_styler(feature)
+            Object.assign(opts, style)
+            
+            return new L.CircleMarker(latlng, opts)
+        }
+
+        function geo_json_1ac8ec05841b1c9cd2ea476ecf3142fd_onEachFeature(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                            geo_json_1ac8ec05841b1c9cd2ea476ecf3142fd.resetStyle(e.target);
+                    }
+                },
+                mouseover: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                        const highlightStyle = geo_json_1ac8ec05841b1c9cd2ea476ecf3142fd_highlighter(e.target.feature)
+                        e.target.setStyle(highlightStyle);
+                    }
+                },
+            });
+        };
+        var geo_json_1ac8ec05841b1c9cd2ea476ecf3142fd = L.geoJson(null, {
+                onEachFeature: geo_json_1ac8ec05841b1c9cd2ea476ecf3142fd_onEachFeature,
+            
+                style: geo_json_1ac8ec05841b1c9cd2ea476ecf3142fd_styler,
+                pointToLayer: geo_json_1ac8ec05841b1c9cd2ea476ecf3142fd_pointToLayer,
+            ...{
+}
+        });
+
+        function geo_json_1ac8ec05841b1c9cd2ea476ecf3142fd_add (data) {
+            geo_json_1ac8ec05841b1c9cd2ea476ecf3142fd
+                .addData(data);
+        }
+            geo_json_1ac8ec05841b1c9cd2ea476ecf3142fd_add({"bbox": [-3.54473876953125, 40.48200988769531, -1.8027159225109013, 42.58421817068326], "features": [{"bbox": [-3.54473876953125, 40.48200988769531, -1.8027159225109013, 42.58421817068326], "geometry": {"coordinates": [[-1.8027159225109013, 42.58421817068326], [-3.54473876953125, 40.48200988769531]], "type": "LineString"}, "id": "0", "properties": {"Callsign": "CAO3151_", "Flight status": "airborne", "ICAO": "780C5B", "TurbulenceCategory": "Light (less than 7000 kg)", "__folium_color": "lightgreen", "prev_t": "2024-12-01 01:47:48.113", "t": "2024-12-01 02:19:11.327"}, "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+    geo_json_1ac8ec05841b1c9cd2ea476ecf3142fd.bindTooltip(
+    function(layer){
+    let div = L.DomUtil.create('div');
+    
+    let handleObject = feature=>typeof(feature)=='object' ? JSON.stringify(feature) : feature;
+    let fields = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let aliases = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let table = '<table>' +
+        String(
+        fields.map(
+        (v,i)=>
+        `<tr>
+            <th>${aliases[i]}</th>
+            
+            <td>${handleObject(layer.feature.properties[v])}</td>
+        </tr>`).join(''))
+    +'</table>';
+    div.innerHTML=table;
+    
+    return div
+    }
+    ,{
+  "sticky": true,
+  "className": "foliumtooltip",
+});
+                     
+    
+            geo_json_1ac8ec05841b1c9cd2ea476ecf3142fd.addTo(feature_group_82950aa792dd7d3474c56c2237c6690a);
+        
+    
+            var circle_325f01258742bb8cc4f6369e54adfbb6 = L.circle(
+                [40.48200988769531, -3.54473876953125],
+                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "lightgreen", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 0.5, "radius": 120, "stroke": true, "weight": 3}
+            ).addTo(feature_group_82950aa792dd7d3474c56c2237c6690a);
+        
+    
+        function geo_json_6ceace2177754e6c1c4124fb94bb5354_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "magenta", "fillColor": "magenta", "fillOpacity": 0.5, "weight": 2};
+            }
+        }
+        function geo_json_6ceace2177754e6c1c4124fb94bb5354_highlighter(feature) {
+            switch(feature.id) {
+                default:
+                    return {"fillOpacity": 0.75};
+            }
+        }
+        function geo_json_6ceace2177754e6c1c4124fb94bb5354_pointToLayer(feature, latlng) {
+            var opts = {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3};
+            
+            let style = geo_json_6ceace2177754e6c1c4124fb94bb5354_styler(feature)
+            Object.assign(opts, style)
+            
+            return new L.CircleMarker(latlng, opts)
+        }
+
+        function geo_json_6ceace2177754e6c1c4124fb94bb5354_onEachFeature(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                            geo_json_6ceace2177754e6c1c4124fb94bb5354.resetStyle(e.target);
+                    }
+                },
+                mouseover: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                        const highlightStyle = geo_json_6ceace2177754e6c1c4124fb94bb5354_highlighter(e.target.feature)
+                        e.target.setStyle(highlightStyle);
+                    }
+                },
+            });
+        };
+        var geo_json_6ceace2177754e6c1c4124fb94bb5354 = L.geoJson(null, {
+                onEachFeature: geo_json_6ceace2177754e6c1c4124fb94bb5354_onEachFeature,
+            
+                style: geo_json_6ceace2177754e6c1c4124fb94bb5354_styler,
+                pointToLayer: geo_json_6ceace2177754e6c1c4124fb94bb5354_pointToLayer,
+            ...{
+}
+        });
+
+        function geo_json_6ceace2177754e6c1c4124fb94bb5354_add (data) {
+            geo_json_6ceace2177754e6c1c4124fb94bb5354
+                .addData(data);
+        }
+            geo_json_6ceace2177754e6c1c4124fb94bb5354_add({"bbox": [-5.6995849609375, 38.52923894332627, -3.5462646484375, 40.4835205078125], "features": [{"bbox": [-5.6995849609375, 38.52923894332627, -3.5462646484375, 40.4835205078125], "geometry": {"coordinates": [[-5.6995849609375, 38.52923894332627], [-3.5462646484375, 40.4835205078125]], "type": "LineString"}, "id": "0", "properties": {"Callsign": "IBS16SU_", "Flight status": "airborne", "ICAO": "34754C", "TurbulenceCategory": "High vortex aircraft", "__folium_color": "magenta", "prev_t": "2024-12-01 01:49:50.780", "t": "2024-12-01 02:15:11"}, "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+    geo_json_6ceace2177754e6c1c4124fb94bb5354.bindTooltip(
+    function(layer){
+    let div = L.DomUtil.create('div');
+    
+    let handleObject = feature=>typeof(feature)=='object' ? JSON.stringify(feature) : feature;
+    let fields = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let aliases = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let table = '<table>' +
+        String(
+        fields.map(
+        (v,i)=>
+        `<tr>
+            <th>${aliases[i]}</th>
+            
+            <td>${handleObject(layer.feature.properties[v])}</td>
+        </tr>`).join(''))
+    +'</table>';
+    div.innerHTML=table;
+    
+    return div
+    }
+    ,{
+  "sticky": true,
+  "className": "foliumtooltip",
+});
+                     
+    
+            geo_json_6ceace2177754e6c1c4124fb94bb5354.addTo(feature_group_82950aa792dd7d3474c56c2237c6690a);
+        
+    
+            var circle_6ee80186c56266ee01c51cd546395a8a = L.circle(
+                [40.4835205078125, -3.5462646484375],
+                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "magenta", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 0.5, "radius": 120, "stroke": true, "weight": 3}
+            ).addTo(feature_group_82950aa792dd7d3474c56c2237c6690a);
+        
+    
+        function geo_json_0b697a449fe0254e1d04d3fdaf2739e3_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "lightblue", "fillColor": "lightblue", "fillOpacity": 0.5, "weight": 2};
+            }
+        }
+        function geo_json_0b697a449fe0254e1d04d3fdaf2739e3_highlighter(feature) {
+            switch(feature.id) {
+                default:
+                    return {"fillOpacity": 0.75};
+            }
+        }
+        function geo_json_0b697a449fe0254e1d04d3fdaf2739e3_pointToLayer(feature, latlng) {
+            var opts = {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3};
+            
+            let style = geo_json_0b697a449fe0254e1d04d3fdaf2739e3_styler(feature)
+            Object.assign(opts, style)
+            
+            return new L.CircleMarker(latlng, opts)
+        }
+
+        function geo_json_0b697a449fe0254e1d04d3fdaf2739e3_onEachFeature(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                            geo_json_0b697a449fe0254e1d04d3fdaf2739e3.resetStyle(e.target);
+                    }
+                },
+                mouseover: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                        const highlightStyle = geo_json_0b697a449fe0254e1d04d3fdaf2739e3_highlighter(e.target.feature)
+                        e.target.setStyle(highlightStyle);
+                    }
+                },
+            });
+        };
+        var geo_json_0b697a449fe0254e1d04d3fdaf2739e3 = L.geoJson(null, {
+                onEachFeature: geo_json_0b697a449fe0254e1d04d3fdaf2739e3_onEachFeature,
+            
+                style: geo_json_0b697a449fe0254e1d04d3fdaf2739e3_styler,
+                pointToLayer: geo_json_0b697a449fe0254e1d04d3fdaf2739e3_pointToLayer,
+            ...{
+}
+        });
+
+        function geo_json_0b697a449fe0254e1d04d3fdaf2739e3_add (data) {
+            geo_json_0b697a449fe0254e1d04d3fdaf2739e3
+                .addData(data);
+        }
+            geo_json_0b697a449fe0254e1d04d3fdaf2739e3_add({"bbox": [-3.544776222922585, 40.48205876754502, -0.8249109441583806, 40.83948684951006], "features": [{"bbox": [-3.544776222922585, 40.48205876754502, -0.8249109441583806, 40.83948684951006], "geometry": {"coordinates": [[-0.8249109441583806, 40.83948684951006], [-3.544776222922585, 40.48205876754502]], "type": "LineString"}, "id": "0", "properties": {"Callsign": "RYR33FZ_", "Flight status": "airborne", "ICAO": "4CAE67", "TurbulenceCategory": "Medium 1 (between 7000 kg and 34000 kg)", "__folium_color": "lightblue", "prev_t": "2024-12-01 01:07:15.811", "t": "2024-12-01 01:34:22.220"}, "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+    geo_json_0b697a449fe0254e1d04d3fdaf2739e3.bindTooltip(
+    function(layer){
+    let div = L.DomUtil.create('div');
+    
+    let handleObject = feature=>typeof(feature)=='object' ? JSON.stringify(feature) : feature;
+    let fields = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let aliases = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let table = '<table>' +
+        String(
+        fields.map(
+        (v,i)=>
+        `<tr>
+            <th>${aliases[i]}</th>
+            
+            <td>${handleObject(layer.feature.properties[v])}</td>
+        </tr>`).join(''))
+    +'</table>';
+    div.innerHTML=table;
+    
+    return div
+    }
+    ,{
+  "sticky": true,
+  "className": "foliumtooltip",
+});
+                     
+    
+            geo_json_0b697a449fe0254e1d04d3fdaf2739e3.addTo(feature_group_82950aa792dd7d3474c56c2237c6690a);
+        
+    
+            var circle_5585c2e54deb1def031caa81f63aaf19 = L.circle(
+                [40.48205876754502, -3.544776222922585],
+                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "lightblue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 0.5, "radius": 120, "stroke": true, "weight": 3}
+            ).addTo(feature_group_82950aa792dd7d3474c56c2237c6690a);
+        
+    
+        function geo_json_620a9297b82f7d60e8db08f28367c78d_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "black", "fillColor": "black", "fillOpacity": 0.5, "weight": 2};
+            }
+        }
+        function geo_json_620a9297b82f7d60e8db08f28367c78d_highlighter(feature) {
+            switch(feature.id) {
+                default:
+                    return {"fillOpacity": 0.75};
+            }
+        }
+        function geo_json_620a9297b82f7d60e8db08f28367c78d_pointToLayer(feature, latlng) {
+            var opts = {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3};
+            
+            let style = geo_json_620a9297b82f7d60e8db08f28367c78d_styler(feature)
+            Object.assign(opts, style)
+            
+            return new L.CircleMarker(latlng, opts)
+        }
+
+        function geo_json_620a9297b82f7d60e8db08f28367c78d_onEachFeature(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                            geo_json_620a9297b82f7d60e8db08f28367c78d.resetStyle(e.target);
+                    }
+                },
+                mouseover: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                        const highlightStyle = geo_json_620a9297b82f7d60e8db08f28367c78d_highlighter(e.target.feature)
+                        e.target.setStyle(highlightStyle);
+                    }
+                },
+            });
+        };
+        var geo_json_620a9297b82f7d60e8db08f28367c78d = L.geoJson(null, {
+                onEachFeature: geo_json_620a9297b82f7d60e8db08f28367c78d_onEachFeature,
+            
+                style: geo_json_620a9297b82f7d60e8db08f28367c78d_styler,
+                pointToLayer: geo_json_620a9297b82f7d60e8db08f28367c78d_pointToLayer,
+            ...{
+}
+        });
+
+        function geo_json_620a9297b82f7d60e8db08f28367c78d_add (data) {
+            geo_json_620a9297b82f7d60e8db08f28367c78d
+                .addData(data);
+        }
+            geo_json_620a9297b82f7d60e8db08f28367c78d_add({"bbox": [-3.546630859375, 40.48388671875, -1.5868377685546875, 40.61771198854608], "features": [{"bbox": [-3.546630859375, 40.48388671875, -1.5868377685546875, 40.61771198854608], "geometry": {"coordinates": [[-1.5868377685546875, 40.61771198854608], [-3.546630859375, 40.48388671875]], "type": "LineString"}, "id": "0", "properties": {"Callsign": "UAE9977_", "Flight status": "airborne", "ICAO": "896614", "TurbulenceCategory": "Heavy (larger than 136000 kg)", "__folium_color": "black", "prev_t": "2024-12-01 01:07:56.570", "t": "2024-12-01 01:28:40.039"}, "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+    geo_json_620a9297b82f7d60e8db08f28367c78d.bindTooltip(
+    function(layer){
+    let div = L.DomUtil.create('div');
+    
+    let handleObject = feature=>typeof(feature)=='object' ? JSON.stringify(feature) : feature;
+    let fields = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let aliases = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let table = '<table>' +
+        String(
+        fields.map(
+        (v,i)=>
+        `<tr>
+            <th>${aliases[i]}</th>
+            
+            <td>${handleObject(layer.feature.properties[v])}</td>
+        </tr>`).join(''))
+    +'</table>';
+    div.innerHTML=table;
+    
+    return div
+    }
+    ,{
+  "sticky": true,
+  "className": "foliumtooltip",
+});
+                     
+    
+            geo_json_620a9297b82f7d60e8db08f28367c78d.addTo(feature_group_82950aa792dd7d3474c56c2237c6690a);
+        
+    
+            var circle_201449979aa7550d4ed144bc2af0cea9 = L.circle(
+                [40.48388671875, -3.546630859375],
+                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "black", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 0.5, "radius": 120, "stroke": true, "weight": 3}
+            ).addTo(feature_group_82950aa792dd7d3474c56c2237c6690a);
+        
+    
+            feature_group_82950aa792dd7d3474c56c2237c6690a.addTo(map_e2b4e5c8fe03df530044c3da455330ac);
+        
+    
+            var feature_group_80c99262a582949caddc220673617266 = L.featureGroup(
+                {
+}
+            );
+        
+    
+        function geo_json_8e4dcd45c4c71db866945402da79b3ae_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "lime", "fillColor": "lime", "fillOpacity": 0.5, "weight": 2};
+            }
+        }
+        function geo_json_8e4dcd45c4c71db866945402da79b3ae_highlighter(feature) {
+            switch(feature.id) {
+                default:
+                    return {"fillOpacity": 0.75};
+            }
+        }
+        function geo_json_8e4dcd45c4c71db866945402da79b3ae_pointToLayer(feature, latlng) {
+            var opts = {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3};
+            
+            let style = geo_json_8e4dcd45c4c71db866945402da79b3ae_styler(feature)
+            Object.assign(opts, style)
+            
+            return new L.CircleMarker(latlng, opts)
+        }
+
+        function geo_json_8e4dcd45c4c71db866945402da79b3ae_onEachFeature(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                            geo_json_8e4dcd45c4c71db866945402da79b3ae.resetStyle(e.target);
+                    }
+                },
+                mouseover: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                        const highlightStyle = geo_json_8e4dcd45c4c71db866945402da79b3ae_highlighter(e.target.feature)
+                        e.target.setStyle(highlightStyle);
+                    }
+                },
+            });
+        };
+        var geo_json_8e4dcd45c4c71db866945402da79b3ae = L.geoJson(null, {
+                onEachFeature: geo_json_8e4dcd45c4c71db866945402da79b3ae_onEachFeature,
+            
+                style: geo_json_8e4dcd45c4c71db866945402da79b3ae_styler,
+                pointToLayer: geo_json_8e4dcd45c4c71db866945402da79b3ae_pointToLayer,
+            ...{
+}
+        });
+
+        function geo_json_8e4dcd45c4c71db866945402da79b3ae_add (data) {
+            geo_json_8e4dcd45c4c71db866945402da79b3ae
+                .addData(data);
+        }
+            geo_json_8e4dcd45c4c71db866945402da79b3ae_add({"bbox": [-1.9723580100319602, 41.91764831542969, -0.4411385276100852, 42.26426696777344], "features": [{"bbox": [-1.9723580100319602, 41.91764831542969, -0.4411385276100852, 42.26426696777344], "geometry": {"coordinates": [[-1.9723580100319602, 42.26426696777344], [-0.4411385276100852, 41.91764831542969]], "type": "LineString"}, "id": "0", "properties": {"Callsign": "ANE3016_", "Flight status": "airborne", "ICAO": "344213", "TurbulenceCategory": "Medium 2 (between 34000 kg to 136000 kg)", "__folium_color": "lime", "prev_t": "2024-12-01 01:00:01.940", "t": "2024-12-01 01:09:17.924"}, "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+    geo_json_8e4dcd45c4c71db866945402da79b3ae.bindTooltip(
+    function(layer){
+    let div = L.DomUtil.create('div');
+    
+    let handleObject = feature=>typeof(feature)=='object' ? JSON.stringify(feature) : feature;
+    let fields = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let aliases = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let table = '<table>' +
+        String(
+        fields.map(
+        (v,i)=>
+        `<tr>
+            <th>${aliases[i]}</th>
+            
+            <td>${handleObject(layer.feature.properties[v])}</td>
+        </tr>`).join(''))
+    +'</table>';
+    div.innerHTML=table;
+    
+    return div
+    }
+    ,{
+  "sticky": true,
+  "className": "foliumtooltip",
+});
+                     
+    
+            geo_json_8e4dcd45c4c71db866945402da79b3ae.addTo(feature_group_80c99262a582949caddc220673617266);
+        
+    
+            var circle_b54e8e40d029ba3170ca874778fb2076 = L.circle(
+                [41.91764831542969, -0.4411385276100852],
+                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "lime", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 0.5, "radius": 120, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80c99262a582949caddc220673617266);
+        
+    
+        function geo_json_86f934ee1cc8d7571632dd4f2ffa2299_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "darkblue", "fillColor": "darkblue", "fillOpacity": 0.5, "weight": 2};
+            }
+        }
+        function geo_json_86f934ee1cc8d7571632dd4f2ffa2299_highlighter(feature) {
+            switch(feature.id) {
+                default:
+                    return {"fillOpacity": 0.75};
+            }
+        }
+        function geo_json_86f934ee1cc8d7571632dd4f2ffa2299_pointToLayer(feature, latlng) {
+            var opts = {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3};
+            
+            let style = geo_json_86f934ee1cc8d7571632dd4f2ffa2299_styler(feature)
+            Object.assign(opts, style)
+            
+            return new L.CircleMarker(latlng, opts)
+        }
+
+        function geo_json_86f934ee1cc8d7571632dd4f2ffa2299_onEachFeature(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                            geo_json_86f934ee1cc8d7571632dd4f2ffa2299.resetStyle(e.target);
+                    }
+                },
+                mouseover: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                        const highlightStyle = geo_json_86f934ee1cc8d7571632dd4f2ffa2299_highlighter(e.target.feature)
+                        e.target.setStyle(highlightStyle);
+                    }
+                },
+            });
+        };
+        var geo_json_86f934ee1cc8d7571632dd4f2ffa2299 = L.geoJson(null, {
+                onEachFeature: geo_json_86f934ee1cc8d7571632dd4f2ffa2299_onEachFeature,
+            
+                style: geo_json_86f934ee1cc8d7571632dd4f2ffa2299_styler,
+                pointToLayer: geo_json_86f934ee1cc8d7571632dd4f2ffa2299_pointToLayer,
+            ...{
+}
+        });
+
+        function geo_json_86f934ee1cc8d7571632dd4f2ffa2299_add (data) {
+            geo_json_86f934ee1cc8d7571632dd4f2ffa2299
+                .addData(data);
+        }
+            geo_json_86f934ee1cc8d7571632dd4f2ffa2299_add({"bbox": [-7.3612060546875, 39.33640819484904, -4.979617096656977, 42.7718702413268], "features": [{"bbox": [-7.3612060546875, 39.33640819484904, -4.979617096656977, 42.7718702413268], "geometry": {"coordinates": [[-7.3612060546875, 39.33640819484904], [-4.979617096656977, 42.7718702413268]], "type": "LineString"}, "id": "0", "properties": {"Callsign": "BIX231H_", "Flight status": "airborne", "ICAO": "4AC8E4", "TurbulenceCategory": "High performance (\u003e5 g acceleration) and high speed (\u003e400 kt)", "__folium_color": "darkblue", "prev_t": "2024-12-01 01:00:01.540", "t": "2024-12-01 01:29:48.188"}, "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+    geo_json_86f934ee1cc8d7571632dd4f2ffa2299.bindTooltip(
+    function(layer){
+    let div = L.DomUtil.create('div');
+    
+    let handleObject = feature=>typeof(feature)=='object' ? JSON.stringify(feature) : feature;
+    let fields = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let aliases = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let table = '<table>' +
+        String(
+        fields.map(
+        (v,i)=>
+        `<tr>
+            <th>${aliases[i]}</th>
+            
+            <td>${handleObject(layer.feature.properties[v])}</td>
+        </tr>`).join(''))
+    +'</table>';
+    div.innerHTML=table;
+    
+    return div
+    }
+    ,{
+  "sticky": true,
+  "className": "foliumtooltip",
+});
+                     
+    
+            geo_json_86f934ee1cc8d7571632dd4f2ffa2299.addTo(feature_group_80c99262a582949caddc220673617266);
+        
+    
+            var circle_0c657fe39f07ad4bce3176335608183d = L.circle(
+                [42.7718702413268, -4.979617096656977],
+                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "darkblue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 0.5, "radius": 120, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80c99262a582949caddc220673617266);
+        
+    
+        function geo_json_0d93aae26d29b19f3cd9c9bd54387400_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "lightgreen", "fillColor": "lightgreen", "fillOpacity": 0.5, "weight": 2};
+            }
+        }
+        function geo_json_0d93aae26d29b19f3cd9c9bd54387400_highlighter(feature) {
+            switch(feature.id) {
+                default:
+                    return {"fillOpacity": 0.75};
+            }
+        }
+        function geo_json_0d93aae26d29b19f3cd9c9bd54387400_pointToLayer(feature, latlng) {
+            var opts = {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3};
+            
+            let style = geo_json_0d93aae26d29b19f3cd9c9bd54387400_styler(feature)
+            Object.assign(opts, style)
+            
+            return new L.CircleMarker(latlng, opts)
+        }
+
+        function geo_json_0d93aae26d29b19f3cd9c9bd54387400_onEachFeature(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                            geo_json_0d93aae26d29b19f3cd9c9bd54387400.resetStyle(e.target);
+                    }
+                },
+                mouseover: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                        const highlightStyle = geo_json_0d93aae26d29b19f3cd9c9bd54387400_highlighter(e.target.feature)
+                        e.target.setStyle(highlightStyle);
+                    }
+                },
+            });
+        };
+        var geo_json_0d93aae26d29b19f3cd9c9bd54387400 = L.geoJson(null, {
+                onEachFeature: geo_json_0d93aae26d29b19f3cd9c9bd54387400_onEachFeature,
+            
+                style: geo_json_0d93aae26d29b19f3cd9c9bd54387400_styler,
+                pointToLayer: geo_json_0d93aae26d29b19f3cd9c9bd54387400_pointToLayer,
+            ...{
+}
+        });
+
+        function geo_json_0d93aae26d29b19f3cd9c9bd54387400_add (data) {
+            geo_json_0d93aae26d29b19f3cd9c9bd54387400
+                .addData(data);
+        }
+            geo_json_0d93aae26d29b19f3cd9c9bd54387400_add({"bbox": [-5.942292646928267, 41.10208802304025, -4.949468568313954, 42.73379051079184], "features": [{"bbox": [-5.942292646928267, 41.10208802304025, -4.949468568313954, 42.73379051079184], "geometry": {"coordinates": [[-5.942292646928267, 41.10208802304025], [-4.949468568313954, 42.73379051079184]], "type": "LineString"}, "id": "0", "properties": {"Callsign": "BTI2YM__", "Flight status": "airborne", "ICAO": "502D5E", "TurbulenceCategory": "Light (less than 7000 kg)", "__folium_color": "lightgreen", "prev_t": "2024-12-01 01:00:00.114", "t": "2024-12-01 01:14:00.927"}, "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+    geo_json_0d93aae26d29b19f3cd9c9bd54387400.bindTooltip(
+    function(layer){
+    let div = L.DomUtil.create('div');
+    
+    let handleObject = feature=>typeof(feature)=='object' ? JSON.stringify(feature) : feature;
+    let fields = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let aliases = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let table = '<table>' +
+        String(
+        fields.map(
+        (v,i)=>
+        `<tr>
+            <th>${aliases[i]}</th>
+            
+            <td>${handleObject(layer.feature.properties[v])}</td>
+        </tr>`).join(''))
+    +'</table>';
+    div.innerHTML=table;
+    
+    return div
+    }
+    ,{
+  "sticky": true,
+  "className": "foliumtooltip",
+});
+                     
+    
+            geo_json_0d93aae26d29b19f3cd9c9bd54387400.addTo(feature_group_80c99262a582949caddc220673617266);
+        
+    
+            var circle_5cc985ceedba2a1947e4d932894bec0c = L.circle(
+                [42.73379051079184, -4.949468568313954],
+                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "lightgreen", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 0.5, "radius": 120, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80c99262a582949caddc220673617266);
+        
+    
+        function geo_json_0ec121a3e2b578949c1b4e9d089e89da_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "darkblue", "fillColor": "darkblue", "fillOpacity": 0.5, "weight": 2};
+            }
+        }
+        function geo_json_0ec121a3e2b578949c1b4e9d089e89da_highlighter(feature) {
+            switch(feature.id) {
+                default:
+                    return {"fillOpacity": 0.75};
+            }
+        }
+        function geo_json_0ec121a3e2b578949c1b4e9d089e89da_pointToLayer(feature, latlng) {
+            var opts = {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3};
+            
+            let style = geo_json_0ec121a3e2b578949c1b4e9d089e89da_styler(feature)
+            Object.assign(opts, style)
+            
+            return new L.CircleMarker(latlng, opts)
+        }
+
+        function geo_json_0ec121a3e2b578949c1b4e9d089e89da_onEachFeature(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                            geo_json_0ec121a3e2b578949c1b4e9d089e89da.resetStyle(e.target);
+                    }
+                },
+                mouseover: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                        const highlightStyle = geo_json_0ec121a3e2b578949c1b4e9d089e89da_highlighter(e.target.feature)
+                        e.target.setStyle(highlightStyle);
+                    }
+                },
+            });
+        };
+        var geo_json_0ec121a3e2b578949c1b4e9d089e89da = L.geoJson(null, {
+                onEachFeature: geo_json_0ec121a3e2b578949c1b4e9d089e89da_onEachFeature,
+            
+                style: geo_json_0ec121a3e2b578949c1b4e9d089e89da_styler,
+                pointToLayer: geo_json_0ec121a3e2b578949c1b4e9d089e89da_pointToLayer,
+            ...{
+}
+        });
+
+        function geo_json_0ec121a3e2b578949c1b4e9d089e89da_add (data) {
+            geo_json_0ec121a3e2b578949c1b4e9d089e89da
+                .addData(data);
+        }
+            geo_json_0ec121a3e2b578949c1b4e9d089e89da_add({"bbox": [-2.255318381569602, 42.472320556640625, -1.5110033611918605, 42.59413379733845], "features": [{"bbox": [-2.255318381569602, 42.472320556640625, -1.5110033611918605, 42.59413379733845], "geometry": {"coordinates": [[-2.255318381569602, 42.472320556640625], [-1.5110033611918605, 42.59413379733845]], "type": "LineString"}, "id": "0", "properties": {"Callsign": "FIA812__", "Flight status": "airborne", "ICAO": "4A1922", "TurbulenceCategory": "High performance (\u003e5 g acceleration) and high speed (\u003e400 kt)", "__folium_color": "darkblue", "prev_t": "2024-12-01 01:00:00.122", "t": "2024-12-01 01:04:24.694"}, "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+    geo_json_0ec121a3e2b578949c1b4e9d089e89da.bindTooltip(
+    function(layer){
+    let div = L.DomUtil.create('div');
+    
+    let handleObject = feature=>typeof(feature)=='object' ? JSON.stringify(feature) : feature;
+    let fields = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let aliases = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let table = '<table>' +
+        String(
+        fields.map(
+        (v,i)=>
+        `<tr>
+            <th>${aliases[i]}</th>
+            
+            <td>${handleObject(layer.feature.properties[v])}</td>
+        </tr>`).join(''))
+    +'</table>';
+    div.innerHTML=table;
+    
+    return div
+    }
+    ,{
+  "sticky": true,
+  "className": "foliumtooltip",
+});
+                     
+    
+            geo_json_0ec121a3e2b578949c1b4e9d089e89da.addTo(feature_group_80c99262a582949caddc220673617266);
+        
+    
+            var circle_1180513f281a4b282c2e8e6c6ccfee87 = L.circle(
+                [42.59413379733845, -1.5110033611918605],
+                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "darkblue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 0.5, "radius": 120, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80c99262a582949caddc220673617266);
+        
+    
+        function geo_json_a6f00cf57ab2004dd50c492cd77410c3_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "lightblue", "fillColor": "lightblue", "fillOpacity": 0.5, "weight": 2};
+            }
+        }
+        function geo_json_a6f00cf57ab2004dd50c492cd77410c3_highlighter(feature) {
+            switch(feature.id) {
+                default:
+                    return {"fillOpacity": 0.75};
+            }
+        }
+        function geo_json_a6f00cf57ab2004dd50c492cd77410c3_pointToLayer(feature, latlng) {
+            var opts = {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3};
+            
+            let style = geo_json_a6f00cf57ab2004dd50c492cd77410c3_styler(feature)
+            Object.assign(opts, style)
+            
+            return new L.CircleMarker(latlng, opts)
+        }
+
+        function geo_json_a6f00cf57ab2004dd50c492cd77410c3_onEachFeature(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                            geo_json_a6f00cf57ab2004dd50c492cd77410c3.resetStyle(e.target);
+                    }
+                },
+                mouseover: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                        const highlightStyle = geo_json_a6f00cf57ab2004dd50c492cd77410c3_highlighter(e.target.feature)
+                        e.target.setStyle(highlightStyle);
+                    }
+                },
+            });
+        };
+        var geo_json_a6f00cf57ab2004dd50c492cd77410c3 = L.geoJson(null, {
+                onEachFeature: geo_json_a6f00cf57ab2004dd50c492cd77410c3_onEachFeature,
+            
+                style: geo_json_a6f00cf57ab2004dd50c492cd77410c3_styler,
+                pointToLayer: geo_json_a6f00cf57ab2004dd50c492cd77410c3_pointToLayer,
+            ...{
+}
+        });
+
+        function geo_json_a6f00cf57ab2004dd50c492cd77410c3_add (data) {
+            geo_json_a6f00cf57ab2004dd50c492cd77410c3
+                .addData(data);
+        }
+            geo_json_a6f00cf57ab2004dd50c492cd77410c3_add({"bbox": [-3.513893459154212, 38.97367858886719, -2.2195652553013394, 42.92102361129502], "features": [{"bbox": [-3.513893459154212, 38.97367858886719, -2.2195652553013394, 42.92102361129502], "geometry": {"coordinates": [[-3.513893459154212, 38.97367858886719], [-2.2195652553013394, 42.92102361129502]], "type": "LineString"}, "id": "0", "properties": {"Callsign": "FIN46N__", "Flight status": "airborne", "ICAO": "461F63", "TurbulenceCategory": "Medium 1 (between 7000 kg and 34000 kg)", "__folium_color": "lightblue", "prev_t": "2024-12-01 01:18:03.321", "t": "2024-12-01 01:49:23.764"}, "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+    geo_json_a6f00cf57ab2004dd50c492cd77410c3.bindTooltip(
+    function(layer){
+    let div = L.DomUtil.create('div');
+    
+    let handleObject = feature=>typeof(feature)=='object' ? JSON.stringify(feature) : feature;
+    let fields = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let aliases = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let table = '<table>' +
+        String(
+        fields.map(
+        (v,i)=>
+        `<tr>
+            <th>${aliases[i]}</th>
+            
+            <td>${handleObject(layer.feature.properties[v])}</td>
+        </tr>`).join(''))
+    +'</table>';
+    div.innerHTML=table;
+    
+    return div
+    }
+    ,{
+  "sticky": true,
+  "className": "foliumtooltip",
+});
+                     
+    
+            geo_json_a6f00cf57ab2004dd50c492cd77410c3.addTo(feature_group_80c99262a582949caddc220673617266);
+        
+    
+            var circle_b0c9a88919d8bda5f59b4eb92ed8e41d = L.circle(
+                [42.92102361129502, -2.2195652553013394],
+                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "lightblue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 0.5, "radius": 120, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80c99262a582949caddc220673617266);
+        
+    
+        function geo_json_dea96e8c517057de54f9a9de2b3389d8_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "magenta", "fillColor": "magenta", "fillOpacity": 0.5, "weight": 2};
+            }
+        }
+        function geo_json_dea96e8c517057de54f9a9de2b3389d8_highlighter(feature) {
+            switch(feature.id) {
+                default:
+                    return {"fillOpacity": 0.75};
+            }
+        }
+        function geo_json_dea96e8c517057de54f9a9de2b3389d8_pointToLayer(feature, latlng) {
+            var opts = {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3};
+            
+            let style = geo_json_dea96e8c517057de54f9a9de2b3389d8_styler(feature)
+            Object.assign(opts, style)
+            
+            return new L.CircleMarker(latlng, opts)
+        }
+
+        function geo_json_dea96e8c517057de54f9a9de2b3389d8_onEachFeature(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                            geo_json_dea96e8c517057de54f9a9de2b3389d8.resetStyle(e.target);
+                    }
+                },
+                mouseover: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                        const highlightStyle = geo_json_dea96e8c517057de54f9a9de2b3389d8_highlighter(e.target.feature)
+                        e.target.setStyle(highlightStyle);
+                    }
+                },
+            });
+        };
+        var geo_json_dea96e8c517057de54f9a9de2b3389d8 = L.geoJson(null, {
+                onEachFeature: geo_json_dea96e8c517057de54f9a9de2b3389d8_onEachFeature,
+            
+                style: geo_json_dea96e8c517057de54f9a9de2b3389d8_styler,
+                pointToLayer: geo_json_dea96e8c517057de54f9a9de2b3389d8_pointToLayer,
+            ...{
+}
+        });
+
+        function geo_json_dea96e8c517057de54f9a9de2b3389d8_add (data) {
+            geo_json_dea96e8c517057de54f9a9de2b3389d8
+                .addData(data);
+        }
+            geo_json_dea96e8c517057de54f9a9de2b3389d8_add({"bbox": [-7.3602427606997285, 39.145843505859375, -6.3372802734375, 39.56712108547404], "features": [{"bbox": [-7.3602427606997285, 39.145843505859375, -6.3372802734375, 39.56712108547404], "geometry": {"coordinates": [[-6.3372802734375, 39.56712108547404], [-7.3602427606997285, 39.145843505859375]], "type": "LineString"}, "id": "0", "properties": {"Callsign": "IBE0101_", "Flight status": "airborne", "ICAO": "34640E", "TurbulenceCategory": "High vortex aircraft", "__folium_color": "magenta", "prev_t": "2024-12-01 01:00:00.320", "t": "2024-12-01 01:07:00.516"}, "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+    geo_json_dea96e8c517057de54f9a9de2b3389d8.bindTooltip(
+    function(layer){
+    let div = L.DomUtil.create('div');
+    
+    let handleObject = feature=>typeof(feature)=='object' ? JSON.stringify(feature) : feature;
+    let fields = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let aliases = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let table = '<table>' +
+        String(
+        fields.map(
+        (v,i)=>
+        `<tr>
+            <th>${aliases[i]}</th>
+            
+            <td>${handleObject(layer.feature.properties[v])}</td>
+        </tr>`).join(''))
+    +'</table>';
+    div.innerHTML=table;
+    
+    return div
+    }
+    ,{
+  "sticky": true,
+  "className": "foliumtooltip",
+});
+                     
+    
+            geo_json_dea96e8c517057de54f9a9de2b3389d8.addTo(feature_group_80c99262a582949caddc220673617266);
+        
+    
+            var circle_41bd432cb908af9ab54af019f3d4cc03 = L.circle(
+                [39.145843505859375, -7.3602427606997285],
+                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "magenta", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 0.5, "radius": 120, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80c99262a582949caddc220673617266);
+        
+    
+        function geo_json_201d41c96761f101e2e88b5466c38774_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "lightblue", "fillColor": "lightblue", "fillOpacity": 0.5, "weight": 2};
+            }
+        }
+        function geo_json_201d41c96761f101e2e88b5466c38774_highlighter(feature) {
+            switch(feature.id) {
+                default:
+                    return {"fillOpacity": 0.75};
+            }
+        }
+        function geo_json_201d41c96761f101e2e88b5466c38774_pointToLayer(feature, latlng) {
+            var opts = {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3};
+            
+            let style = geo_json_201d41c96761f101e2e88b5466c38774_styler(feature)
+            Object.assign(opts, style)
+            
+            return new L.CircleMarker(latlng, opts)
+        }
+
+        function geo_json_201d41c96761f101e2e88b5466c38774_onEachFeature(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                            geo_json_201d41c96761f101e2e88b5466c38774.resetStyle(e.target);
+                    }
+                },
+                mouseover: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                        const highlightStyle = geo_json_201d41c96761f101e2e88b5466c38774_highlighter(e.target.feature)
+                        e.target.setStyle(highlightStyle);
+                    }
+                },
+            });
+        };
+        var geo_json_201d41c96761f101e2e88b5466c38774 = L.geoJson(null, {
+                onEachFeature: geo_json_201d41c96761f101e2e88b5466c38774_onEachFeature,
+            
+                style: geo_json_201d41c96761f101e2e88b5466c38774_styler,
+                pointToLayer: geo_json_201d41c96761f101e2e88b5466c38774_pointToLayer,
+            ...{
+}
+        });
+
+        function geo_json_201d41c96761f101e2e88b5466c38774_add (data) {
+            geo_json_201d41c96761f101e2e88b5466c38774
+                .addData(data);
+        }
+            geo_json_201d41c96761f101e2e88b5466c38774_add({"bbox": [-7.334389064622962, 39.159759521484375, -7.076150645380435, 39.28038024902344], "features": [{"bbox": [-7.334389064622962, 39.159759521484375, -7.076150645380435, 39.28038024902344], "geometry": {"coordinates": [[-7.076150645380435, 39.28038024902344], [-7.334389064622962, 39.159759521484375]], "type": "LineString"}, "id": "0", "properties": {"Callsign": "IBE0169_", "Flight status": "airborne", "ICAO": "34510A", "TurbulenceCategory": "Medium 1 (between 7000 kg and 34000 kg)", "__folium_color": "lightblue", "prev_t": "2024-12-01 01:00:00.121", "t": "2024-12-01 01:01:55.007"}, "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+    geo_json_201d41c96761f101e2e88b5466c38774.bindTooltip(
+    function(layer){
+    let div = L.DomUtil.create('div');
+    
+    let handleObject = feature=>typeof(feature)=='object' ? JSON.stringify(feature) : feature;
+    let fields = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let aliases = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let table = '<table>' +
+        String(
+        fields.map(
+        (v,i)=>
+        `<tr>
+            <th>${aliases[i]}</th>
+            
+            <td>${handleObject(layer.feature.properties[v])}</td>
+        </tr>`).join(''))
+    +'</table>';
+    div.innerHTML=table;
+    
+    return div
+    }
+    ,{
+  "sticky": true,
+  "className": "foliumtooltip",
+});
+                     
+    
+            geo_json_201d41c96761f101e2e88b5466c38774.addTo(feature_group_80c99262a582949caddc220673617266);
+        
+    
+            var circle_a018bda37be0ec305d52d97bd893b366 = L.circle(
+                [39.159759521484375, -7.334389064622962],
+                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "lightblue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 0.5, "radius": 120, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80c99262a582949caddc220673617266);
+        
+    
+        function geo_json_3966f60793d7dda88bc066986b1dd31a_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "lightblue", "fillColor": "lightblue", "fillOpacity": 0.5, "weight": 2};
+            }
+        }
+        function geo_json_3966f60793d7dda88bc066986b1dd31a_highlighter(feature) {
+            switch(feature.id) {
+                default:
+                    return {"fillOpacity": 0.75};
+            }
+        }
+        function geo_json_3966f60793d7dda88bc066986b1dd31a_pointToLayer(feature, latlng) {
+            var opts = {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3};
+            
+            let style = geo_json_3966f60793d7dda88bc066986b1dd31a_styler(feature)
+            Object.assign(opts, style)
+            
+            return new L.CircleMarker(latlng, opts)
+        }
+
+        function geo_json_3966f60793d7dda88bc066986b1dd31a_onEachFeature(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                            geo_json_3966f60793d7dda88bc066986b1dd31a.resetStyle(e.target);
+                    }
+                },
+                mouseover: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                        const highlightStyle = geo_json_3966f60793d7dda88bc066986b1dd31a_highlighter(e.target.feature)
+                        e.target.setStyle(highlightStyle);
+                    }
+                },
+            });
+        };
+        var geo_json_3966f60793d7dda88bc066986b1dd31a = L.geoJson(null, {
+                onEachFeature: geo_json_3966f60793d7dda88bc066986b1dd31a_onEachFeature,
+            
+                style: geo_json_3966f60793d7dda88bc066986b1dd31a_styler,
+                pointToLayer: geo_json_3966f60793d7dda88bc066986b1dd31a_pointToLayer,
+            ...{
+}
+        });
+
+        function geo_json_3966f60793d7dda88bc066986b1dd31a_add (data) {
+            geo_json_3966f60793d7dda88bc066986b1dd31a
+                .addData(data);
+        }
+            geo_json_3966f60793d7dda88bc066986b1dd31a_add({"bbox": [-3.393310546875, 38.64077810513771, -2.83148193359375, 39.99650573730469], "features": [{"bbox": [-3.393310546875, 38.64077810513771, -2.83148193359375, 39.99650573730469], "geometry": {"coordinates": [[-2.83148193359375, 39.99650573730469], [-3.393310546875, 38.64077810513771]], "type": "LineString"}, "id": "0", "properties": {"Callsign": "MAC112X_", "Flight status": "airborne", "ICAO": "02012B", "TurbulenceCategory": "Medium 1 (between 7000 kg and 34000 kg)", "__folium_color": "lightblue", "prev_t": "2024-12-01 01:00:00.625", "t": "2024-12-01 01:11:58.888"}, "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+    geo_json_3966f60793d7dda88bc066986b1dd31a.bindTooltip(
+    function(layer){
+    let div = L.DomUtil.create('div');
+    
+    let handleObject = feature=>typeof(feature)=='object' ? JSON.stringify(feature) : feature;
+    let fields = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let aliases = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let table = '<table>' +
+        String(
+        fields.map(
+        (v,i)=>
+        `<tr>
+            <th>${aliases[i]}</th>
+            
+            <td>${handleObject(layer.feature.properties[v])}</td>
+        </tr>`).join(''))
+    +'</table>';
+    div.innerHTML=table;
+    
+    return div
+    }
+    ,{
+  "sticky": true,
+  "className": "foliumtooltip",
+});
+                     
+    
+            geo_json_3966f60793d7dda88bc066986b1dd31a.addTo(feature_group_80c99262a582949caddc220673617266);
+        
+    
+            var circle_5acef77893c1595dda711738fede6bd0 = L.circle(
+                [38.64077810513771, -3.393310546875],
+                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "lightblue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 0.5, "radius": 120, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80c99262a582949caddc220673617266);
+        
+    
+        function geo_json_35a3fcf44189f7a3aaebec42a89c6792_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "lightblue", "fillColor": "lightblue", "fillOpacity": 0.5, "weight": 2};
+            }
+        }
+        function geo_json_35a3fcf44189f7a3aaebec42a89c6792_highlighter(feature) {
+            switch(feature.id) {
+                default:
+                    return {"fillOpacity": 0.75};
+            }
+        }
+        function geo_json_35a3fcf44189f7a3aaebec42a89c6792_pointToLayer(feature, latlng) {
+            var opts = {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3};
+            
+            let style = geo_json_35a3fcf44189f7a3aaebec42a89c6792_styler(feature)
+            Object.assign(opts, style)
+            
+            return new L.CircleMarker(latlng, opts)
+        }
+
+        function geo_json_35a3fcf44189f7a3aaebec42a89c6792_onEachFeature(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                            geo_json_35a3fcf44189f7a3aaebec42a89c6792.resetStyle(e.target);
+                    }
+                },
+                mouseover: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                        const highlightStyle = geo_json_35a3fcf44189f7a3aaebec42a89c6792_highlighter(e.target.feature)
+                        e.target.setStyle(highlightStyle);
+                    }
+                },
+            });
+        };
+        var geo_json_35a3fcf44189f7a3aaebec42a89c6792 = L.geoJson(null, {
+                onEachFeature: geo_json_35a3fcf44189f7a3aaebec42a89c6792_onEachFeature,
+            
+                style: geo_json_35a3fcf44189f7a3aaebec42a89c6792_styler,
+                pointToLayer: geo_json_35a3fcf44189f7a3aaebec42a89c6792_pointToLayer,
+            ...{
+}
+        });
+
+        function geo_json_35a3fcf44189f7a3aaebec42a89c6792_add (data) {
+            geo_json_35a3fcf44189f7a3aaebec42a89c6792
+                .addData(data);
+        }
+            geo_json_35a3fcf44189f7a3aaebec42a89c6792_add({"bbox": [-3.37933349609375, 38.7132133871822, -0.38203039834665703, 42.653487900556144], "features": [{"bbox": [-3.37933349609375, 38.7132133871822, -0.38203039834665703, 42.653487900556144], "geometry": {"coordinates": [[-0.38203039834665703, 42.653487900556144], [-3.37933349609375, 38.7132133871822]], "type": "LineString"}, "id": "0", "properties": {"Callsign": "MAC264__", "Flight status": "airborne", "ICAO": "020176", "TurbulenceCategory": "Medium 1 (between 7000 kg and 34000 kg)", "__folium_color": "lightblue", "prev_t": "2024-12-01 01:04:29.249", "t": "2024-12-01 01:43:39.901"}, "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+    geo_json_35a3fcf44189f7a3aaebec42a89c6792.bindTooltip(
+    function(layer){
+    let div = L.DomUtil.create('div');
+    
+    let handleObject = feature=>typeof(feature)=='object' ? JSON.stringify(feature) : feature;
+    let fields = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let aliases = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let table = '<table>' +
+        String(
+        fields.map(
+        (v,i)=>
+        `<tr>
+            <th>${aliases[i]}</th>
+            
+            <td>${handleObject(layer.feature.properties[v])}</td>
+        </tr>`).join(''))
+    +'</table>';
+    div.innerHTML=table;
+    
+    return div
+    }
+    ,{
+  "sticky": true,
+  "className": "foliumtooltip",
+});
+                     
+    
+            geo_json_35a3fcf44189f7a3aaebec42a89c6792.addTo(feature_group_80c99262a582949caddc220673617266);
+        
+    
+            var circle_e4238d98dfee76e5f584c0f6b3a3ff6e = L.circle(
+                [38.7132133871822, -3.37933349609375],
+                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "lightblue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 0.5, "radius": 120, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80c99262a582949caddc220673617266);
+        
+    
+        function geo_json_0e44a3f93762f903085fcaa7e59e9a2c_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "lightblue", "fillColor": "lightblue", "fillOpacity": 0.5, "weight": 2};
+            }
+        }
+        function geo_json_0e44a3f93762f903085fcaa7e59e9a2c_highlighter(feature) {
+            switch(feature.id) {
+                default:
+                    return {"fillOpacity": 0.75};
+            }
+        }
+        function geo_json_0e44a3f93762f903085fcaa7e59e9a2c_pointToLayer(feature, latlng) {
+            var opts = {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3};
+            
+            let style = geo_json_0e44a3f93762f903085fcaa7e59e9a2c_styler(feature)
+            Object.assign(opts, style)
+            
+            return new L.CircleMarker(latlng, opts)
+        }
+
+        function geo_json_0e44a3f93762f903085fcaa7e59e9a2c_onEachFeature(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                            geo_json_0e44a3f93762f903085fcaa7e59e9a2c.resetStyle(e.target);
+                    }
+                },
+                mouseover: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                        const highlightStyle = geo_json_0e44a3f93762f903085fcaa7e59e9a2c_highlighter(e.target.feature)
+                        e.target.setStyle(highlightStyle);
+                    }
+                },
+            });
+        };
+        var geo_json_0e44a3f93762f903085fcaa7e59e9a2c = L.geoJson(null, {
+                onEachFeature: geo_json_0e44a3f93762f903085fcaa7e59e9a2c_onEachFeature,
+            
+                style: geo_json_0e44a3f93762f903085fcaa7e59e9a2c_styler,
+                pointToLayer: geo_json_0e44a3f93762f903085fcaa7e59e9a2c_pointToLayer,
+            ...{
+}
+        });
+
+        function geo_json_0e44a3f93762f903085fcaa7e59e9a2c_add (data) {
+            geo_json_0e44a3f93762f903085fcaa7e59e9a2c
+                .addData(data);
+        }
+            geo_json_0e44a3f93762f903085fcaa7e59e9a2c_add({"bbox": [-4.991065492021277, 38.23054504394531, -2.3641683888989826, 42.03397071967691], "features": [{"bbox": [-4.991065492021277, 38.23054504394531, -2.3641683888989826, 42.03397071967691], "geometry": {"coordinates": [[-2.3641683888989826, 42.03397071967691], [-4.991065492021277, 38.23054504394531]], "type": "LineString"}, "id": "0", "properties": {"Callsign": "MAC998__", "Flight status": "airborne", "ICAO": "02019D", "TurbulenceCategory": "Medium 1 (between 7000 kg and 34000 kg)", "__folium_color": "lightblue", "prev_t": "2024-12-01 01:39:14.122", "t": "2024-12-01 02:16:00.348"}, "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+    geo_json_0e44a3f93762f903085fcaa7e59e9a2c.bindTooltip(
+    function(layer){
+    let div = L.DomUtil.create('div');
+    
+    let handleObject = feature=>typeof(feature)=='object' ? JSON.stringify(feature) : feature;
+    let fields = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let aliases = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let table = '<table>' +
+        String(
+        fields.map(
+        (v,i)=>
+        `<tr>
+            <th>${aliases[i]}</th>
+            
+            <td>${handleObject(layer.feature.properties[v])}</td>
+        </tr>`).join(''))
+    +'</table>';
+    div.innerHTML=table;
+    
+    return div
+    }
+    ,{
+  "sticky": true,
+  "className": "foliumtooltip",
+});
+                     
+    
+            geo_json_0e44a3f93762f903085fcaa7e59e9a2c.addTo(feature_group_80c99262a582949caddc220673617266);
+        
+    
+            var circle_822851c246916fa385772377b86ea244 = L.circle(
+                [38.23054504394531, -4.991065492021277],
+                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "lightblue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 0.5, "radius": 120, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80c99262a582949caddc220673617266);
+        
+    
+        function geo_json_fe80e85f8a2b8efb4c5028f5aa14f3c1_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "black", "fillColor": "black", "fillOpacity": 0.5, "weight": 2};
+            }
+        }
+        function geo_json_fe80e85f8a2b8efb4c5028f5aa14f3c1_highlighter(feature) {
+            switch(feature.id) {
+                default:
+                    return {"fillOpacity": 0.75};
+            }
+        }
+        function geo_json_fe80e85f8a2b8efb4c5028f5aa14f3c1_pointToLayer(feature, latlng) {
+            var opts = {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3};
+            
+            let style = geo_json_fe80e85f8a2b8efb4c5028f5aa14f3c1_styler(feature)
+            Object.assign(opts, style)
+            
+            return new L.CircleMarker(latlng, opts)
+        }
+
+        function geo_json_fe80e85f8a2b8efb4c5028f5aa14f3c1_onEachFeature(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                            geo_json_fe80e85f8a2b8efb4c5028f5aa14f3c1.resetStyle(e.target);
+                    }
+                },
+                mouseover: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                        const highlightStyle = geo_json_fe80e85f8a2b8efb4c5028f5aa14f3c1_highlighter(e.target.feature)
+                        e.target.setStyle(highlightStyle);
+                    }
+                },
+            });
+        };
+        var geo_json_fe80e85f8a2b8efb4c5028f5aa14f3c1 = L.geoJson(null, {
+                onEachFeature: geo_json_fe80e85f8a2b8efb4c5028f5aa14f3c1_onEachFeature,
+            
+                style: geo_json_fe80e85f8a2b8efb4c5028f5aa14f3c1_styler,
+                pointToLayer: geo_json_fe80e85f8a2b8efb4c5028f5aa14f3c1_pointToLayer,
+            ...{
+}
+        });
+
+        function geo_json_fe80e85f8a2b8efb4c5028f5aa14f3c1_add (data) {
+            geo_json_fe80e85f8a2b8efb4c5028f5aa14f3c1
+                .addData(data);
+        }
+            geo_json_fe80e85f8a2b8efb4c5028f5aa14f3c1_add({"bbox": [-5.151310410610465, 41.78975768008475, 0.22483648255813954, 42.874420166015625], "features": [{"bbox": [-5.151310410610465, 41.78975768008475, 0.22483648255813954, 42.874420166015625], "geometry": {"coordinates": [[-5.151310410610465, 42.874420166015625], [0.22483648255813954, 41.78975768008475]], "type": "LineString"}, "id": "0", "properties": {"Callsign": "N258X___", "Flight status": "airborne", "ICAO": "A27743", "TurbulenceCategory": "Heavy (larger than 136000 kg)", "__folium_color": "black", "prev_t": "2024-12-01 01:12:39.209", "t": "2024-12-01 01:44:29.854"}, "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+    geo_json_fe80e85f8a2b8efb4c5028f5aa14f3c1.bindTooltip(
+    function(layer){
+    let div = L.DomUtil.create('div');
+    
+    let handleObject = feature=>typeof(feature)=='object' ? JSON.stringify(feature) : feature;
+    let fields = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let aliases = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let table = '<table>' +
+        String(
+        fields.map(
+        (v,i)=>
+        `<tr>
+            <th>${aliases[i]}</th>
+            
+            <td>${handleObject(layer.feature.properties[v])}</td>
+        </tr>`).join(''))
+    +'</table>';
+    div.innerHTML=table;
+    
+    return div
+    }
+    ,{
+  "sticky": true,
+  "className": "foliumtooltip",
+});
+                     
+    
+            geo_json_fe80e85f8a2b8efb4c5028f5aa14f3c1.addTo(feature_group_80c99262a582949caddc220673617266);
+        
+    
+            var circle_6a55b4614af29c314d2ec06125d2194a = L.circle(
+                [41.78975768008475, 0.22483648255813954],
+                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "black", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 0.5, "radius": 120, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80c99262a582949caddc220673617266);
+        
+    
+        function geo_json_ac8736f06c6b068de7aef9a094529a6c_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "lightgreen", "fillColor": "lightgreen", "fillOpacity": 0.5, "weight": 2};
+            }
+        }
+        function geo_json_ac8736f06c6b068de7aef9a094529a6c_highlighter(feature) {
+            switch(feature.id) {
+                default:
+                    return {"fillOpacity": 0.75};
+            }
+        }
+        function geo_json_ac8736f06c6b068de7aef9a094529a6c_pointToLayer(feature, latlng) {
+            var opts = {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3};
+            
+            let style = geo_json_ac8736f06c6b068de7aef9a094529a6c_styler(feature)
+            Object.assign(opts, style)
+            
+            return new L.CircleMarker(latlng, opts)
+        }
+
+        function geo_json_ac8736f06c6b068de7aef9a094529a6c_onEachFeature(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                            geo_json_ac8736f06c6b068de7aef9a094529a6c.resetStyle(e.target);
+                    }
+                },
+                mouseover: function(e) {
+                    if(typeof e.target.setStyle === "function"){
+                        const highlightStyle = geo_json_ac8736f06c6b068de7aef9a094529a6c_highlighter(e.target.feature)
+                        e.target.setStyle(highlightStyle);
+                    }
+                },
+            });
+        };
+        var geo_json_ac8736f06c6b068de7aef9a094529a6c = L.geoJson(null, {
+                onEachFeature: geo_json_ac8736f06c6b068de7aef9a094529a6c_onEachFeature,
+            
+                style: geo_json_ac8736f06c6b068de7aef9a094529a6c_styler,
+                pointToLayer: geo_json_ac8736f06c6b068de7aef9a094529a6c_pointToLayer,
+            ...{
+}
+        });
+
+        function geo_json_ac8736f06c6b068de7aef9a094529a6c_add (data) {
+            geo_json_ac8736f06c6b068de7aef9a094529a6c
+                .addData(data);
+        }
+            geo_json_ac8736f06c6b068de7aef9a094529a6c_add({"bbox": [-4.641186258067256, 38.53074645996094, -4.43109130859375, 40.203277587890625], "features": [{"bbox": [-4.641186258067256, 38.53074645996094, -4.43109130859375, 40.203277587890625], "geometry": {"coordinates": [[-4.43109130859375, 40.203277587890625], [-4.641186258067256, 38.53074645996094]], "type": "LineString"}, "id": "0", "properties": {"Callsign": "RYR8178_", "Flight status": "airborne", "ICAO": "4CADA4", "TurbulenceCategory": "Light (less than 7000 kg)", "__folium_color": "lightgreen", "prev_t": "2024-12-01 01:00:00.320", "t": "2024-12-01 01:14:33.235"}, "type": "Feature"}], "type": "FeatureCollection"});
+
+        
+    
+    geo_json_ac8736f06c6b068de7aef9a094529a6c.bindTooltip(
+    function(layer){
+    let div = L.DomUtil.create('div');
+    
+    let handleObject = feature=>typeof(feature)=='object' ? JSON.stringify(feature) : feature;
+    let fields = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let aliases = ["ICAO", "Flight status", "Callsign", "TurbulenceCategory", "t", "prev_t"];
+    let table = '<table>' +
+        String(
+        fields.map(
+        (v,i)=>
+        `<tr>
+            <th>${aliases[i]}</th>
+            
+            <td>${handleObject(layer.feature.properties[v])}</td>
+        </tr>`).join(''))
+    +'</table>';
+    div.innerHTML=table;
+    
+    return div
+    }
+    ,{
+  "sticky": true,
+  "className": "foliumtooltip",
+});
+                     
+    
+            geo_json_ac8736f06c6b068de7aef9a094529a6c.addTo(feature_group_80c99262a582949caddc220673617266);
+        
+    
+            var circle_05e40a4585527ae7d651e78dfb4cd3ee = L.circle(
+                [38.53074645996094, -4.641186258067256],
+                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "lightgreen", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 0.5, "radius": 120, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80c99262a582949caddc220673617266);
+        
+    
+            feature_group_80c99262a582949caddc220673617266.addTo(map_e2b4e5c8fe03df530044c3da455330ac);
+        
+    
+            var layer_control_a8897c5863f0a4574413ed8ebb2f65c7_layers = {
+                base_layers : {
+                    "cartodbpositron" : tile_layer_8e0592609957ac605cca0cc7d9b5b7ff,
+                },
+                overlays :  {
+                    "Locations" : marker_cluster_5247cf0514bdc6f28da6a4d0e1d9b80f,
+                    "Take-offs" : feature_group_89a2bff4f51fee91c94f82dd9097f284,
+                    "Landings" : feature_group_82950aa792dd7d3474c56c2237c6690a,
+                    "Other flights" : feature_group_80c99262a582949caddc220673617266,
+                },
+            };
+            let layer_control_a8897c5863f0a4574413ed8ebb2f65c7 = L.control.layers(
+                layer_control_a8897c5863f0a4574413ed8ebb2f65c7_layers.base_layers,
+                layer_control_a8897c5863f0a4574413ed8ebb2f65c7_layers.overlays,
+                {
+  "position": "topright",
+  "collapsed": true,
+  "autoZIndex": true,
+}
+            ).addTo(map_e2b4e5c8fe03df530044c3da455330ac);
+
+        
+</script>
+</html>
