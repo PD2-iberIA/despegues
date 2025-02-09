@@ -1,6 +1,6 @@
 import tarfile
 import pandas as pd
-from decoder import Decoder
+from preprocess.decoder import Decoder
 
 class Reader:
 
@@ -19,7 +19,7 @@ class Reader:
             csv_file = tar.extractfile(Reader.FILE_NAME)
             num_chunks = 0
 
-            for chunk in pd.read_csv(csv_file, chunksize=Reader.CHUNK_SIZE):
+            for chunk in pd.read_csv(csv_file, chunksize=Reader.CHUNK_SIZE, sep=';'):
                 try:
                     # Eliminamos la columna no deseada
                     chunk = chunk.drop(columns=['Unnamed: 2'])

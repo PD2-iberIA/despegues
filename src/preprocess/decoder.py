@@ -3,8 +3,8 @@ import base64
 from enum import Enum
 from collections import defaultdict
 from datetime import datetime
-import airport_constants as ac
-from utilities import separateCoordinates, separateVelocity, processStaticAirTemperature
+import preprocess.airport_constants as ac
+from preprocess.utilities import separateCoordinates, separateVelocity, processStaticAirTemperature
 
 class MessageType(Enum):
     ALTITUDE = "ALTITUDE"
