@@ -15,7 +15,7 @@ Desarrollamos este proyecto para proporcionar una herramienta de visualización 
 A través de análisis de datos y visualizaciones como histogramas, boxplots y mapas de calor, buscamos ofrecer una mejor comprensión del comportamiento de los vuelos en tierra.
 [siguientes etapas __]
 
-Al llevar a cabo este proyecto, aprenderemos a trabajar en equipo, con grandes conjuntos de datos, realizar visualizaciones interactivas y aplicar técnicas de análisis de datos para obtener conclusiones valiosas sobre la eficiencia del tráfico aéreo.
+Al llevar a cabo este proyecto, aprenderemos a trabajar en equipo, con grandes conjuntos de datos, realizar visualizaciones interactivas y aplicar técnicas de análisis de datos para obtener conclusiones valiosas sobre la eficiencia del tráfico aéreo, además de presentar todo ello públicamente.
 
 
 ## 2. Instrucciones de instalación
@@ -37,6 +37,22 @@ pip install -r requirements.txt
 
 ## 3. Instrucciones de uso
 <code> falta </code>
+
+3.1 Convenio commits
+Para mantener la historia del repositorio más legible, si un commit aborda múltiples aspectos o cambios, se deben dividir en commits individuales que traten de separar lo máximo posible estos. Por lo tanto, es preferible realizar commits frecuentes y pequeños en lugar de grandes commits que abarquen múltiples cambios.
+
+Por último, los commits deben contener código que esté que no rompa la compilación ni la funcionalidad del código anterior.
+
+En general, los commits deben cumplir las siguientes pautas:
+
+- Empezar en imperativo (puede continuar la frase 'Este commit ...' con una acción)
+- No tener punto final
+- No superar los 72 caracteres
+- No incluir el nombre del fichero que modifica
+- Primera palabra capitalizada
+- Si es preciso, rellenar la descripción con información adicional
+- No poner prefijos del estilo 'ADD, EDIT...'
+- Describir el cambio realizado de forma precisa y concisa
 
 
 ## 4. Crédito
