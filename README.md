@@ -42,7 +42,9 @@ pip install -r requirements.txt
 ## 3. Instrucciones de uso
 <code> falta </code>
 
+
 3.1 Convenio commits
+
 Para mantener la historia del repositorio más legible, si un commit aborda múltiples aspectos o cambios, se deben dividir en commits individuales que traten de separar lo máximo posible estos. Por lo tanto, es preferible realizar commits frecuentes y pequeños en lugar de grandes commits que abarquen múltiples cambios.
 
 Por último, los commits deben contener código que esté que no rompa la compilación ni la funcionalidad del código anterior.
