@@ -21,23 +21,23 @@ Al llevar a cabo este proyecto, aprenderemos a trabajar en equipo, con grandes c
 ## 2. Instrucciones de instalación
 En primer lugar, clona el repositorio de este proyecto en la carpeta de tu dispositivo donde desees guardarlo, utilizando el comando:
 
-'''
+```
 git clone <https://github.com/PD2-iberIA/despegues.git>
-'''
+```
 
 o apoyándote en aplicaciones como GitHub Desktop o Git Bash, entre otras.
 
 Para acceder a la carpeta del proyecto, ejecuta la instrucción:
 
-'''
+```
 cd despegues
-'''
+```
 
 Por último, instala las dependencias necesarias [pendiente de creación]:
 
-'''
+```
 pip install -r requirements.txt
-'''
+```
 
 ## 3. Instrucciones de uso
 <code> falta </code>
