@@ -35,7 +35,7 @@ class DataframeProcessor:
         df_pos = df[((5.0 <= df["Typecode"]) & (df["Typecode"]  <= 22.0)) & (df["Typecode"] != 19.0)]
         df_pos = df_pos[columnasPosiciones].reset_index(drop=True)
         
-        df_pos
+        return df_pos
     
     @staticmethod
     def getVelocities(df):
@@ -64,7 +64,7 @@ class DataframeProcessor:
 
         return df_vel_final
     
-
+    @staticmethod
     def getFlightsInfo(df):
 
         df_pos = DataframeProcessor.getPositions(df)
@@ -83,6 +83,7 @@ class DataframeProcessor:
 
         return df
 
+    @staticmethod
     def removeOutlierFlights(df):
 
         # Calcula la distancia entre dos puntos geográficos
@@ -109,6 +110,6 @@ class DataframeProcessor:
         df_filtered = df[~df['ICAO'].isin(removed_planes)]
         df_filtered = df_filtered.drop(columns=['prev_lat', 'prev_lon', 'distance'])
 
-        df_filtered
+        return df_filtered
 
 
