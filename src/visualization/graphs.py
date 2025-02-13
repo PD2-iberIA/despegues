@@ -1,4 +1,5 @@
 import plotly.express as px
+from ../preprocess/dataframe_processor import DataframeProcessor
 
 # Gráfica por horas de aviones en tierra y aterrizados
 def graph_hourly_flight_status(df):
@@ -49,3 +50,37 @@ def graph_hourly_flight_status(df):
     )
 
     return fig
+
+# Sacar df de los tiempos de espera
+def df_wait_times(df):
+    # Extraemos las columnas necesarias y creamos un df nuevo
+    df1 = DataframeProcessor.getVelocities(df)
+    df2 = DataframeProcessor.getFlights(df)
+
+    df1_s = df1.sort_values(["Timestamp (date)", "ICAO"])
+    df2_s = df2.sort_values(["Timestamp (date)", "ICAO"])
+
+    t = pd.Timedelta('10 minute')
+    dff = pd.merge_asof(df1_s, df2_s, on="Timestamp (date)", by="ICAO", direction="nearest", tolerance=t)
+
+    # Ensure data is sorted by Flight ID and timestamp
+    dff = dff.sort_values(by=["Callsign", "Timestamp (date)"])
+
+    # Separate on-ground and airborne events
+    on_ground = dff[(dff["Flight status"] == "on-ground") & (dff["Speed"]==0)].groupby("Callsign")["Timestamp (date)"].min()
+    airborne = dff[dff["Flight status"] == "airborne"].groupby("Callsign")["Timestamp (date)"].min()
+
+    # Create new dataframes and rename timestamp columns
+    on_ground = pd.DataFrame(on_ground)
+    on_ground.columns = ["ts ground"]
+
+    airborne = pd.DataFrame(airborne)
+    airborne.columns = ["ts airborne"]
+
+    # Merge them into a new dataframe and extract the waiting seconds
+    df_wait_times = on_ground.merge(airborne, how="inner", on="Callsign")
+    df_wait_times = df_wait_times[df_wait_times["ts airborne"] > df_wait_times["ts ground"]]
+    df_wait_times["Wait time"] = df_wait_times["ts airborne"] - df_wait_times["ts ground"]
+    df_wait_times["Wait time (s)"] = df_wait_times["Wait time"].dt.total_seconds()
+
+    return df_wait_times
