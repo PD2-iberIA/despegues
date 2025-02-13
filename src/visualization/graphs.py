@@ -84,3 +84,31 @@ def df_wait_times(df):
     df_wait_times["Wait time (s)"] = df_wait_times["Wait time"].dt.total_seconds()
 
     return df_wait_times
+
+def histogram_wait_times(df):
+    fig_hist = px.histogram(df, x="Wait time (s)", nbins=10, title="Wait Time Distribution")
+    return fig_hist
+
+def boxplot_wait_times(df):
+    fig_box = px.box(df_wait_times, y="Wait time (s)", title="Boxplot de Valores")
+    return fig_box
+
+def heatmap_wait_times(df):
+    # Extraer fecha y hora
+    df["Date"] = df["ts ground"].dt.date
+    df["Hour"] = df["ts ground"].dt.hour
+
+    # Crear tabla pivote para el heatmap
+    heatmap_data = df.pivot_table(index="Date", columns="Hour", values="Wait time (s)", aggfunc="mean")
+
+    # Crear el mapa de calor con Plotly
+    fig_heatmap = px.imshow(
+        heatmap_data.values,
+        labels=dict(x="Hour", y="Date", color="Tiempo de espera (s)"),
+        x=heatmap_data.columns,
+        y=heatmap_data.index,
+        color_continuous_scale="RdYlGn_r",
+        title="Mapa de Calor del Tiempo de Espera por Hora y Día del Mes"
+    )
+
+    return fig_heatmap
