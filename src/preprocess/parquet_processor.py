@@ -1,30 +1,50 @@
+import os
 import pandas as pd
 import numpy as np
 
 class ParquetProcessor:
-    def __init__(self, filepath):
+    def __init__(self, filepaths, output_folder="processed_data"):
         """
-        Inicializa el procesador con la ruta al archivo parquet.
+        Inicializa el procesador con una lista de rutas a archivos Parquet.
+        
+        :param filepaths: Lista de rutas de archivos Parquet.
+        :param output_folder: Carpeta donde se guardarán los archivos procesados.
         """
-        self.filepath = filepath
+        self.filepaths = filepaths
+        self.output_folder = output_folder
         self.df = None
 
     def load_data(self):
         """
-        Carga el archivo Parquet en un DataFrame.
+        Carga múltiples archivos Parquet en un solo DataFrame.
         """
-        self.df = pd.read_parquet(self.filepath, engine="pyarrow")
+        dfs = []
+        for file in self.filepaths:
+            try:
+                df = pd.read_parquet(file, engine="pyarrow")
+                dfs.append(df)
+            except Exception as e:
+                print(f"Error al cargar {file}: {e}")
+
+        if dfs:
+            self.df = pd.concat(dfs, ignore_index=True)
+        else:
+            print("No se pudieron cargar archivos.")
 
     def clean_data(self):
         """
         Limpia los datos reemplazando valores nulos y no convertibles.
         """
+        if self.df is None:
+            print("No hay datos cargados para limpiar.")
+            return
+        
         # Reemplazar valores que deberían ser NaN
         self.df.replace(["null", "None", "", "nan"], np.nan, inplace=True)
 
     def convert_data_types(self):
         """
-        Convierte las columnas del DataFrame a los tipos de datos correctos.
+        Convierte las columnas del df a los tipos de datos correctos.
         """
         dtypes_correctos = {
             "Timestamp (kafka)": "int64",
@@ -84,9 +104,27 @@ class ParquetProcessor:
             else:
                 self.df[col] = self.df[col].astype(dtype)  # Convierte a int64 u object sin ignorar errores
 
-    def get_cleaned_data(self):
+    def save_by_date_hour(self):
         """
-        Devuelve el DataFrame limpio con tipos de datos correctos.
+        Divide el df por día y hora y guarda los archivos en la estructura de carpetas adecuada.
         """
-        return self.df
 
+        self.df.dropna(subset=["Timestamp (date)"], inplace=True)
+
+        # Extraemos la fecha y hora en el formato correcto
+        self.df["date"] = self.df["Timestamp (date)"].dt.strftime("%Y-%m-%d")
+        self.df["hour"] = self.df["Timestamp (date)"].dt.strftime("%H")
+
+        for (date, hour), group in self.df.groupby(["date", "hour"]):
+            folder_path = os.path.join(self.output_folder, date, hour)
+            os.makedirs(folder_path, exist_ok=True)
+
+            output_filepath = os.path.join(folder_path, f"data_{date}_{hour}.parquet")
+            group.to_parquet(output_filepath, engine="pyarrow")
+            print(f"Guardado en {output_filepath}")
+
+    def process(self):
+        """
+        Ejecuta el guardado.
+        """
+        self.save_by_date_hour()
