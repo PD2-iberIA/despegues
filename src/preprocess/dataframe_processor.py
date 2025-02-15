@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 class DataframeProcessor:
-    """Clase que permite realizar operaciones con los dataframes de Pandas"""
+    """Clase que permite realizar operaciones de procesamiento y análisis de datos con los dataframes de Pandas"""
 
     @staticmethod
     def getAirplaneCategories(df):
@@ -40,9 +40,11 @@ class DataframeProcessor:
     @staticmethod
     def getVelocities(df):
 
+        # Filtramos las filas donde la velocidad no es nula
         df_vel = df[df["Speed"].notna()]
         df_vel = df_vel[["Timestamp (date)", "ICAO", "Flight status", "Speed", "lat", "lon"]]
 
+        # Dividimos en 2 dataframe según si los vuelos están en tierra o en aire
         df_vel_ground = df_vel[df_vel["Flight status"] == "on-ground"]
         df_vel_air = df_vel[df_vel["Flight status"] == "airborne"]
 
@@ -50,16 +52,19 @@ class DataframeProcessor:
         df_pos = df_pos.sort_values(by="Timestamp (date)")
         df_vel_air = df_vel_air.sort_values(by="Timestamp (date)")
 
-        tolerance = pd.Timedelta('1 second')
+        # Juntamos posiciones y velocidades de los vuelos en el aire según el timestamp
+        tolerance = pd.Timedelta('1 second') # tolerancia de 1 segundo
         df_vel_air_pos = pd.merge_asof(df_pos, df_vel_air, on="Timestamp (date)", by="ICAO", direction="nearest", tolerance=tolerance)
 
         df_vel_air_pos = df_vel_air_pos[df_vel_air_pos["Speed"].notna()]
 
+        # Eliminamos columnas redundantes
         df_vel_air_pos = df_vel_air_pos.drop(columns=['lat_y', 'lon_y', 'Flight status_y'])
         df_vel_air_pos = df_vel_air_pos.rename(columns={'lat_x': 'lat', 'lon_x': 'lon', 'Flight status_x': 'Flight status'})
 
         df_vel_air_pos = df_vel_air_pos[["Timestamp (date)", "ICAO", "Flight status", "Speed", "lat", "lon"]]
 
+        # El df que buscamos con esto tiene: velocidades de aviones en tierra y velocidades+posiciones de aviones en el aire
         df_vel_final = pd.concat([df_vel_ground, df_vel_air_pos])
 
         return df_vel_final
@@ -74,7 +79,7 @@ class DataframeProcessor:
         df_pos = df_pos.sort_values(["Timestamp (date)", "ICAO"])
         df_flights = df_flights.sort_values(["Timestamp (date)", "ICAO"])
 
-        tolerance = pd.Timedelta('10 minute')
+        tolerance = pd.Timedelta('10 minute') # tolerancia
         df = pd.merge_asof(df_pos, df_flights, on="Timestamp (date)", by="ICAO", direction="nearest", tolerance=tolerance)
 
         df = df[df["Callsign"].notna()]
@@ -105,8 +110,10 @@ class DataframeProcessor:
 
         DISTANCE_THRESHOLD = 200 
 
+        # Outlier si la distancia supera los 200km
         removed_planes = df[df['distance'] > DISTANCE_THRESHOLD]['ICAO'].unique()
 
+        # Eliminamos los outliers (y las columnas auxiliares para el cálculo)
         df_filtered = df[~df['ICAO'].isin(removed_planes)]
         df_filtered = df_filtered.drop(columns=['prev_lat', 'prev_lon', 'distance'])
 

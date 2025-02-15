@@ -1,10 +1,10 @@
 class Airplane:
     def __init__(self, icao):
-        self.icao = icao
+        self.icao = icao  # Código único del avión
         self.total_airborne_time = 0  # Tiempo total en aire (segundos)
         self.total_ground_time = 0    # Tiempo total en tierra (segundos)
-        self.last_status = None
-        self.last_timestamp = None
+        self.last_status = None  # Último estado del avión (airborne o on-ground)
+        self.last_timestamp = None  # Última marca de tiempo registrada
 
     def update_flight_status(self, status, current_timestamp):
         # Si es el primer mensaje con estado conocido, lo guardamos y salimos
@@ -33,6 +33,7 @@ class Airplane:
         self.last_timestamp = current_timestamp
 
     def finalize(self, final_timestamp):
+        # Si el avión aún tiene un estado válido
         if self.last_status is not None:
             time_diff = (final_timestamp - self.last_timestamp).total_seconds()
             if time_diff < 0:
