@@ -18,3 +18,9 @@ def processStaticAirTemperature(temperature):
     if temperature == (0.0, 0.0):
         temperature = np.nan
     return temperature
+
+def stringToNan(df):
+    """Transforma todos los strings 'nan' o 'None' de un dataframe a nulos de Numpy."""
+    df.replace("nan", np.nan, inplace=True)
+    df.replace("None", np.nan, inplace=True)
+    return df

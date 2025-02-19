@@ -6,11 +6,12 @@ from preprocess.decoder import Decoder
 
 class DataReader:
     def __init__(self, path):
-        self.data = pd.read_csv(path, sep=';')
+        self.data = pd.read_csv(path, sep=';') # self.data es un dataframe
 
     def cleanData(self):
         # Elimina las columnas que no se van a utilizar
         self.data = self.data.drop(columns=['Unnamed: 2'])
+        # Elimina duplicados en los datos
         self.data = self.data.drop_duplicates()
 
     def dfToDict(self, msg, ts_kafka):
@@ -18,7 +19,8 @@ class DataReader:
         return Decoder.processMessage(msg, ts_kafka)
     
     def transformData(self):
-        # Transforma el DataFrame aplicando la función dfToDict a cada fila
+        # Transforma el DataFrame a un conjunto de diccionarios aplicando la función dfToDict a cada fila
+        # pero, tras estructurar mejor los datos, se convierten de vuelta a un dataframe
         self.data = self.data.apply(lambda x: self.dfToDict(x['Message'], x['Timestamp']), axis=1).apply(pd.Series)
 
     def getAirplaneMessages(self, icao):

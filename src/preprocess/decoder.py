@@ -7,6 +7,7 @@ import preprocess.airport_constants as ac
 from preprocess.utilities import separateCoordinates, separateVelocity, processStaticAirTemperature
 
 class MessageType(Enum):
+    # tipos de mensajes que pueden ser procesados
     ALTITUDE = "ALTITUDE"
     IDENTITY = "IDENTITY"
     ADS_B = "ADS_B"
@@ -14,10 +15,12 @@ class MessageType(Enum):
     NONE = "NONE"
 
 class Decoder:
+    # para procesar los mensajes y extraer información
     
     ON_GROUND = "on-ground"
     AIRBORNE = "airborne"
     
+    # para identificar qué tipo de mensaje se recibe en función del formato
     MAP_DF = defaultdict(lambda: [MessageType.NONE], {  
         4: [MessageType.ALTITUDE],
         5: [MessageType.IDENTITY],
@@ -27,6 +30,7 @@ class Decoder:
         21: [MessageType.MODE_S, MessageType.IDENTITY]
     })
 
+    # estado de vuelo del avión
     MAP_CA = defaultdict(lambda: float('nan'), {
         4: ON_GROUND,
         5: AIRBORNE
@@ -39,6 +43,7 @@ class Decoder:
         3: ON_GROUND
     })
 
+    # categorías de turbulencias
     MAP_WTC = {
         (4, 1): "Light",
         (4, 2): "Medium 1",
@@ -46,6 +51,7 @@ class Decoder:
         (4, 5): "Heavy",
     }
 
+    # categorías de aviones
     MAP_AIRCRAFT_CATEGORY = {
         (1, 0): 'Reserved',
         (0, 0): 'No category information',
@@ -99,7 +105,7 @@ class Decoder:
 
         data["Flight status"] = Decoder.getFlightStatus(msgHex, msgType)
 
-        
+        # según el tipo del mensaje...
         if Decoder.isADS_B(msgType):
             data.update(Decoder.processADS_B(msgHex))
             
@@ -116,34 +122,42 @@ class Decoder:
     
     @staticmethod
     def kafkaToDate(tsKafka):
+        # Convierte el timestamp de Kafka en una fecha legible
         return datetime.fromtimestamp(tsKafka / 1000)
         
     @staticmethod
     def base64toHex(msg):
+        # Convierte el mensaje base64 a hexadecimal
         return base64.b64decode(msg).hex().upper()
     
     @staticmethod
     def getICAO(msg):
+        # Extrae el código ICAO del mensaje
         return pms.icao(msg)
     
     @staticmethod
     def getDF(msg):
+        # Obtiene el formato de downlink del mensaje
         return pms.df(msg)
     
     @staticmethod
     def isIDENTITY(msgType):
+        # Verifica si el tipo de mensaje corresponde a identidad
         return MessageType.IDENTITY in msgType
     
     @staticmethod
     def isALTITUDE(msgType):
+        # Verifica si el tipo de mensaje corresponde a altitud       
         return MessageType.ALTITUDE in msgType
     
     @staticmethod
     def isADS_B(msgType):
+        # Verifica si el tipo de mensaje corresponde a ads-b
         return MessageType.ADS_B in msgType
     
     @staticmethod
     def isMODE_S(msgType):
+        # Verifica si el tipo de mensaje corresponde a mode s
         return MessageType.MODE_S in msgType
     
     @staticmethod
@@ -156,6 +170,7 @@ class Decoder:
     
     @staticmethod
     def getFlightStatus(msgHex, msgType):
+        # obtiene el estado del vuelo
 
         byteData = bytes.fromhex(msgHex)
         status_byte = byteData[4]
@@ -172,6 +187,8 @@ class Decoder:
     
     @staticmethod
     def getWakeTurbulenceCategory(msg):
+        # determina la categoría de turbulencia
+        
         msgHex = Decoder.base64toHex(msg)
         byteData = bytes.fromhex(msgHex)  
 
