@@ -24,3 +24,8 @@ def stringToNan(df):
     df.replace("nan", np.nan, inplace=True)
     df.replace("None", np.nan, inplace=True)
     return df
+
+def extractDaysOfTheWeek(df):
+    """ Crea una nueva columna 'day_of_week' con las tres primeras letras del día de la semana"""
+    df['day_of_week'] = df['Timestamp (date)'].dt.strftime('%a')
+    return df
