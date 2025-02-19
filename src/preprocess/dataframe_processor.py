@@ -48,7 +48,6 @@ class DataframeProcessor:
 
         return df_wait_times
 
-
     @staticmethod
     def getAirplaneCategories(df):
         """
@@ -177,6 +176,37 @@ class DataframeProcessor:
         df = df.merge(df_types, on="ICAO")
 
         return df
+    
+    @staticmethod
+    def getAltitudes(df):
+        """
+        Genera un Dataframe con los datos necesarios para visualizar las altitudes por trayectoria.
+        
+        Parámetros:
+            df: DataFrame de datos.
+
+        Devuelve:
+            DataFrame con las siguientes columnas: "Timestamp (date)", "ICAO", "Flight status", "lat", "lon", "Callsign", "TurbulenceCategory".
+        """
+        # DataFrame filtrando las filas que contienen una altitud no nula
+        df_alt = df[df["Altitude (ft)"].notna()]
+        df_alt = df_alt[["Timestamp (date)", "ICAO", "Callsign", "Flight status", "Altitude (ft)", "lat", "lon"]]
+
+        # DataFrame para las trayectorias
+        df_traj = DataframeProcessor.getFlightsInfo(df)
+
+        # Hacemos merge y ordenamos
+        df_merged = pd.merge(df_traj, df_alt, on=["ICAO", "Callsign", "Timestamp (date)"])
+        df_merged.sort_values(by=["ICAO", "Callsign", "Timestamp (date)"], inplace=True)
+
+        # Filtramos las columnas de x (las de df_traj) y las renombramos
+        df_filtered = df_merged.filter(like='_x')
+        df_filtered.columns = df_filtered.columns.str.replace('_x', '')
+        
+        # Unimos las columnas filtradas con las demás columnas necesarias
+        df_final = pd.concat([df_filtered, df_merged[['ICAO', 'Callsign', 'Timestamp (date)', 'Altitude (ft)']]], axis=1)
+
+        return df_final
 
     @staticmethod
     def removeOutlierFlights(df):

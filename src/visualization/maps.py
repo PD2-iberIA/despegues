@@ -9,6 +9,7 @@ import matplotlib.colors as mcolors
 import geopy.distance
 import re
 import pandas as pd
+from branca.colormap import linear
 
 class Maps:
     """Clase encargada de generar mapas."""
@@ -321,4 +322,90 @@ class Maps:
 
         m.get_root().html.add_child(folium.Element(legend_html))
             
+        return m
+    
+    @staticmethod
+    def altitudesMap(df):
+        """
+        Genera un mapa con las trayectorias coloreadas por altura.
+
+        Parámetros:
+            df (pandas.DataFrame): obtenido a partir de la función `getAltitudes` del módulo dataframe_processor. Columnas: "Timestamp (date)", "lat", "lon", "ICAO", 
+            "Callsign", "TurbulenceCategory", "Altitude (ft)".
+
+        Retorna:
+            folium.Map: Mapa con trayectorias degradadas por altura.
+        """
+
+        # Creamos un colormap para la altura
+        min_alt, max_alt = df["Altitude (ft)"].min(), df["Altitude (ft)"].max()
+        colormap = linear.Set2_04.scale(min_alt, max_alt)
+        colormap.caption = 'Altitude (ft)'
+
+        center = [ac.RADAR_POSITION[0], ac.RADAR_POSITION[1]]
+        m = folium.Map(location=center, tiles="Cartodb Positron", zoom_start=13)
+
+        # Grupos de capas
+        group1 = MarkerCluster(name="Locations").add_to(m)
+        group4 = folium.FeatureGroup("Flights by Altitude").add_to(m)
+
+        # Marcadores
+        Maps.getRadarMarker().add_to(group1)
+        for mk in Maps.getRunwayMarkers():
+            mk.add_to(group1)
+
+        # Generamos las trayectorias
+        trajs = mpd.TrajectoryCollection(
+            df,
+            traj_id_col="Callsign",
+            obj_id_col="ICAO",
+            t="Timestamp (date)",
+            x="lon",
+            y="lat"
+        )
+
+        # Dibujamos cada trayectoria con degradado por altura
+        for traj in trajs:
+            traj_df = traj.df.sort_values("Timestamp (date)")
+
+            # Calculamos la altitud media de la trayectoria para usarla en el tooltip
+            avg_altitude = traj_df["Altitude (ft)"].mean()
+            # Tooltip para la trayectoria completa
+            trajectory_tooltip = f"ICAO: {traj.df['ICAO'].iloc[0]}<br>Callsign: {traj.df['Callsign'].iloc[0]}<br>Altitud media: {avg_altitude:.0f} pies"
+
+            for i in range(len(traj_df) - 1):
+                p1 = traj_df.iloc[i]
+                p2 = traj_df.iloc[i + 1]
+                
+                # Color basado en la altura promedio del segmento
+                avg_alt = (p1["Altitude (ft)"] + p2["Altitude (ft)"]) / 2
+                color = colormap(avg_alt)
+
+                folium.PolyLine(
+                    locations=[
+                        [p1['geometry'].y, p1['geometry'].x],
+                        [p2['geometry'].y, p2['geometry'].x]
+                    ],
+                    color=color,
+                    weight=3,
+                    opacity=0.9,
+                    tooltip=f"ICAO: {traj.df['ICAO'].iloc[0]}<br>Callsign: {traj.df['Callsign'].iloc[0]}<br>Altitude: {avg_alt:.0f} ft"
+                ).add_to(group4)
+
+            # Círculo final para indicar el sentido
+            last_point = traj_df.iloc[-1]
+            folium.Circle(
+                location=[last_point['geometry'].y, last_point['geometry'].x],
+                radius=120,
+                color="black",
+                fill=True,
+                fill_color=color,
+                opacity=0.7,
+                tooltip=trajectory_tooltip
+            ).add_to(group4)
+
+        # Añadimos leyenda y controles
+        colormap.add_to(m)
+        folium.LayerControl().add_to(m)
+
         return m
