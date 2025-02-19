@@ -1,8 +1,53 @@
 import numpy as np
 import pandas as pd
+import utilities as ut
 
 class DataframeProcessor:
     """Clase que permite realizar operaciones de procesamiento y análisis de datos con los dataframes de Pandas"""
+
+    @staticmethod
+    def getFlightStatus(df):
+        """ Creamos el df para el diagrama de barras de aviones aterrizados vs en vuelo"""
+        df_status = df.groupby(['hour', 'Flight status']).size().unstack(fill_value=0)
+        df_status = df_status.reset_index()
+        df_status = df_status.melt(id_vars=['hour'], var_name='Flight Status', value_name='Count')
+        return df_status
+    
+    @staticmethod
+    def getWaitTimes(df):
+        """Creamos el df para las gráficas de tiempo de espera"""
+        df1 = DataframeProcessor.getVelocities(df)
+        df2 = DataframeProcessor.getFlights(df)
+
+        df1_s = df1.sort_values(["Timestamp (date)", "ICAO"])
+        df2_s = df2.sort_values(["Timestamp (date)", "ICAO"])
+
+        t = pd.Timedelta('10 minute')
+        dff = pd.merge_asof(df1_s, df2_s, on="Timestamp (date)", by="ICAO", direction="nearest", tolerance=t)
+
+        # Ensure data is sorted by Flight ID and timestamp
+        dff = dff.sort_values(by=["Callsign", "Timestamp (date)"])
+
+        # Separate on-ground and airborne events
+        on_ground = dff[(dff["Flight status"] == "on-ground") & (dff["Speed"]==0)].groupby("Callsign")["Timestamp (date)"].min()
+        airborne = dff[dff["Flight status"] == "airborne"].groupby("Callsign")["Timestamp (date)"].min()
+
+        # Convertimos las series en df de Pandas
+        on_ground = pd.DataFrame(on_ground)
+        on_ground.columns = ["ts ground"]
+
+        airborne = pd.DataFrame(airborne)
+        airborne.columns = ["ts airborne"]
+
+        # Creamos las columnas de tiempos de espera
+        df_wait_times = on_ground.merge(airborne, how="inner", on="Callsign")
+        df_wait_times = df_wait_times[df_wait_times["ts airborne"] > df_wait_times["ts ground"]]
+        df_wait_times["Wait time"] = df_wait_times["ts airborne"] - df_wait_times["ts ground"]
+        df_wait_times["Wait time (s)"] = df_wait_times["Wait time"].dt.total_seconds()
+        df_wait_times = ut.extractDaysOfTheWeek(df_wait_times)
+
+        return df_wait_times
+
 
     @staticmethod
     def getAirplaneCategories(df):
