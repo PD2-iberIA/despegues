@@ -7,9 +7,6 @@ from decoder import Decoder
 
 # Configuración
 
-TAR_PATH = "C:/Users/bryan/PycharmProjects/despegues/src/202412010000_202412072359.tar"
-FILE_NAME = "202412010000_202412072359.csv"
-
 CHUNK_SIZE = 2_000_000
 SAVE_EVERY = 10 # Guardar cada 10 chunks (~5M filas por Parquet)
 START_ROW = 0
@@ -28,7 +25,7 @@ def process_chunk(chunk):
     return chunk.apply(lambda x: safe_process_message(x["message"], x["ts_kafka"]), axis=1).apply(pd.Series)
 
 
-def read_data():
+def read_data(TAR_PATH, FILE_NAME):
     """Lee el archivo TAR y procesa los datos en chunks con paralelismo."""
     dfs = []
     num_chunks = 0
@@ -110,6 +107,3 @@ def safe_process_message(message, ts_kafka):
         print(f"⚠️ Error en processMessage: {e}")
         return {}  # Devuelve un diccionario vacío en caso de error
 
-
-if __name__ == "__main__":
-    read_data()
