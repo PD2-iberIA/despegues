@@ -28,25 +28,39 @@ class DataframeProcessor:
         # Ensure data is sorted by Flight ID and timestamp
         dff = dff.sort_values(by=["Callsign", "Timestamp (date)"])
 
+        # Define runways
+        RUNWAYS = [
+            {"name": "1", "position": (40.463, -3.554)},
+            {"name": "2", "position": (40.473, -3.536)},
+            {"name": "3", "position": (40.507, -3.574)},
+            {"name": "4", "position": (40.507, -3.559)}
+        ]
+
+        def find_nearest_runway(lat, lon):
+            return min(RUNWAYS, key=lambda r: (r["position"][0] - lat) ** 2 + (r["position"][1] - lon) ** 2)["name"]
+
         # Separate on-ground and airborne events
-        on_ground = dff[(dff["Flight status"] == "on-ground") & (dff["Speed"]==0)].groupby("Callsign")["Timestamp (date)"].min()
-        airborne = dff[dff["Flight status"] == "airborne"].groupby("Callsign")["Timestamp (date)"].min()
+        on_ground = dff[(dff["Flight status"] == "on-ground") & (dff["Speed"]==0)].groupby(["Callsign", "ICAO"])["Timestamp (date)"].min()
+        on_ground = pd.DataFrame(on_ground).reset_index()
+        on_ground.columns = ["Callsign", "ICAO", "ts ground"]
 
-        # Convertimos las series en df de Pandas
-        on_ground = pd.DataFrame(on_ground)
-        on_ground.columns = ["ts ground"]
-
-        airborne = pd.DataFrame(airborne)
-        airborne.columns = ["ts airborne"]
+        airborne = dff[dff["Flight status"] == "airborne"].groupby(["Callsign", "ICAO"]).agg({
+            "Timestamp (date)": "min",
+            "lat": "first",
+            "lon": "first"
+        }).reset_index()
+        airborne.columns = ["Callsign", "ICAO", "ts airborne", "lat", "lon"]
+        airborne["runway"] = airborne.apply(lambda row: find_nearest_runway(row["lat"], row["lon"]), axis=1)
 
         # Creamos las columnas de tiempos de espera
-        df_wait_times = on_ground.merge(airborne, how="inner", on="Callsign")
+        df_wait_times = on_ground.merge(airborne, how="inner", on=["Callsign", "ICAO"])
         df_wait_times = df_wait_times[df_wait_times["ts airborne"] > df_wait_times["ts ground"]]
         df_wait_times["Wait time"] = df_wait_times["ts airborne"] - df_wait_times["ts ground"]
         df_wait_times["Wait time (s)"] = df_wait_times["Wait time"].dt.total_seconds()
         df_wait_times = ut.extractDaysOfTheWeek(df_wait_times, "ts airborne")
 
         return df_wait_times
+
 
     @staticmethod
     def getAirplaneCategories(df):
