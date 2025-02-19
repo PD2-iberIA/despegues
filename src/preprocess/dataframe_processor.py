@@ -44,7 +44,7 @@ class DataframeProcessor:
         df_wait_times = df_wait_times[df_wait_times["ts airborne"] > df_wait_times["ts ground"]]
         df_wait_times["Wait time"] = df_wait_times["ts airborne"] - df_wait_times["ts ground"]
         df_wait_times["Wait time (s)"] = df_wait_times["Wait time"].dt.total_seconds()
-        df_wait_times = ut.extractDaysOfTheWeek(df_wait_times)
+        df_wait_times = ut.extractDaysOfTheWeek(df_wait_times, "ts airborne")
 
         return df_wait_times
 
