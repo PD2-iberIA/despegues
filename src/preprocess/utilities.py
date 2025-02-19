@@ -29,3 +29,9 @@ def extractDaysOfTheWeek(df):
     """ Crea una nueva columna 'day_of_week' con las tres primeras letras del día de la semana"""
     df['day_of_week'] = df['Timestamp (date)'].dt.strftime('%a')
     return df
+
+def extractHour(df):
+    """ Asegura q el df está en formato timestamp y extrae una columna 'hour' con la hora a partir de la fecha"""
+    df['Timestamp (date)'] = pd.to_datetime(df['Timestamp (date)'])
+    df['hour'] = df['Timestamp (date)'].dt.floor('H')
+    return df

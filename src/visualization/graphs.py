@@ -1,5 +1,6 @@
 import plotly.express as px
-from ../preprocess/dataframe_processor import DataframeProcessor
+from preprocess.dataframe_processor import DataframeProcessor
+import pandas as pd
 
 # Gráfica por horas de aviones en tierra y aterrizados
 def graph_hourly_flight_status(df):
@@ -90,7 +91,7 @@ def histogram_wait_times(df):
     return fig_hist
 
 def boxplot_wait_times(df):
-    fig_box = px.box(df_wait_times, y="Wait time (s)", title="Boxplot de Valores")
+    fig_box = px.box(df, y="Wait time (s)", title="Boxplot de Valores")
     return fig_box
 
 def heatmap_wait_times(df):

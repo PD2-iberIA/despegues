@@ -8,9 +8,11 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import geopy.distance
 import re
+import pandas as pd
+from branca.colormap import linear
 
 class Maps:
-    """Clase encargada de generar mapas"""
+    """Clase encargada de generar mapas."""
 
     CATEGORY_COLORS = {
         'Reserved': 'grey',
@@ -35,6 +37,12 @@ class Maps:
 
     @staticmethod
     def getTitleHTML(title):
+        """
+        Genera el título del mapa en html.
+
+        Parámetros:
+            title (str): Nombre del mapa.
+        """
         return f'''
         <div style="position: fixed; 
                     bottom: 50px; left: 50%; transform: translateX(-50%); width: auto; 
@@ -46,7 +54,12 @@ class Maps:
 
     @staticmethod
     def getRadarMarker():
-
+        """
+        Genera el icono del radar para que se muestre en el mapa.
+        
+        Devuelve:
+            folium.Marker: Un marker de folium correspondiente al radar.
+        """
         icon = folium.CustomIcon("./visualization/custom_icons/radar_icon.png", icon_size=(30,30))
         return folium.Marker(
                 location=[ac.RADAR_POSITION[0], ac.RADAR_POSITION[1]],
@@ -56,9 +69,14 @@ class Maps:
     
     @staticmethod
     def getRunwayMarkers():
+        """
+        Genera los iconos de las pistas del aeropuerto.
+        
+        Devuelve:
+            folium.Marker (list): Lista con los marcadores.
+        """
         runways = [ac.RUNWAY_1, ac.RUNWAY_2, ac.RUNWAY_3, ac.RUNWAY_4]
 
-        
         icons = [folium.CustomIcon("./visualization/custom_icons/runway_icon.png", icon_size=(40,40)) for i in range(len(runways))]
         
         return [
@@ -74,11 +92,11 @@ class Maps:
         Genera un mapa de calor animado en función de una frecuencia dada.
     
         Parámetros:
-        df (pandas.DataFrame): Dataframe con las siguientes columnas: "Timestamp (date)", "lat", "lon"
-        freq (int): Frecuencia en minutos
+            df (pandas.DataFrame): Dataframe con las siguientes columnas: "Timestamp (date)", "lat", "lon"
+            freq (int): Frecuencia en minutos
     
         Retorna:
-        folium.map: Mapa de calor
+            folium.map: Mapa de calor
         """
     
         center = [ac.RADAR_POSITION[0], ac.RADAR_POSITION[1]]
@@ -105,19 +123,17 @@ class Maps:
 
         return m
 
-
-
     @staticmethod
     def positionsScatterMap(df, title="Flight Status Scatter Map"):
         """
         Genera un Scatter Map.
     
         Parámetros:
-        df (pandas.DataFrame): Dataframe con las siguientes columnas: "ICAO", "lat", "lon", "Flight status"
-        title (string): Título del mapa
+            df (pandas.DataFrame): Dataframe con las siguientes columnas: "ICAO", "lat", "lon", "Flight status"
+            title (string): Título del mapa
         
         Retorna:
-        folium.map: Scatter Map
+            folium.map: Scatter Map
         """
         center = [ac.RADAR_POSITION[0], ac.RADAR_POSITION[1]]
         
@@ -145,10 +161,18 @@ class Maps:
         
         # Añadimos los puntos
         for i, row in df.iterrows():
+            # Añadimos un hover con la información de cada punto
+            tooltip_text = f"""
+                ICAO: {row['ICAO']}<br>
+                Flight status: {row['Flight status']}<br>
+                Latitud: {row['lat']:.5f}<br>
+                Longitud: {row['lon']:.5f}
+            """
+
             folium.Circle(
                 location=[row['lat'], row['lon']],
                 radius=7,
-                tooltip=row['ICAO'],
+                tooltip=folium.Tooltip(tooltip_text, sticky=True),
                 color=colores.get(row['Flight status'], 'black'),
                 fill=True,
                 fill_color=colores.get(row['Flight status'], 'black'),
@@ -179,13 +203,13 @@ class Maps:
     @staticmethod
     def trajectoriesMap(df):
         """
-        Genera un mapa con las trayectorias clasificadas por avión y tipo de vuelo
+        Genera un mapa con las trayectorias clasificadas por avión y tipo de vuelo.
     
         Parámetros:
-        df (pandas.DataFrame): Dataframe con las siguientes columnas: "Timestamp (date)", "lat", "lon", "ICAO", "Callsign", "TurbulenceCategory"
+            df (pandas.DataFrame): Dataframe con las siguientes columnas: "Timestamp (date)", "lat", "lon", "ICAO", "Callsign", "TurbulenceCategory".
     
         Retorna:
-        folium.map: Mapa con las trayectorias
+            folium.map: Mapa con las trayectorias.
         """
         
         center = [ac.RADAR_POSITION[0], ac.RADAR_POSITION[1]]
@@ -238,14 +262,31 @@ class Maps:
             
             # Dibujamos la trayectoria y la clasificamos
             if dist_first < PROXIMITY_THRESHOLD:  
-                traj.explore(m=group2, color=Maps.CATEGORY_COLORS[first_point["TurbulenceCategory"]])
                 group = group2
             elif dist_last < PROXIMITY_THRESHOLD:
-                traj.explore(m=group3, color=Maps.CATEGORY_COLORS[first_point["TurbulenceCategory"]])
                 group = group3
             else:
-                traj.explore(m=group4, color=Maps.CATEGORY_COLORS[first_point["TurbulenceCategory"]])
                 group = group4
+            
+            # Hover personalizado para cada trayectoria
+            hover_text = (
+                f"<strong>ICAO:</strong> {first_point['ICAO']}<br>"
+                f"<strong>Callsign:</strong> {first_point['Callsign']}<br>"
+                f"<strong>Turbulence Category:</strong> {first_point['TurbulenceCategory']}<br>"
+                f"<strong>Flight Status:</strong> {'Take-off' if dist_first < PROXIMITY_THRESHOLD else ('Landing' if dist_last < PROXIMITY_THRESHOLD else 'In flight')}"
+            )
+
+            # Coordenadas de la trayectoria
+            trajectory_points = [[row['geometry'].y, row['geometry'].x] for _, row in traj.df.iterrows()]
+
+            # Trayectoria con hover
+            folium.PolyLine(
+                locations=trajectory_points,
+                color=Maps.CATEGORY_COLORS[first_point["TurbulenceCategory"]],
+                weight=3,
+                opacity=0.8,
+                tooltip=folium.Tooltip(hover_text, sticky=True, direction="top")
+            ).add_to(group)
 
             # Dibujamos un círculo al final de la trayectoria para indicar sentido
             folium.Circle(
@@ -282,4 +323,89 @@ class Maps:
         m.get_root().html.add_child(folium.Element(legend_html))
             
         return m
+    
+    @staticmethod
+    def altitudesMap(df):
+        """
+        Genera un mapa con las trayectorias coloreadas por altura.
 
+        Parámetros:
+            df (pandas.DataFrame): obtenido a partir de la función `getAltitudes` del módulo dataframe_processor. Columnas: "Timestamp (date)", "lat", "lon", "ICAO", 
+            "Callsign", "TurbulenceCategory", "Altitude (ft)".
+
+        Retorna:
+            folium.Map: Mapa con trayectorias degradadas por altura.
+        """
+
+        # Creamos un colormap para la altura
+        min_alt, max_alt = df["Altitude (ft)"].min(), df["Altitude (ft)"].max()
+        colormap = linear.Set2_04.scale(min_alt, max_alt)
+        colormap.caption = 'Altitude (ft)'
+
+        center = [ac.RADAR_POSITION[0], ac.RADAR_POSITION[1]]
+        m = folium.Map(location=center, tiles="Cartodb Positron", zoom_start=13)
+
+        # Grupos de capas
+        group1 = MarkerCluster(name="Locations").add_to(m)
+        group4 = folium.FeatureGroup("Flights by Altitude").add_to(m)
+
+        # Marcadores
+        Maps.getRadarMarker().add_to(group1)
+        for mk in Maps.getRunwayMarkers():
+            mk.add_to(group1)
+
+        # Generamos las trayectorias
+        trajs = mpd.TrajectoryCollection(
+            df,
+            traj_id_col="Callsign",
+            obj_id_col="ICAO",
+            t="Timestamp (date)",
+            x="lon",
+            y="lat"
+        )
+
+        # Dibujamos cada trayectoria con degradado por altura
+        for traj in trajs:
+            traj_df = traj.df.sort_values("Timestamp (date)")
+
+            # Calculamos la altitud media de la trayectoria para usarla en el tooltip
+            avg_altitude = traj_df["Altitude (ft)"].mean()
+            # Tooltip para la trayectoria completa
+            trajectory_tooltip = f"ICAO: {traj.df['ICAO'].iloc[0]}<br>Callsign: {traj.df['Callsign'].iloc[0]}<br>Altitud media: {avg_altitude:.0f} pies"
+
+            for i in range(len(traj_df) - 1):
+                p1 = traj_df.iloc[i]
+                p2 = traj_df.iloc[i + 1]
+                
+                # Color basado en la altura promedio del segmento
+                avg_alt = (p1["Altitude (ft)"] + p2["Altitude (ft)"]) / 2
+                color = colormap(avg_alt)
+
+                folium.PolyLine(
+                    locations=[
+                        [p1['geometry'].y, p1['geometry'].x],
+                        [p2['geometry'].y, p2['geometry'].x]
+                    ],
+                    color=color,
+                    weight=3,
+                    opacity=0.9,
+                    tooltip=f"ICAO: {traj.df['ICAO'].iloc[0]}<br>Callsign: {traj.df['Callsign'].iloc[0]}<br>Altitude: {avg_alt:.0f} ft"
+                ).add_to(group4)
+
+            # Círculo final para indicar el sentido
+            last_point = traj_df.iloc[-1]
+            folium.Circle(
+                location=[last_point['geometry'].y, last_point['geometry'].x],
+                radius=120,
+                color="black",
+                fill=True,
+                fill_color=color,
+                opacity=0.7,
+                tooltip=trajectory_tooltip
+            ).add_to(group4)
+
+        # Añadimos leyenda y controles
+        colormap.add_to(m)
+        folium.LayerControl().add_to(m)
+
+        return m
