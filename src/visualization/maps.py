@@ -323,7 +323,92 @@ class Maps:
         m.get_root().html.add_child(folium.Element(legend_html))
             
         return m
-    
+
+    @staticmethod
+    def detailedTrajectoriesMap(df):
+        # Calculamos la distancia de cada punto al radar
+        def calculate_distance_to_radar(lat, lon, radar_position):
+            return geopy.distance.distance((lat, lon), radar_position).km
+        
+        # Radar position (use your predefined value here)
+        radar_position = [ac.RADAR_POSITION[0], ac.RADAR_POSITION[1]]
+        
+        # Crear una columna de distancias en el DataFrame
+        df['distance_to_radar'] = df.apply(
+            lambda row: calculate_distance_to_radar(row['lat'], row['lon'], radar_position), axis=1
+        )
+        
+        # Aplicamos la tasa de muestreo basada en la distancia y la velocidad
+        df_filtered = pd.DataFrame()
+
+        for traj_id in df['Callsign'].unique():
+            traj_df = df[df['Callsign'] == traj_id]
+            undersampled_traj = []
+
+            for i in range(0, len(traj_df), 1):  # Iterar sobre los puntos de la trayectoria
+                point = traj_df.iloc[i]
+                distance = point['distance_to_radar']
+                speed = point['Speed']
+                
+                # Definir tasa de muestreo: mayor en puntos cerca del radar y con velocidad baja
+                if distance < 10 and speed <= 300:  # Dentro de 10 km y velocidad <= 300 km/h
+                    sample_rate = 10  # Tomar 1 de cada 5 puntos
+                else:
+                    sample_rate = 50  # Tomar 1 de cada 30 puntos
+                
+                if i % sample_rate == 0:  # Solo agregar puntos a la muestra según la tasa de muestreo
+                    undersampled_traj.append(point)
+            
+            df_filtered = pd.concat([df_filtered, pd.DataFrame(undersampled_traj)])
+
+        # Crear el mapa
+        center = [ac.RADAR_POSITION[0], ac.RADAR_POSITION[1]]
+        m = folium.Map(location=center, tiles="Cartodb Positron", zoom_start=13)
+
+        # Grupos de capas
+        group1 = MarkerCluster(name="Locations").add_to(m)
+        group2 = folium.FeatureGroup("Trayectories").add_to(m)
+
+        # Marcadores
+        Maps.getRadarMarker().add_to(group1)
+        rwMarkers = Maps.getRunwayMarkers()
+        for mk in rwMarkers:
+            mk.add_to(group1)
+
+        # Generamos las trayectorias
+        trajs = mpd.TrajectoryCollection(
+            df_filtered,
+            traj_id_col="Callsign",
+            obj_id_col="ICAO",
+            t="Timestamp (date)",
+            x="lon",
+            y="lat"
+        )
+
+        # Recorremos las trayectorias
+        for traj in trajs:
+
+            # Última posición
+            last_point = traj.df.iloc[-1]
+            lon_last, lat_last = last_point['geometry'].x, last_point['geometry'].y
+
+
+            # Dibujamos un círculo al final de la trayectoria para indicar sentido
+            folium.Circle(
+                location=[lat_last, lon_last],
+                radius=120,
+                color="black",
+                fill=True,
+                fill_color=Maps.CATEGORY_COLORS[last_point["TurbulenceCategory"]],
+                opacity=0.5
+            ).add_to(m)
+
+        return trajs.explore(
+            m=m,
+            column="Speed",
+            cmap="plasma"
+        )
+
     @staticmethod
     def altitudesMap(df):
         """
