@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-import utilities as ut
+import preprocess.utilities as ut
 
 class DataframeProcessor:
     """Clase que permite realizar operaciones de procesamiento y análisis de datos con los dataframes de Pandas"""
