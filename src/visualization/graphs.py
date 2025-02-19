@@ -91,7 +91,7 @@ def histogram_wait_times(df):
     return fig_hist
 
 def boxplot_wait_times(df):
-    fig_box = px.box(df_wait_times, y="Wait time (s)", title="Boxplot de Valores")
+    fig_box = px.box(df, y="Wait time (s)", title="Boxplot de Valores")
     return fig_box
 
 def heatmap_wait_times(df):
