@@ -20,27 +20,32 @@ class ParquetProcessor:
         try:
             df = pd.read_parquet(file, engine="pyarrow")
 
-            # Asegurar que la columna Timestamp está en formato datetime
-            df["Timestamp (date)"] = pd.to_datetime(df["Timestamp (date)"], errors="coerce")
-            df.dropna(subset=["Timestamp (date)"], inplace=True)  # Eliminar valores NaN
+            # Convertir la columna "Static air temperature (C)" a string en el DataFrame nuevo
+            if "Static air temperature (C)" in df.columns:
+                df["Static air temperature (C)"] = df["Static air temperature (C)"].astype(str)
 
-            # Extraer fecha y hora
+            # Asegurar que la columna Timestamp esté en formato datetime y eliminar filas con valores nulos
+            df["Timestamp (date)"] = pd.to_datetime(df["Timestamp (date)"], errors="coerce")
+            df.dropna(subset=["Timestamp (date)"], inplace=True)
+
+            # Extraer fecha y hora en formato string limpio
             df["date"] = df["Timestamp (date)"].dt.strftime("%Y-%m-%d").str.strip()
             df["hour"] = df["Timestamp (date)"].dt.strftime("%H").str.strip()
 
-            # Guardar por día y hora fusionando si ya existe el archivo
+            # Guardar o actualizar datos por día y hora
             for (date, hour), group in df.groupby(["date", "hour"]):
                 folder_path = os.path.join(self.output_folder, date, hour)
                 os.makedirs(folder_path, exist_ok=True)
-
                 output_filepath = os.path.join(folder_path, f"data_{date}_{hour}.parquet")
 
-                # Si el archivo ya existe, lo cargamos y fusionamos
+                # Si ya existe un archivo para esa fecha y hora, cargarlo y concatenar
                 if os.path.exists(output_filepath):
                     existing_df = pd.read_parquet(output_filepath, engine="pyarrow")
+                    # Asegurarse de que la columna "Static air temperature (C)" en el DataFrame existente sea string
+                    if "Static air temperature (C)" in existing_df.columns:
+                        existing_df["Static air temperature (C)"] = existing_df["Static air temperature (C)"].astype(str)
                     group = pd.concat([existing_df, group], ignore_index=True)
 
-                # Guardamos el archivo actualizado
                 group.to_parquet(output_filepath, engine="pyarrow")
                 print(f"Actualizado {output_filepath}")
 
@@ -55,6 +60,13 @@ class ParquetProcessor:
             print(f"Procesando {file}...")
             self.process_file(file)
 
+    def process(self):
+        """
+        Procesa cada archivo de la lista sin concatenarlos en memoria.
+        """
+        for file in self.filepaths:
+            print(f"Procesando {file}...")
+            self.process_file(file)
 
     def clean_data(self):
         """
