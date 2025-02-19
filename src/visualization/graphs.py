@@ -1,6 +1,10 @@
 import plotly.express as px
 from preprocess.dataframe_processor import DataframeProcessor
 import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
+
 
 # Gráfica por horas de aviones en tierra y aterrizados
 def graph_hourly_flight_status(df):
@@ -113,3 +117,73 @@ def heatmap_wait_times(df):
     )
 
     return fig_heatmap
+
+def waits_by_categories_and_runways(df):
+
+    df_espera = DataframeProcessor.getWaitTimes(df)
+    df_aterrizajes = df_espera[df_espera["runway"].isin(["3","4"])]
+    df_tipos = DataframeProcessor.getAirplaneCategories(df)
+    df_aterrizajes = df_aterrizajes.merge(df_tipos, on="ICAO")
+
+    df_aterrizajes = df_aterrizajes.sort_values(by="ts airborne")
+
+    # - Boxplot de tiempo de espera según la categoría del avión anterior y la pista -
+
+    df_aterrizajes["Prev_Turbulence"] = df_aterrizajes.groupby("runway")["TurbulenceCategory"].shift(1)
+    df_aterrizajes = df_aterrizajes.dropna(subset=["Prev_Turbulence"])
+
+    df_aterrizajes["Prev_Turbulence"] = df_aterrizajes["Prev_Turbulence"].str.replace(r'\s*\(.*?\)', '', regex=True)
+
+    plt.figure(figsize=(12, 6))
+    sns.boxplot(
+        data=df_aterrizajes,
+        y="Prev_Turbulence",
+        x="Wait time (s)",
+        hue="runway",
+        palette=sns.color_palette("viridis", n_colors=len(df_aterrizajes["runway"].unique()))
+    )
+
+    plt.title("Tiempo de espera según la categoría del avión anterior y la pista")
+    plt.xlabel("Tiempo de espera (s)")
+    plt.ylabel("Categoría del avión anterior")
+    plt.legend(title="Pista")
+    plt.grid(axis="x", linestyle="--", alpha=0.7)
+
+    plt.show()
+
+    # - Distribución de tiempos de espera poe pista -
+    
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 12), sharex=True)
+
+    sns.histplot(
+        data=df_aterrizajes,
+        x="Wait time (s)",
+        hue="runway",
+        kde=True,  # Añadir la estimación de densidad
+        bins=30,  # Número de bins
+        palette=sns.color_palette("viridis", n_colors=len(df_aterrizajes["runway"].unique())),
+        alpha=0.6,
+        stat="density",  # Usar densidad para normalizar el histograma
+        ax=ax1  # Especificar el eje
+    )
+
+    ax1.set_title("Distribución de tiempos de espera por pista")
+    ax1.set_ylabel("Densidad")
+    ax1.grid(axis="x", linestyle="--", alpha=0.7)
+
+    sns.boxplot(
+        data=df_aterrizajes,
+        x="Wait time (s)",
+        y="runway",
+        palette=sns.color_palette("viridis", n_colors=len(df_aterrizajes["runway"].unique())),
+        whis=np.inf,  # Para mostrar todos los puntos
+        width=0.4,  # Ancho del boxplot
+        ax=ax2  # Especificar el eje
+    )
+
+    ax2.set_xlabel("Tiempo de Espera (s)")
+    ax2.set_ylabel("Pista")
+    ax2.grid(axis="x", linestyle="--", alpha=0.7)
+
+    plt.show()
+
