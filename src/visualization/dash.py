@@ -4,8 +4,8 @@ import plotly.express as px
 import pandas as pd
 import numpy as np
 import graphs as g
-import preprocess/utilities as ut
-from dataframe_processor import DataframeProcessor
+import preprocess.utilities as ut
+from preprocess.dataframe_processor import DataframeProcessor
 
 DATA_PATH = ""
 df = pd.read_parquet(DATA_PATH)
