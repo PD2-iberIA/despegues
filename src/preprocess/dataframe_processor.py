@@ -8,9 +8,34 @@ class DataframeProcessor:
     @staticmethod
     def getFlightStatus(df):
         """ Creamos el df para el diagrama de barras de aviones aterrizados vs en vuelo"""
-        df_status = df.groupby(['hour', 'Flight status']).size().unstack(fill_value=0)
+        # Conseguimos el df con todos los datos necesarios->flight status en todos los callsign
+        df1 = DataframeProcessor.getVelocities(df)
+        df2 = DataframeProcessor.getFlights(df)
+
+        df1_s = df1.sort_values(["Timestamp (date)", "ICAO"])
+        df2_s = df2.sort_values(["Timestamp (date)", "ICAO"])
+
+        t = pd.Timedelta('10 minute')
+        dff = pd.merge_asof(df1_s, df2_s, on="Timestamp (date)", by="ICAO", direction="nearest", tolerance=t)
+
+        # Ensure timestamp is in datetime format
+        dff['Timestamp (date)'] = pd.to_datetime(dff['Timestamp (date)'])
+
+        # Extract hour
+        dff = ut.extractHour(dff)
+
+        # Day of the week
+        dff = ut.extractDaysOfTheWeek(dff)
+
+
+        df_status = df.groupby(['hour', 'Flight status', 'Callsign']).size().unstack(fill_value=0)
+        # Sumammos el número de vuelos, no el número de mensajes
+        df_status['count_nonzero'] = (df_status.ne(0)).sum(axis=1)
         df_status = df_status.reset_index()
-        df_status = df_status.melt(id_vars=['hour'], var_name='Flight Status', value_name='Count')
+        
+        # Summarize data: count_nonzero per hour divided by Flight status
+        df_status = df_status.groupby(['hour', 'Flight status'])['count_nonzero'].sum().reset_index()
+        
         return df_status
     
     @staticmethod

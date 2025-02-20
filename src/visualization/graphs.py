@@ -20,26 +20,12 @@ def graph_hourly_flight_status(df):
     Returns:
         plotly.graph_objects.Figure: A Plotly figure object displaying the stacked bar chart.
     """
-    # Ensure timestamp is in datetime format
-    df['Timestamp (date)'] = pd.to_datetime(df['Timestamp (date)'])
-
-    # Extract hour
-    df['hour'] = df['Timestamp (date)'].dt.floor('H')
-
-    # Group by hour and flight status
-    traffic_by_hour = df.groupby(['hour', 'Flight status']).size().unstack(fill_value=0)
-
-    # Reset index for plotting
-    traffic_by_hour_reset = traffic_by_hour.reset_index()
-
-    # Melt the DataFrame for Plotly
-    traffic_melted = traffic_by_hour_reset.melt(id_vars=['hour'], var_name='Flight Status', value_name='Count')
 
     # Create interactive stacked bar chart using Plotly
     fig = px.bar(
-        traffic_melted, 
+        df, 
         y='hour', 
-        x='Count', 
+        x='count_nonzero', 
         color='Flight Status', 
         title="Hourly Air Traffic (On-Ground vs Airborne)",
         labels={'hour': 'Hour', 'Count': 'Number of Flights'},
