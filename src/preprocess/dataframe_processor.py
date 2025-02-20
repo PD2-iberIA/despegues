@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from datetime import timedelta
 import preprocess.utilities as ut
 
 class DataframeProcessor:
@@ -250,39 +251,37 @@ class DataframeProcessor:
     @staticmethod
     def removeOutlierFlights(df):
         """
-        Elimina vuelos considerados outliers de un DataFrame.
+        Elimina vuelos considerados outliers de un DataFrame. Consideramos como outlier un vuelo si recorre una distancia
+        mayor a 200km en menos de 1 minuto.
 
         Parámetros:
             df: DataFrame de datos.
 
         Devuelve:
-            DataFrame con los datos limpios.
+            df_filtered: DataFrame con los datos limpios.
         """
+        df_limpio = df[~df['lat'].isna()]
 
-        # Calcula la distancia entre dos puntos geográficos
-        def haversine(lat1, lon1, lat2, lon2):
-            R = 6371  # Radio de la Tierra en km
-            phi1, phi2 = np.radians(lat1), np.radians(lat2)
-            delta_phi = np.radians(lat2 - lat1)
-            delta_lambda = np.radians(lon2 - lon1)
+        # Calcula la distancia y tiempo entre filas consecutivas por ICAO
+        df_limpio['prev_lat'] = df_limpio.groupby(['ICAO'])['lat'].shift(1)
+        df_limpio['prev_lon'] = df_limpio.groupby(['ICAO'])['lon'].shift(1)
+        df_limpio['distance'] = df_limpio.apply(lambda row: ut.haversine(row['lat'], row['lon'], row['prev_lat'], row['prev_lon']) 
+                            if not pd.isna(row['prev_lat']) else 0, axis=1)
+        df_limpio['prev_time'] = df_limpio.groupby(['ICAO'])['Timestamp (date)'].shift(1)
+        df_limpio['time_diff'] = df_limpio['Timestamp (date)'] - df_limpio['prev_time']
 
-            a = np.sin(delta_phi / 2)**2 + np.cos(phi1) * np.cos(phi2) * np.sin(delta_lambda / 2)**2
-            c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
-            return R * c  # Distancia en km
-
-        # Calcula la distancia entre filas consecutivas por ICAO y Callsign
-        df['prev_lat'] = df.groupby(['ICAO', 'Callsign'])['lat'].shift(1)
-        df['prev_lon'] = df.groupby(['ICAO', 'Callsign'])['lon'].shift(1)
-        df['distance'] = df.apply(lambda row: haversine(row['lat'], row['lon'], row['prev_lat'], row['prev_lon']) 
-                                if not pd.isna(row['prev_lat']) else 0, axis=1)
-
+        # Límites de tiempo y distancia
         DISTANCE_THRESHOLD = 200 
+        MINUTES_THRESHOLD = 1
+        
+        # Filtros
+        filtro_distancia = df_limpio['distance'] > DISTANCE_THRESHOLD
+        filtro_tiempo = df_limpio['time_diff'] < timedelta(minutes=MINUTES_THRESHOLD)
 
-        # Outlier si la distancia supera los 200km
-        removed_planes = df[df['distance'] > DISTANCE_THRESHOLD]['ICAO'].unique()
+        # Obtenemos los ICAO de los outliers
+        outliers_icao = df_limpio[filtro_distancia & filtro_tiempo]['ICAO'].unique()
 
         # Eliminamos los outliers (y las columnas auxiliares para el cálculo)
-        df_filtered = df[~df['ICAO'].isin(removed_planes)]
-        df_filtered = df_filtered.drop(columns=['prev_lat', 'prev_lon', 'distance'])
+        df_filtered = df[~df['ICAO'].isin(outliers_icao)]
 
         return df_filtered

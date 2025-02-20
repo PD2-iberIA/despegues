@@ -36,3 +36,23 @@ def extractHour(df):
     df['Timestamp (date)'] = pd.to_datetime(df['Timestamp (date)'], format='mixed', errors='coerce')
     df['hour'] = df['Timestamp (date)'].dt.floor('H')
     return df
+
+def haversine(lat1, lon1, lat2, lon2):
+    """Calcula la distancia entre dos puntos. Para ello utilizamos la fórmula de Haversine.
+    
+    Parámetros:
+            lat1, lon1: coordenadas del punto 1
+            lat2, lon2: coordenadas del punto 2
+
+    Devuelve:
+        float: distancia entre los dos puntos (km)"""
+    EARTH_RADIUS = 6378 # radio de la Tierra (km)
+
+    phi1, phi2 = np.radians(lat1), np.radians(lat2)
+    delta_phi = np.radians(lat2 - lat1)
+    delta_lambda = np.radians(lon2 - lon1)
+
+    a = np.sin(delta_phi / 2)**2 + np.cos(phi1) * np.cos(phi2) * np.sin(delta_lambda / 2)**2
+    c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
+    distance = EARTH_RADIUS * c # km
+    return distance
