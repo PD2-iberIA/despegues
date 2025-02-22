@@ -1,12 +1,116 @@
 import numpy as np
 import pandas as pd
+from datetime import timedelta
+import preprocess.utilities as ut
 
 class DataframeProcessor:
-    """Clase que permite realizar operaciones de procesamiento y análisis de datos con los dataframes de Pandas"""
+    """Clase que permite realizar operaciones de procesamiento y análisis de datos con los dataframes de Pandas."""
+
+    @staticmethod
+    def getFlightStatus(df):
+        """Crea el DataFrame para el diagrama de barras de aviones aterrizados vs en vuelo.
+
+        Parámetros:
+            df: DataFrame de datos.
+
+        Devuelve:
+            df_status: DataFrame transformado.
+        """
+        # Conseguimos el df con todos los datos necesarios->flight status en todos los callsign
+        df1 = DataframeProcessor.getVelocities(df)
+        df2 = DataframeProcessor.getFlights(df)
+
+        df1_s = df1.sort_values(["Timestamp (date)", "ICAO"])
+        df2_s = df2.sort_values(["Timestamp (date)", "ICAO"])
+
+        t = pd.Timedelta('10 minute')
+        dff = pd.merge_asof(df1_s, df2_s, on="Timestamp (date)", by="ICAO", direction="nearest", tolerance=t)
+
+        # Ensure timestamp is in datetime format
+        dff['Timestamp (date)'] = pd.to_datetime(dff['Timestamp (date)'])
+
+        # Extract hour
+        dff = ut.extractHour(dff)
+
+        # Day of the week
+        dff = ut.extractDaysOfTheWeek(dff)
+
+        df_status = df.groupby(['hour', 'Flight status', 'Callsign']).size().unstack(fill_value=0)
+        # Sumammos el número de vuelos, no el número de mensajes
+        df_status['count_nonzero'] = (df_status.ne(0)).sum(axis=1)
+        df_status = df_status.reset_index()
+        
+        # Summarize data: count_nonzero per hour divided by Flight status
+        df_status = df_status.groupby(['hour', 'Flight status'])['count_nonzero'].sum().reset_index()
+        
+        return df_status
+    
+    @staticmethod
+    def getWaitTimes(df):
+        """Crea el DataFrame para las gráficas de tiempo de espera.
+        
+        Parámetros:
+            df: DataFrame de datos.
+
+        Devuelve:
+            df_wait_times: DataFrame transformado.
+        """
+        df1 = DataframeProcessor.getVelocities(df)
+        df2 = DataframeProcessor.getFlights(df)
+
+        df1_s = df1.sort_values(["Timestamp (date)", "ICAO"])
+        df2_s = df2.sort_values(["Timestamp (date)", "ICAO"])
+
+        t = pd.Timedelta('10 minute')
+        dff = pd.merge_asof(df1_s, df2_s, on="Timestamp (date)", by="ICAO", direction="nearest", tolerance=t)
+
+        # Ensure data is sorted by Flight ID and timestamp
+        dff = dff.sort_values(by=["Callsign", "Timestamp (date)"])
+
+        # Define runways
+        RUNWAYS = [
+            {"name": "1", "position": (40.463, -3.554)},
+            {"name": "2", "position": (40.473, -3.536)},
+            {"name": "3", "position": (40.507, -3.574)},
+            {"name": "4", "position": (40.507, -3.559)}
+        ]
+
+        def find_nearest_runway(lat, lon):
+            return min(RUNWAYS, key=lambda r: (r["position"][0] - lat) ** 2 + (r["position"][1] - lon) ** 2)["name"]
+
+        # Separate on-ground and airborne events
+        on_ground = dff[(dff["Flight status"] == "on-ground") & (dff["Speed"]==0)].groupby(["Callsign", "ICAO"])["Timestamp (date)"].min()
+        on_ground = pd.DataFrame(on_ground).reset_index()
+        on_ground.columns = ["Callsign", "ICAO", "ts ground"]
+
+        airborne = dff[dff["Flight status"] == "airborne"].groupby(["Callsign", "ICAO"]).agg({
+            "Timestamp (date)": "min",
+            "lat": "first",
+            "lon": "first"
+        }).reset_index()
+        airborne.columns = ["Callsign", "ICAO", "ts airborne", "lat", "lon"]
+        airborne["runway"] = airborne.apply(lambda row: find_nearest_runway(row["lat"], row["lon"]), axis=1)
+
+        # Creamos las columnas de tiempos de espera
+        df_wait_times = on_ground.merge(airborne, how="inner", on=["Callsign", "ICAO"])
+        df_wait_times = df_wait_times[df_wait_times["ts airborne"] > df_wait_times["ts ground"]]
+        df_wait_times["Wait time"] = df_wait_times["ts airborne"] - df_wait_times["ts ground"]
+        df_wait_times["Wait time (s)"] = df_wait_times["Wait time"].dt.total_seconds()
+        df_wait_times = ut.extractDaysOfTheWeek(df_wait_times, "ts airborne")
+
+        return df_wait_times
 
     @staticmethod
     def getAirplaneCategories(df):
+        """
+        Genera un DataFrame solo con los datos de la categoría de los aviones.
+        
+        Parámetros:
+            df: DataFrame de datos.
 
+        Devuelve:
+            DataFrame con las siguientes columnas: "ICAO", "TurbulenceCategory".
+        """
         # Seleccionamos mensajes ADS-B
         df = df[df["Downlink Format"].isin([17, 18])]
 
@@ -17,7 +121,15 @@ class DataframeProcessor:
 
     @staticmethod
     def getFlights(df):
+        """
+        Genera un DataFrame con los datos de vuelo.
+        
+        Parámetros:
+            df: DataFrame de datos.
 
+        Devuelve:
+            DataFrame con las siguientes columnas: "Timestamp (date)", "ICAO", "Callsign".
+        """
         NULL_CALLSIGN = "########"  # valor de nulo de la columna
         flightColumns = ["Timestamp (date)", "ICAO", "Callsign"] # columnas de la proyección
 
@@ -28,7 +140,15 @@ class DataframeProcessor:
     
     @staticmethod
     def getPositions(df):
+        """
+        Genera un DataFrame con los datos necesarios para visualizar las posiciones.
+        
+        Parámetros:
+            df: DataFrame de datos
 
+        Devuelve:
+            DataFrame con las siguientes columnas: "Timestamp (date)", "ICAO", "Flight status", "lat", "lon".
+        """
         columnasPosiciones = ["Timestamp (date)", "ICAO", "Flight status", "lat", "lon"]
 
         # Typecodes que indican posición
@@ -39,7 +159,15 @@ class DataframeProcessor:
     
     @staticmethod
     def getVelocities(df):
+        """
+        Genera un dataframe con los datos necesarios para visualizar las velocidades.
 
+        Parámetros:
+            df: DataFrame de datos.
+
+        Devuelve:
+            DataFrame con las siguientes columnas: "Timestamp (date)", "ICAO", "Flight status", "Speed", "lat", "lon".
+        """
         # Filtramos las filas donde la velocidad no es nula
         df_vel = df[df["Speed"].notna()]
         df_vel = df_vel[["Timestamp (date)", "ICAO", "Flight status", "Speed", "lat", "lon"]]
@@ -71,7 +199,15 @@ class DataframeProcessor:
     
     @staticmethod
     def getFlightsInfo(df):
+        """
+        Genera un dataframe con los datos necesarios para visualizar la  información de vuelo.
 
+        Parámetros:
+            df: DataFrame de datos.
+
+        Devuelve:
+            DataFrame con las siguientes columnas: "Timestamp (date)", "ICAO", "Flight status", "lat", "lon", "Callsign", "TurbulenceCategory".
+        """
         df_pos = DataframeProcessor.getPositions(df)
         df_flights = DataframeProcessor.getFlights(df)
         df_types = DataframeProcessor.getAirplaneCategories(df)
@@ -87,36 +223,72 @@ class DataframeProcessor:
         df = df.merge(df_types, on="ICAO")
 
         return df
+    
+    @staticmethod
+    def getAltitudes(df):
+        """
+        Genera un Dataframe con los datos necesarios para visualizar las altitudes por trayectoria.
+        
+        Parámetros:
+            df: DataFrame de datos.
+
+        Devuelve:
+            DataFrame con las siguientes columnas: "Timestamp (date)", "ICAO", "Flight status", "lat", "lon", "Callsign", "TurbulenceCategory".
+        """
+        # DataFrame filtrando las filas que contienen una altitud no nula
+        df_alt = df[df["Altitude (ft)"].notna()]
+        df_alt = df_alt[["Timestamp (date)", "ICAO", "Callsign", "Flight status", "Altitude (ft)", "lat", "lon"]]
+
+        # DataFrame para las trayectorias
+        df_traj = DataframeProcessor.getFlightsInfo(df)
+
+        # Hacemos merge y ordenamos
+        df_merged = pd.merge(df_traj, df_alt, on=["ICAO", "Callsign", "Timestamp (date)"])
+        df_merged.sort_values(by=["ICAO", "Callsign", "Timestamp (date)"], inplace=True)
+
+        # Filtramos las columnas de x (las de df_traj) y las renombramos
+        df_filtered = df_merged.filter(like='_x')
+        df_filtered.columns = df_filtered.columns.str.replace('_x', '')
+        
+        # Unimos las columnas filtradas con las demás columnas necesarias
+        df_final = pd.concat([df_filtered, df_merged[['ICAO', 'Callsign', 'Timestamp (date)', 'Altitude (ft)']]], axis=1)
+
+        return df_final
 
     @staticmethod
     def removeOutlierFlights(df):
+        """
+        Elimina vuelos considerados outliers de un DataFrame. Consideramos como outlier un vuelo si recorre una distancia
+        mayor a 200km en menos de 1 minuto.
 
-        # Calcula la distancia entre dos puntos geográficos
-        def haversine(lat1, lon1, lat2, lon2):
-            R = 6371  # Radio de la Tierra en km
-            phi1, phi2 = np.radians(lat1), np.radians(lat2)
-            delta_phi = np.radians(lat2 - lat1)
-            delta_lambda = np.radians(lon2 - lon1)
+        Parámetros:
+            df: DataFrame de datos.
 
-            a = np.sin(delta_phi / 2)**2 + np.cos(phi1) * np.cos(phi2) * np.sin(delta_lambda / 2)**2
-            c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
-            return R * c  # Distancia en km
+        Devuelve:
+            df_filtered: DataFrame con los datos limpios.
+        """
+        df_limpio = df[~df['lat'].isna()]
 
-        # Calcula la distancia entre filas consecutivas por ICAO y Callsign
-        df['prev_lat'] = df.groupby(['ICAO', 'Callsign'])['lat'].shift(1)
-        df['prev_lon'] = df.groupby(['ICAO', 'Callsign'])['lon'].shift(1)
-        df['distance'] = df.apply(lambda row: haversine(row['lat'], row['lon'], row['prev_lat'], row['prev_lon']) 
-                                if not pd.isna(row['prev_lat']) else 0, axis=1)
+        # Calcula la distancia y tiempo entre filas consecutivas por ICAO
+        df_limpio['prev_lat'] = df_limpio.groupby(['ICAO'])['lat'].shift(1)
+        df_limpio['prev_lon'] = df_limpio.groupby(['ICAO'])['lon'].shift(1)
+        df_limpio['distance'] = df_limpio.apply(lambda row: ut.haversine(row['lat'], row['lon'], row['prev_lat'], row['prev_lon']) 
+                            if not pd.isna(row['prev_lat']) else 0, axis=1)
+        df_limpio['prev_time'] = df_limpio.groupby(['ICAO'])['Timestamp (date)'].shift(1)
+        df_limpio['time_diff'] = df_limpio['Timestamp (date)'] - df_limpio['prev_time']
 
+        # Límites de tiempo y distancia
         DISTANCE_THRESHOLD = 200 
+        MINUTES_THRESHOLD = 1
+        
+        # Filtros
+        filtro_distancia = df_limpio['distance'] > DISTANCE_THRESHOLD
+        filtro_tiempo = df_limpio['time_diff'] < timedelta(minutes=MINUTES_THRESHOLD)
 
-        # Outlier si la distancia supera los 200km
-        removed_planes = df[df['distance'] > DISTANCE_THRESHOLD]['ICAO'].unique()
+        # Obtenemos los ICAO de los outliers
+        outliers_icao = df_limpio[filtro_distancia & filtro_tiempo]['ICAO'].unique()
 
         # Eliminamos los outliers (y las columnas auxiliares para el cálculo)
-        df_filtered = df[~df['ICAO'].isin(removed_planes)]
-        df_filtered = df_filtered.drop(columns=['prev_lat', 'prev_lon', 'distance'])
+        df_filtered = df[~df['ICAO'].isin(outliers_icao)]
 
         return df_filtered
-
-
