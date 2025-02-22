@@ -1,5 +1,9 @@
 import plotly.express as px
-from ../preprocess/dataframe_processor import DataframeProcessor
+from preprocess.dataframe_processor import DataframeProcessor
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
 
 # Gráfica por horas de aviones en tierra y aterrizados
 def graph_hourly_flight_status(df):
