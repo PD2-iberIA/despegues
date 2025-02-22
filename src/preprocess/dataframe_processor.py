@@ -3,6 +3,7 @@ import pandas as pd
 from datetime import timedelta
 import preprocess.utilities as ut
 
+
 class DataframeProcessor:
     """Clase que permite realizar operaciones de procesamiento y análisis de datos con los dataframes de Pandas."""
 
@@ -194,6 +195,7 @@ class DataframeProcessor:
 
         # El df que buscamos con esto tiene: velocidades de aviones en tierra y velocidades+posiciones de aviones en el aire
         df_vel_final = pd.concat([df_vel_ground, df_vel_air_pos])
+        df_vel_final["Speed"] = df_vel_final["Speed"].apply(ut.knots_to_kmh)
 
         return df_vel_final
     

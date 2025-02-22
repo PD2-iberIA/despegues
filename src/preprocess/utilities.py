@@ -41,8 +41,8 @@ def haversine(lat1, lon1, lat2, lon2):
     """Calcula la distancia entre dos puntos. Para ello utilizamos la fórmula de Haversine.
     
     Parámetros:
-            lat1, lon1: coordenadas del punto 1
-            lat2, lon2: coordenadas del punto 2
+        lat1, lon1: coordenadas del punto 1
+        lat2, lon2: coordenadas del punto 2
 
     Devuelve:
         float: distancia entre los dos puntos (km)"""
@@ -56,3 +56,14 @@ def haversine(lat1, lon1, lat2, lon2):
     c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
     distance = EARTH_RADIUS * c # km
     return distance
+
+def knots_to_kmh(speed_knots):
+    """Transforma una velocidad de nudos (knots) a km/h
+
+    Parámetros:
+        speed_knots: la velocidad en nudos
+    
+    Devuelve:
+        float: la velocidad en km/h
+    """
+    return speed_knots * 1.852 if pd.notna(speed_knots) else None
