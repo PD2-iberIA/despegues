@@ -1,6 +1,5 @@
 import os
 import pandas as pd
-import numpy as np
 
 class ParquetProcessor:
     def __init__(self, filepaths, output_folder="processed_data"):
@@ -12,24 +11,62 @@ class ParquetProcessor:
         """
         self.filepaths = filepaths
         self.output_folder = output_folder
-        self.df = None
 
-    def load_data(self):
+    def process_file(self, file):
         """
-        Carga múltiples archivos Parquet en un solo DataFrame.
+        Carga un archivo Parquet, lo divide por fecha y hora y guarda los resultados,
+        fusionando datos si ya existe un archivo de la misma hora.
         """
-        dfs = []
+        try:
+            df = pd.read_parquet(file, engine="pyarrow")
+
+            # Convertir la columna "Static air temperature (C)" a string en el DataFrame nuevo
+            if "Static air temperature (C)" in df.columns:
+                df["Static air temperature (C)"] = df["Static air temperature (C)"].astype(str)
+
+            # Asegurar que la columna Timestamp esté en formato datetime y eliminar filas con valores nulos
+            df["Timestamp (date)"] = pd.to_datetime(df["Timestamp (date)"], errors="coerce")
+            df.dropna(subset=["Timestamp (date)"], inplace=True)
+
+            # Extraer fecha y hora en formato string limpio
+            df["date"] = df["Timestamp (date)"].dt.strftime("%Y-%m-%d").str.strip()
+            df["hour"] = df["Timestamp (date)"].dt.strftime("%H").str.strip()
+
+            # Guardar o actualizar datos por día y hora
+            for (date, hour), group in df.groupby(["date", "hour"]):
+                folder_path = os.path.join(self.output_folder, date, hour)
+                os.makedirs(folder_path, exist_ok=True)
+                output_filepath = os.path.join(folder_path, f"data_{date}_{hour}.parquet")
+
+                # Si ya existe un archivo para esa fecha y hora, cargarlo y concatenar
+                if os.path.exists(output_filepath):
+                    existing_df = pd.read_parquet(output_filepath, engine="pyarrow")
+                    # Asegurarse de que la columna "Static air temperature (C)" en el DataFrame existente sea string
+                    if "Static air temperature (C)" in existing_df.columns:
+                        existing_df["Static air temperature (C)"] = existing_df["Static air temperature (C)"].astype(str)
+                    group = pd.concat([existing_df, group], ignore_index=True)
+
+                group.to_parquet(output_filepath, engine="pyarrow")
+                print(f"Actualizado {output_filepath}")
+
+        except Exception as e:
+            print(f"Error al procesar {file}: {e}")
+
+    def process(self):
+        """
+        Procesa cada archivo de la lista sin concatenarlos en memoria.
+        """
         for file in self.filepaths:
-            try:
-                df = pd.read_parquet(file, engine="pyarrow")
-                dfs.append(df)
-            except Exception as e:
-                print(f"Error al cargar {file}: {e}")
+            print(f"Procesando {file}...")
+            self.process_file(file)
 
-        if dfs:
-            self.df = pd.concat(dfs, ignore_index=True)
-        else:
-            print("No se pudieron cargar archivos.")
+    def process(self):
+        """
+        Procesa cada archivo de la lista sin concatenarlos en memoria.
+        """
+        for file in self.filepaths:
+            print(f"Procesando {file}...")
+            self.process_file(file)
 
     def clean_data(self):
         """
@@ -104,27 +141,3 @@ class ParquetProcessor:
             else:
                 self.df[col] = self.df[col].astype(dtype)  # Convierte a int64 u object sin ignorar errores
 
-    def save_by_date_hour(self):
-        """
-        Divide el df por día y hora y guarda los archivos en la estructura de carpetas adecuada.
-        """
-
-        self.df.dropna(subset=["Timestamp (date)"], inplace=True)
-
-        # Extraemos la fecha y hora en el formato correcto
-        self.df["date"] = self.df["Timestamp (date)"].dt.strftime("%Y-%m-%d")
-        self.df["hour"] = self.df["Timestamp (date)"].dt.strftime("%H")
-
-        for (date, hour), group in self.df.groupby(["date", "hour"]):
-            folder_path = os.path.join(self.output_folder, date, hour)
-            os.makedirs(folder_path, exist_ok=True)
-
-            output_filepath = os.path.join(folder_path, f"data_{date}_{hour}.parquet")
-            group.to_parquet(output_filepath, engine="pyarrow")
-            print(f"Guardado en {output_filepath}")
-
-    def process(self):
-        """
-        Ejecuta el guardado.
-        """
-        self.save_by_date_hour()

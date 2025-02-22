@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 def separateCoordinates(coord):
     """Obtiene la latitud y longitud a partir de la tupla de posición."""
@@ -25,7 +26,33 @@ def stringToNan(df):
     df.replace("None", np.nan, inplace=True)
     return df
 
-def extractDaysOfTheWeek(df):
+def extractDaysOfTheWeek(df, col='Timestamp (date)'):
     """ Crea una nueva columna 'day_of_week' con las tres primeras letras del día de la semana"""
-    df['day_of_week'] = df['Timestamp (date)'].dt.strftime('%a')
+    df['day_of_week'] = df[col].dt.strftime('%a')
     return df
+
+def extractHour(df):
+    """ Asegura q el df está en formato timestamp y extrae una columna 'hour' con la hora a partir de la fecha"""
+    df['Timestamp (date)'] = pd.to_datetime(df['Timestamp (date)'], format='mixed', errors='coerce')
+    df['hour'] = df['Timestamp (date)'].dt.floor('H')
+    return df
+
+def haversine(lat1, lon1, lat2, lon2):
+    """Calcula la distancia entre dos puntos. Para ello utilizamos la fórmula de Haversine.
+    
+    Parámetros:
+            lat1, lon1: coordenadas del punto 1
+            lat2, lon2: coordenadas del punto 2
+
+    Devuelve:
+        float: distancia entre los dos puntos (km)"""
+    EARTH_RADIUS = 6378 # radio de la Tierra (km)
+
+    phi1, phi2 = np.radians(lat1), np.radians(lat2)
+    delta_phi = np.radians(lat2 - lat1)
+    delta_lambda = np.radians(lon2 - lon1)
+
+    a = np.sin(delta_phi / 2)**2 + np.cos(phi1) * np.cos(phi2) * np.sin(delta_lambda / 2)**2
+    c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
+    distance = EARTH_RADIUS * c # km
+    return distance

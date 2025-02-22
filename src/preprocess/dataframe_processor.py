@@ -36,58 +36,37 @@ class DataframeProcessor:
         df_pos = df_pos[columnasPosiciones].reset_index(drop=True)
         
         return df_pos
-
+    
     @staticmethod
-    def getVelocities(df, batch_size=100000):
-        """
-        Método optimizado para filtrar y combinar información de velocidades
-        con uso eficiente de memoria mediante procesamiento por lotes.
-        """
+    def getVelocities(df):
 
-        def process_batch(batch):
-            # Filtrar las filas donde la velocidad no es nula
-            batch_vel = batch[batch["Speed"].notna()]
-            batch_vel = batch_vel[["Timestamp (date)", "ICAO", "Flight status", "Speed", "lat", "lon"]]
+        # Filtramos las filas donde la velocidad no es nula
+        df_vel = df[df["Speed"].notna()]
+        df_vel = df_vel[["Timestamp (date)", "ICAO", "Flight status", "Speed", "lat", "lon"]]
 
-            # Dividir en vuelos en tierra y en aire
-            batch_vel_ground = batch_vel[batch_vel["Flight status"] == "on-ground"]
-            batch_vel_air = batch_vel[batch_vel["Flight status"] == "airborne"]
+        # Dividimos en 2 dataframe según si los vuelos están en tierra o en aire
+        df_vel_ground = df_vel[df_vel["Flight status"] == "on-ground"]
+        df_vel_air = df_vel[df_vel["Flight status"] == "airborne"]
 
-            # Obtener posiciones
-            batch_pos = DataframeProcessor.getPositions(batch)
-            batch_pos = batch_pos.sort_values(by="Timestamp (date)")
-            batch_vel_air = batch_vel_air.sort_values(by="Timestamp (date)")
+        df_pos = DataframeProcessor.getPositions(df)
+        df_pos = df_pos.sort_values(by="Timestamp (date)")
+        df_vel_air = df_vel_air.sort_values(by="Timestamp (date)")
 
-            # Combinar posiciones y velocidades de vuelos en el aire
-            tolerance = pd.Timedelta('1 second')  # tolerancia de 1 segundo
-            batch_vel_air_pos = pd.merge_asof(
-                batch_pos,
-                batch_vel_air,
-                on="Timestamp (date)",
-                by="ICAO",
-                direction="nearest",
-                tolerance=tolerance,
-            )
+        # Juntamos posiciones y velocidades de los vuelos en el aire según el timestamp
+        tolerance = pd.Timedelta('1 second') # tolerancia de 1 segundo
+        df_vel_air_pos = pd.merge_asof(df_pos, df_vel_air, on="Timestamp (date)", by="ICAO", direction="nearest", tolerance=tolerance)
 
-            batch_vel_air_pos = batch_vel_air_pos[batch_vel_air_pos["Speed"].notna()]
-            batch_vel_air_pos = batch_vel_air_pos.drop(columns=['lat_y', 'lon_y', 'Flight status_y'])
-            batch_vel_air_pos = batch_vel_air_pos.rename(
-                columns={'lat_x': 'lat', 'lon_x': 'lon', 'Flight status_x': 'Flight status'})
+        df_vel_air_pos = df_vel_air_pos[df_vel_air_pos["Speed"].notna()]
 
-            batch_vel_air_pos = batch_vel_air_pos[["Timestamp (date)", "ICAO", "Flight status", "Speed", "lat", "lon"]]
+        # Eliminamos columnas redundantes
+        df_vel_air_pos = df_vel_air_pos.drop(columns=['lat_y', 'lon_y', 'Flight status_y'])
+        df_vel_air_pos = df_vel_air_pos.rename(columns={'lat_x': 'lat', 'lon_x': 'lon', 'Flight status_x': 'Flight status'})
 
-            # Combinar resultados
-            batch_result = pd.concat([batch_vel_ground, batch_vel_air_pos])
-            return batch_result
+        df_vel_air_pos = df_vel_air_pos[["Timestamp (date)", "ICAO", "Flight status", "Speed", "lat", "lon"]]
 
-        # Procesar DataFrame en lotes
-        result_batches = []
-        for i in range(0, len(df), batch_size):
-            batch = df.iloc[i:i + batch_size]
-            result_batches.append(process_batch(batch))
+        # El df que buscamos con esto tiene: velocidades de aviones en tierra y velocidades+posiciones de aviones en el aire
+        df_vel_final = pd.concat([df_vel_ground, df_vel_air_pos])
 
-        # Combinar resultados de todos los lotes
-        df_vel_final = pd.concat(result_batches, ignore_index=True)
         return df_vel_final
     
     @staticmethod
