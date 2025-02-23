@@ -170,7 +170,8 @@ class DataframeProcessor:
             DataFrame con las siguientes columnas: "Timestamp (date)", "ICAO", "Flight status", "Speed", "lat", "lon".
         """
         # Filtramos las filas donde la velocidad no es nula
-        df_vel = df[df["Speed"].notna()]
+        # df_vel = df[df["Speed"].notna()] con pandas
+        df_vel = df[df["Speed"].isnull() == False]  # Dask-friendly filtering 
         df_vel = df_vel[["Timestamp (date)", "ICAO", "Flight status", "Speed", "lat", "lon"]]
 
         # Dividimos en 2 dataframe según si los vuelos están en tierra o en aire
