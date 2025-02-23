@@ -61,14 +61,6 @@ class ParquetProcessor:
             print(f"Procesando {file}...")
             self.process_file(file)
 
-    def process(self):
-        """
-        Procesa cada archivo de la lista sin concatenarlos en memoria.
-        """
-        for file in self.filepaths:
-            print(f"Procesando {file}...")
-            self.process_file(file)
-
     def clean_data(self):
         """
         Limpia los datos reemplazando valores nulos y no convertibles.
