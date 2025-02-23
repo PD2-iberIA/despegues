@@ -4,28 +4,36 @@
 
 <code> GIDIA - Proyecto de datos II </code>
 
+## Índice
+
+1. [Descripción del proyecto](#descripcion)
+2. [Instrucciones de instalación](#instalación)
+3. [Uso](#uso)
+4. [Crédito](#credito)
+
 ## 1. Descripción del proyecto
+<a name="descripcion"></a>
 
-Este proyecto tiene como objetivo predecir el tiempo que los aviones permanecen en tierra antes de despegar, utilizando datos de tráfico aéreo obtenidos a través de tecnología **ADS-B**. 
+Este proyecto tiene como objetivo predecir el tiempo que los aviones permanecen en tierra antes de despegar, es decir, cuánto tiempo transcurre entre el punto de espera y el despegue. Para ello se utilizarán datos de tráfico aéreo obtenidos a través de señales **ADS-B** y **Mode S**.
 
-La motivación detrás de este proyecto es mejorar la eficiencia operativa de los aeropuertos, ayudando a predecir y gestionar los tiempos de espera, lo que puede resultar en una mejor planificación de vuelos y reducción de demoras. 
+La motivación detrás de este proyecto es mejorar la eficiencia operativa de los aeropuertos, ayudando a predecir y analizar patrones en los tiempos de espera, lo que puede resultar en una mejor planificación de vuelos y reducción de demoras.
 
-Desarrollamos este proyecto para proporcionar una herramienta de visualización que permita analizar patrones en los tiempos de espera de los aviones, y así identificar posibles cuellos de botella en los puntos de espera. 
+Al llevar a cabo este proyecto, aprenderemos a trabajar en equipo, gestionar grandes conjuntos de datos, realizar visualizaciones interactivas y aplicar técnicas de análisis de datos para obtener conclusiones valiosas sobre la eficiencia del tráfico aéreo, además de presentar todo ello públicamente.
 
-A través de análisis de datos y visualizaciones como histogramas, boxplots y mapas de calor, buscamos ofrecer una mejor comprensión del comportamiento de los vuelos en tierra.
-[siguientes etapas __]
+### Entrega 1 - Visualización
 
-Al llevar a cabo este proyecto, aprenderemos a trabajar en equipo, con grandes conjuntos de datos, realizar visualizaciones interactivas y aplicar técnicas de análisis de datos para obtener conclusiones valiosas sobre la eficiencia del tráfico aéreo, además de presentar todo ello públicamente.
-
+Para la primera entrega decodificamos y preprocesamos los datos para después construir visualizaciones como histogramas, boxplots y mapas de calor. Buscamos ofrecer un primer acercamiento que permita identificar patrones y tendencias generales en los datos.
 
 ## 2. Instrucciones de instalación
-En primer lugar, clona el repositorio de este proyecto en la carpeta de tu dispositivo donde desees guardarlo, utilizando el comando:
+<a name="instalacion"></a>
+
+En primer lugar, clona el repositorio de este proyecto en la carpeta local de tu dispositivo donde desees guardarlo. Utiliza el siguiente comando:
 
 ```
 git clone <https://github.com/PD2-iberIA/despegues.git>
 ```
 
-o apoyándote en aplicaciones como GitHub Desktop o Git Bash, entre otras.
+o apóyate en aplicaciones como GitHub Desktop o Git Bash, entre otras.
 
 Para acceder a la carpeta del proyecto, ejecuta la instrucción:
 
@@ -33,47 +41,42 @@ Para acceder a la carpeta del proyecto, ejecuta la instrucción:
 cd despegues
 ```
 
-Por último, instala las dependencias necesarias [pendiente de creación]:
+Por último, instala las dependencias necesarias:
 
 ```
 pip install -r requirements.txt
 ```
 
 ## 3. Instrucciones de uso
-<code> falta </code>
+<a name="uso"></a>
 
+### 3.1. Convenio commits
 
-3.1 Convenio commits
+A la hora de realizar commits, hemos tratado de adoptar el siguiente convenio para facilitar el trabajo en grupo:
 
-Para mantener la historia del repositorio más legible, si un commit aborda múltiples aspectos o cambios, se deben dividir en commits individuales que traten de separar lo máximo posible estos. Por lo tanto, es preferible realizar commits frecuentes y pequeños en lugar de grandes commits que abarquen múltiples cambios.
+- Para mantener la historia del repositorio más legible, si un commit aborda múltiples aspectos o cambios, se deben dividir en commits individuales que traten de separar lo máximo posible estos. Por lo tanto, es preferible realizar commits frecuentes y pequeños en lugar de grandes commits que abarquen múltiples cambios.
 
-Por último, los commits deben contener código que esté que no rompa la compilación ni la funcionalidad del código anterior.
+- Los commits deben contener código que no rompa la compilación ni la funcionalidad del código anterior.
 
 En general, los commits deben cumplir las siguientes pautas:
 
-- Empezar en imperativo (puede continuar la frase 'Este commit ...' con una acción)
+- Empezar en imperativo
 - No tener punto final
 - No superar los 72 caracteres
-- No incluir el nombre del fichero que modifica
+- No incluir el nombre del fichero que modifican
 - Primera palabra capitalizada
 - Si es preciso, rellenar la descripción con información adicional
 - No poner prefijos del estilo 'ADD, EDIT...'
 - Describir el cambio realizado de forma precisa y concisa
 
-
 ## 4. Crédito
+<a name="credito"></a>
+
+Integrantes del equipo *iberIA*:
 
 - Carmen Fernández González
 - Javier Martín Fuentes
 - Bryan Xavier Quilumba Farinango
-- María Romero Huertos
+- María Romero Huertas
 - Carlota Salazar Martín
 - Yushan Yang Xu
-
-
-% Otros puntos a añadir, based on: [Guía profesional sobre README, 6 Feb 2024]<https://coding-boot-camp.github.io/full-stack/es/github/professional-readme-guide>
-## 5. Licencia
-## 6. Insignias
-## 7. Funciones
-## 8. Cómo contribuir
-## 9. Pruebas
