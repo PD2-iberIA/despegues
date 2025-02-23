@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import numpy as np
 
 class ParquetProcessor:
     def __init__(self, filepaths, output_folder="processed_data"):
