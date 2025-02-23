@@ -36,21 +36,24 @@ class Maps:
     }
 
     @staticmethod
-    def getTitleHTML(title):
+    def getTitleHTML(title, date):
         """
         Genera el título del mapa en html.
 
         Parámetros:
             title (str): Nombre del mapa.
+            fecha (str): Fecha asociada al mapa.
         """
         return f'''
         <div style="position: fixed; 
                     bottom: 50px; left: 50%; transform: translateX(-50%); width: auto; 
                     background-color: black; opacity: 0.7; z-index: 9999; 
                     border-radius: 5px; padding: 10px; font-size: 14px; color: white; text-align: center;">
-            <strong>{title}</strong>
+            <strong>{title}</strong><br>
+            <span style="font-size: 11px;">{date}</span>
         </div>
         '''
+
 
     @staticmethod
     def getRadarMarker():
@@ -87,7 +90,7 @@ class Maps:
             ) for i, rw in enumerate(runways)]
     
     @staticmethod
-    def positionsHeatMap(df, freq=5):
+    def positionsHeatMap(df, freq=5, title="Flight Position Heatmap", date=""):
         """
         Genera un mapa de calor animado en función de una frecuencia dada.
     
@@ -121,10 +124,13 @@ class Maps:
         heatmap = HeatMapWithTime(data, index=[str(time) for time in time_steps], auto_play=True)
         heatmap.add_to(m)
 
+        # - Título -
+        m.get_root().html.add_child(folium.Element(Maps.getTitleHTML(title, date)))
+
         return m
 
     @staticmethod
-    def positionsScatterMap(df, title="Flight Status Scatter Map"):
+    def positionsScatterMap(df, title="Flight Status Scatter Map", date=""):
         """
         Genera un Scatter Map.
     
@@ -184,24 +190,24 @@ class Maps:
         # - Leyenda -
         legend_html = '''
         <div style="position: fixed; 
-                    bottom: 50px; right: 50px; width: 150px; height: 100px; 
+                    bottom: 50px; right: 50px; width: 150px; height: 75px; 
                     background-color: black; opacity: 0.7; z-index: 9999; 
                     border-radius: 5px; padding: 10px; font-size: 12px; color: white;">
             <strong>Flight Status</strong><br>
-            <i style="background: MediumSeaGreen; width: 20px; height: 20px; display: inline-block; margin-right: 5px;"></i> On-ground<br>
-            <i style="background: DarkSlateBlue; width: 20px; height: 20px; display: inline-block; margin-right: 5px;"></i> Airborne
+            <i style="background: MediumSeaGreen; width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 5px;"></i> On-ground<br>
+            <i style="background: DarkSlateBlue; width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 5px;"></i> Airborne
         </div>
         '''
         m.get_root().html.add_child(folium.Element(legend_html))
 
         # - Título -
-        m.get_root().html.add_child(folium.Element(Maps.getTitleHTML(title)))
+        m.get_root().html.add_child(folium.Element(Maps.getTitleHTML(title, date)))
         
         return m
 
 
     @staticmethod
-    def trajectoriesMap(df):
+    def trajectoriesMap(df, title="Flight Trajectories by Turbulence Category", date=""):
         """
         Genera un mapa con las trayectorias clasificadas por avión y tipo de vuelo.
     
@@ -321,11 +327,14 @@ class Maps:
         legend_html += '</div>'
 
         m.get_root().html.add_child(folium.Element(legend_html))
+
+        # - Título -
+        m.get_root().html.add_child(folium.Element(Maps.getTitleHTML(title, date)))
             
         return m
 
     @staticmethod
-    def detailedTrajectoriesMap(df):
+    def detailedTrajectoriesMap(df, title="Flight Trajectories with Velocities", date=""):
         # Calculamos la distancia de cada punto al radar
         def calculate_distance_to_radar(lat, lon, radar_position):
             return geopy.distance.distance((lat, lon), radar_position).km
@@ -403,14 +412,18 @@ class Maps:
                 opacity=0.5
             ).add_to(m)
 
+        # - Título -
+        m.get_root().html.add_child(folium.Element(Maps.getTitleHTML(title, date)))
+
         return trajs.explore(
             m=m,
             column="Speed",
             cmap="plasma"
         )
 
+
     @staticmethod
-    def altitudesMap(df):
+    def altitudesMap(df, title="Flight Trajectories with Altitudes", date=""):
         """
         Genera un mapa con las trayectorias coloreadas por altura.
 
@@ -492,5 +505,8 @@ class Maps:
         # Añadimos leyenda y controles
         colormap.add_to(m)
         folium.LayerControl().add_to(m)
+
+        # - Título -
+        m.get_root().html.add_child(folium.Element(Maps.getTitleHTML(title, date)))
 
         return m
