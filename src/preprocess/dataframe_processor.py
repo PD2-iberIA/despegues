@@ -170,8 +170,8 @@ class DataframeProcessor:
             DataFrame con las siguientes columnas: "Timestamp (date)", "ICAO", "Flight status", "Speed", "lat", "lon".
         """
         # Filtramos las filas donde la velocidad no es nula
-        # df_vel = df[df["Speed"].notna()] con pandas
-        df_vel = df[df["Speed"].isnull() == False]  # Dask-friendly filtering 
+        df_vel = df[df["Speed"].notna()] # con pandas
+        # df_vel = df[df["Speed"].isnull() == False]  # Dask-friendly filtering 
         df_vel = df_vel[["Timestamp (date)", "ICAO", "Flight status", "Speed", "lat", "lon"]]
 
         # Dividimos en 2 dataframe según si los vuelos están en tierra o en aire
@@ -181,6 +181,8 @@ class DataframeProcessor:
         df_pos = DataframeProcessor.getPositions(df)
         df_pos = df_pos.sort_values(by="Timestamp (date)")
         df_vel_air = df_vel_air.sort_values(by="Timestamp (date)")
+        # df_pos = df_pos.compute().sort_values(by="Timestamp (date)")
+        # df_vel_air = df_vel_air.compute().sort_values(by="Timestamp (date)")
 
         # Juntamos posiciones y velocidades de los vuelos en el aire según el timestamp
         tolerance = pd.Timedelta('1 second') # tolerancia de 1 segundo
