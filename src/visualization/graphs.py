@@ -110,11 +110,11 @@ def heatmap_wait_times(df):
     # Crear el mapa de calor con Plotly
     fig_heatmap = px.imshow(
         heatmap_data.values,
-        labels=dict(x="Hour", y="Date", color="Tiempo de espera (s)"),
+        labels=dict(x="Hora", y="Fecha", color="Tiempo de espera (s)"),
         x=heatmap_data.columns,
         y=heatmap_data.index,
         color_continuous_scale="RdYlGn_r",
-        title="Mapa de Calor del Tiempo de Espera por Hora y Día del Mes"
+        title="Mapa de calor del tiempo de espera por hora y día del mes"
     )
 
     return fig_heatmap
