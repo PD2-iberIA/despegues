@@ -22,28 +22,30 @@ def graph_hourly_flight_status(df):
     # Ensure timestamp is in datetime format
     df['Timestamp (date)'] = pd.to_datetime(df['Timestamp (date)'])
 
-    # Extract hour
-    df['hour'] = df['Timestamp (date)'].dt.floor('H')
+    df["day_of_week"] = df["hour"].dt.day_name()
+
+    # Extraer solo la hora sin fecha
+    df["hour"] = df["hour"].dt.strftime('%H:00')
 
     # Group by hour and flight status
-    traffic_by_hour = df.groupby(['hour', 'Flight status']).size().unstack(fill_value=0)
+    #traffic_by_hour = df.groupby(['hour', 'Flight status']).size().unstack(fill_value=0)
 
     # Reset index for plotting
-    traffic_by_hour_reset = traffic_by_hour.reset_index()
+    #traffic_by_hour_reset = traffic_by_hour.reset_index()
 
     # Melt the DataFrame for Plotly
-    traffic_melted = traffic_by_hour_reset.melt(id_vars=['hour'], var_name='Flight Status', value_name='Count')
+    #traffic_melted = traffic_by_hour_reset.melt(id_vars=['hour'], var_name='Flight Status', value_name='Count')
 
-    # Create interactive stacked bar chart using Plotly
-    fig = px.bar(
-        traffic_melted, 
-        y='hour', 
-        x='Count', 
-        color='Flight Status', 
-        title="Hourly Air Traffic (On-Ground vs Airborne)",
-        labels={'hour': 'Hour', 'Count': 'Number of Flights'},
-        barmode='stack'
-    )
+    
+    # Agrupar por hora y estado de vuelo
+    df_grouped = df.groupby(["hour", "Flight status"], as_index=False).sum()
+
+    # Crear el gráfico de barras apiladas horizontal con eje y invertido
+    fig = px.bar(df_grouped, x="count_nonzero", y="hour", color="Flight status", barmode="stack",
+                labels={"count_nonzero": "Número de vuelos", "hour": "Hora", "Flight status": "Estado del vuelo"},
+                title="Número de vuelos por hora y estado",
+                color_discrete_sequence=px.colors.qualitative.Plotly,
+                category_orders={"hour": df_grouped["hour"].sort_values(ascending=False)})
 
     # Update layout for better visualization
     fig.update_layout(
