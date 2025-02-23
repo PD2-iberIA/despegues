@@ -270,18 +270,18 @@ class DataframeProcessor:
             df_filtered: DataFrame con los datos limpios.
         """
         df_limpio = df[~df['lat'].isna()]
-
+    
         # Calcula la distancia y tiempo entre filas consecutivas por ICAO
-        df_limpio['prev_lat'] = df_limpio.groupby(['ICAO'])['lat'].shift(1)
-        df_limpio['prev_lon'] = df_limpio.groupby(['ICAO'])['lon'].shift(1)
+        df_limpio['prev_lat'] = df_limpio.groupby(['ICAO', 'Callsign'])['lat'].shift(1)
+        df_limpio['prev_lon'] = df_limpio.groupby(['ICAO', 'Callsign'])['lon'].shift(1)
         df_limpio['distance'] = df_limpio.apply(lambda row: ut.haversine(row['lat'], row['lon'], row['prev_lat'], row['prev_lon']) 
                             if not pd.isna(row['prev_lat']) else 0, axis=1)
-        df_limpio['prev_time'] = df_limpio.groupby(['ICAO'])['Timestamp (date)'].shift(1)
+        df_limpio['prev_time'] = df_limpio.groupby(['ICAO', 'Callsign'])['Timestamp (date)'].shift(1)
         df_limpio['time_diff'] = df_limpio['Timestamp (date)'] - df_limpio['prev_time']
 
         # Límites de tiempo y distancia
         DISTANCE_THRESHOLD = 200 
-        MINUTES_THRESHOLD = 1
+        MINUTES_THRESHOLD = 10
         
         # Filtros
         filtro_distancia = df_limpio['distance'] > DISTANCE_THRESHOLD
@@ -289,6 +289,7 @@ class DataframeProcessor:
 
         # Obtenemos los ICAO de los outliers
         outliers_icao = df_limpio[filtro_distancia & filtro_tiempo]['ICAO'].unique()
+        print(f"Se han eliminado un total de {len(outliers_icao)} aeronaves: {outliers_icao}")
 
         # Eliminamos los outliers (y las columnas auxiliares para el cálculo)
         df_filtered = df[~df['ICAO'].isin(outliers_icao)]
