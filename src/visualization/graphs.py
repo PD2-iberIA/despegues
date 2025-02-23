@@ -129,32 +129,73 @@ def waits_by_categories_and_runways(df):
 
     # - Boxplot de tiempo de espera según la categoría del avión anterior y la pista -
 
-    df_aterrizajes["Prev_Turbulence"] = df_aterrizajes.groupby("runway")["TurbulenceCategory"].shift(1)
-    df_aterrizajes = df_aterrizajes.dropna(subset=["Prev_Turbulence"])
+    df_aterrizajes2 = df_aterrizajes.sort_values(by="ts airborne")
 
-    df_aterrizajes["Prev_Turbulence"] = df_aterrizajes["Prev_Turbulence"].str.replace(r'\s*\(.*?\)', '', regex=True)
+    df_aterrizajes2["Prev_Turbulence"] = df_aterrizajes2.groupby("runway")["TurbulenceCategory"].shift(1)
+    df_aterrizajes2 = df_aterrizajes2.dropna(subset=["Prev_Turbulence"])
+
+    df_aterrizajes2["Prev_Turbulence"] = df_aterrizajes2["Prev_Turbulence"].str.replace(r'\s*\(.*?\)', '', regex=True)
+
+    df_aterrizajes2["Prev_Turbulence"] = pd.Categorical(
+        df_aterrizajes2["Prev_Turbulence"], 
+        categories=sorted(df_aterrizajes2["Prev_Turbulence"].unique()), 
+        ordered=True
+    )
 
     plt.figure(figsize=(12, 6))
     sns.boxplot(
-        data=df_aterrizajes,
+        data=df_aterrizajes2,
         y="Prev_Turbulence",
         x="Wait time (s)",
         hue="runway",
         palette=sns.color_palette("viridis", n_colors=len(df_aterrizajes["runway"].unique()))
     )
 
-    plt.title("Tiempo de espera según la categoría del avión anterior y la pista")
-    plt.xlabel("Tiempo de espera (s)")
-    plt.ylabel("Categoría del avión anterior")
+    plt.title("Tiempo de espera según la categoría de turbulencia de la aeronave anterior y la pista", fontweight="bold")
+    plt.suptitle("2024-12-07", fontsize=12, color="gray", y=0.95)
+    plt.xlabel("Tiempo de espera (s)", fontsize=12, color="gray")
+    plt.ylabel("Categoría de turbulencia de la aeronave anterior", fontsize=12, color="gray")
     plt.legend(title="Pista")
     plt.grid(axis="x", linestyle="--", alpha=0.7)
 
     plt.show()
 
-    # - Distribución de tiempos de espera poe pista -
+    # - Boxplot de tiempo de espera según la categoría del avión anterior y la pista -
+
+    df_aterrizajes3 = df_aterrizajes.copy()
+
+    df_aterrizajes3["TurbulenceCategory"] = df_aterrizajes3["TurbulenceCategory"].str.replace(r'\s*\(.*?\)', '', regex=True)
+
+    df_aterrizajes3["TurbulenceCategory"] = pd.Categorical(
+        df_aterrizajes3["TurbulenceCategory"], 
+        categories=sorted(df_aterrizajes3["TurbulenceCategory"].unique()), 
+        ordered=True
+    )
+
+    plt.figure(figsize=(12, 6))
+    sns.boxplot(
+        data=df_aterrizajes3,
+        y="TurbulenceCategory",
+        x="Wait time (s)",
+        hue="runway",
+        palette=sns.color_palette("viridis", n_colors=len(df_aterrizajes["runway"].unique()))
+    )
+
+    plt.title("Tiempo de espera según la categoría de turbulencia de la aeronave y la pista", fontweight="bold")
+    plt.suptitle("2024-12-07", fontsize=12, color="gray", y=0.95)
+    plt.xlabel("Tiempo de espera (s)", fontsize=12, color="gray")
+    plt.ylabel("Categoría de turbulencia", fontsize=12, color="gray")
+    plt.legend(title="Pista")
+    plt.grid(axis="x", linestyle="--", alpha=0.7)
+
+    plt.show()
+
+
+    # - Distribución de tiempos de espera por pista -
     
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 12), sharex=True)
 
+    # Crear el histograma por pista
     sns.histplot(
         data=df_aterrizajes,
         x="Wait time (s)",
@@ -167,10 +208,12 @@ def waits_by_categories_and_runways(df):
         ax=ax1  # Especificar el eje
     )
 
-    ax1.set_title("Distribución de tiempos de espera por pista")
-    ax1.set_ylabel("Densidad")
+    ax1.set_title("Tiempo de espera según la pista", fontweight="bold")
+    ax1.set_ylabel("Densidad", fontsize=12, color="gray")
     ax1.grid(axis="x", linestyle="--", alpha=0.7)
 
+
+    # Crear el boxplot
     sns.boxplot(
         data=df_aterrizajes,
         x="Wait time (s)",
@@ -181,8 +224,11 @@ def waits_by_categories_and_runways(df):
         ax=ax2  # Especificar el eje
     )
 
-    ax2.set_xlabel("Tiempo de Espera (s)")
-    ax2.set_ylabel("Pista")
+    # Añadir títulos y etiquetas
+    ax2.set_xlabel("Tiempo de Espera (s)", fontsize=12, color="gray")
+    ax2.set_ylabel("Pista", fontsize=12, color="gray")
     ax2.grid(axis="x", linestyle="--", alpha=0.7)
+
+    fig.suptitle("2024-12-07", fontsize=12, color="gray", y=0.92)
 
     plt.show()
