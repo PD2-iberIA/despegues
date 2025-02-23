@@ -216,18 +216,44 @@ class DataframeProcessor:
         df_pos = DataframeProcessor.getPositions(df)
         df_flights = DataframeProcessor.getFlights(df)
         df_types = DataframeProcessor.getAirplaneCategories(df)
+        df_speed = DataframeProcessor.getVelocities(df)
+        df_alt = DataframeProcessor.getAltitudes(df)
 
         df_pos = df_pos.sort_values(["Timestamp (date)", "ICAO"])
         df_flights = df_flights.sort_values(["Timestamp (date)", "ICAO"])
+        df_speed = df_speed.sort_values(["Timestamp (date)", "ICAO"])
 
+        # Merge de posiciones y estado de vuelo
         tolerance = pd.Timedelta('10 minute') # tolerancia
         df = pd.merge_asof(df_pos, df_flights, on="Timestamp (date)", by="ICAO", direction="nearest", tolerance=tolerance)
 
+        # Merge con velocidades
+        tolerance_speed = pd.Timedelta('1 minute')
+        df = pd.merge_asof(df, df_speed, on="Timestamp (date)", by="ICAO", direction="nearest", tolerance=tolerance_speed)
+        
+        # Limpiar columnas duplicadas y renombrar
+        df = df.drop(columns=['lat_y', 'lon_y', 'Flight status_y'])
+        df = df.rename(columns={'lat_x': 'lat', 'lon_x': 'lon', 'Flight status_x': 'Flight status'})
+
+        # Filtrar vuelos válidos
         df = df[df["Callsign"].notna()]
         df = df[df["Flight status"] == "airborne"]
+
+        # Añadimos categoría de turbulencia
         df = df.merge(df_types, on="ICAO")
 
-        return df
+        # Hacemos merge con las altitudes y ordenamos
+        df_merged = pd.merge(df, df_alt, on=["ICAO", "Callsign", "Timestamp (date)"])
+        df_merged.sort_values(by=["ICAO", "Callsign", "Timestamp (date)"], inplace=True)
+
+        # Filtramos las columnas de x (las de df) y las renombramos
+        df_filtered = df_merged.filter(like='_x')
+        df_filtered.columns = df_filtered.columns.str.replace('_x', '')
+        
+        # Unimos las columnas filtradas con el resto de columnas necesarias
+        df_final = pd.concat([df_filtered, df_merged[["Timestamp (date)", "ICAO", "Callsign", "TurbulenceCategory", "Speed", "Altitude (ft)"]]], axis=1)
+
+        return df_final
     
     @staticmethod
     def getAltitudes(df):
@@ -244,21 +270,7 @@ class DataframeProcessor:
         df_alt = df[df["Altitude (ft)"].notna()]
         df_alt = df_alt[["Timestamp (date)", "ICAO", "Callsign", "Flight status", "Altitude (ft)", "lat", "lon"]]
 
-        # DataFrame para las trayectorias
-        df_traj = DataframeProcessor.getFlightsInfo(df)
-
-        # Hacemos merge y ordenamos
-        df_merged = pd.merge(df_traj, df_alt, on=["ICAO", "Callsign", "Timestamp (date)"])
-        df_merged.sort_values(by=["ICAO", "Callsign", "Timestamp (date)"], inplace=True)
-
-        # Filtramos las columnas de x (las de df_traj) y las renombramos
-        df_filtered = df_merged.filter(like='_x')
-        df_filtered.columns = df_filtered.columns.str.replace('_x', '')
-        
-        # Unimos las columnas filtradas con las demás columnas necesarias
-        df_final = pd.concat([df_filtered, df_merged[['ICAO', 'Callsign', 'Timestamp (date)', 'Altitude (ft)']]], axis=1)
-
-        return df_final
+        return df_alt
 
     @staticmethod
     def removeOutlierFlights(df):
