@@ -36,7 +36,7 @@ class DataframeProcessor:
         # Day of the week
         dff = ut.extractDaysOfTheWeek(dff)
 
-        df_status = df.groupby(['hour', 'Flight status', 'Callsign']).size().unstack(fill_value=0)
+        df_status = dff.groupby(['hour', 'Flight status', 'Callsign']).size().unstack(fill_value=0)
         # Sumammos el número de vuelos, no el número de mensajes
         df_status['count_nonzero'] = (df_status.ne(0)).sum(axis=1)
         df_status = df_status.reset_index()
