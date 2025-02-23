@@ -1,0 +1,13 @@
+branca==0.8.1
+folium==0.19.4
+geopy==2.4.1
+matplotlib==3.10.0
+movingpandas==0.21.2
+numpy==2.2.3
+pandas==2.2.3
+plotly==6.0.0
+pyModeS==2.19
+seaborn==0.13.2
+jupyter>=1.1.1
+geopandas>=1.0.1
+dash>=2.18.2

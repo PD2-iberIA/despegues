@@ -1,10 +1,30 @@
 [project]
 name = "despeguehub"
 version = "0.1.0"
-description = "Add your description here"
+description = "Este proyecto tiene como objetivo predecir cuánto tiempo estarán en tierra aquellos aviones en puntos de espera, es decir, cuánto tiempo transcurre entre el punto de espera y el despegue"
+authors = [
+  {name = "Carmen Fernández González", email = "carfer23@ucm.es"},
+  {name = "Javier Martín Fuentes", email = "jmarti32@ucm.es"},
+  {name = "Bryan Xavier Quilumba Farinango", email = "bryanxqu@ucm.es"},
+  {name = "María Romero Huertas", email = "marome35@ucm.es"},
+  {name = "Carlota Salazar Martín", email = "carsal02@ucm.es"},
+  {name = "Yushan Yang Xu", email = "yushyang@ucm.es"}
+]
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "jupyter>=1.1.1",
-    "pymodes>=2.19",
+    "pymodes (==2.19)",
+    "pandas (==2.2.3)",
+    "numpy (==2.2.3)",
+    "datetime (>=5.5,<6.0)",
+    "geopandas (>=1.0.1,<2.0.0)",
+    "geopy (==2.4.1)",
+    "movingpandas (==0.21.2)",
+    "branca (==0.8.1)",
+    "folium (==0.19.4)",
+    "matplotlib (==3.10.0)",
+    "plotly (==6.0.0)",
+    "seaborn (==0.13.2)",
+    "dash (>=2.18.2,<3.0.0)",
 ]
