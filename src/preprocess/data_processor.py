@@ -9,6 +9,7 @@ NM_KM_EQUIVALENCE = 1852
 MAXIMUM_RANGE = 180 * NM_KM_EQUIVALENCE
 
 class DataProcessor:
+    """Clase que incluye funciones para procesar los datos una vez han sido codificados."""
 
     @staticmethod
     def airborne_position_is_valid(lat, lon, h):
@@ -16,11 +17,11 @@ class DataProcessor:
         Determina si la posición decodificada de un avión en el aire es válida.
         
         Parámetros:
-        lat, lon: coordenadas del avión
-        h: altura del avión
+            lat, lon: coordenadas del avión
+            h: altura del avión
 
         Devuelve:
-        boolean: indica si la posición es válida (True) o no (False)
+            boolean: indica si la posición es válida (True) o no (False)
         """
         inside_range = True
 
@@ -43,11 +44,11 @@ class DataProcessor:
         Calcula el rango máximo de alcance del radar.
 
         Parámetros:
-        h_t (float): altura del avión
-        h_r (float): altura del radar
+            h_t (float): altura del avión
+            h_r (float): altura del radar
         
         Devuelve:
-        float: rango máximo del radar (km)
+            float: rango máximo del radar (km)
         """
         R = EARTH_RADIUS
         alpha_r = math.acos(R / (R + h_r))
@@ -65,10 +66,10 @@ class DataProcessor:
         suficiente porque la altitud tiene un impacto muy pequeño en la distancia total.
 
         Parámetros:
-        lat, lon: coordenadas del avión
+            lat, lon: coordenadas del avión
 
         Devuelve:
-        float: distancia entre el radar y el avión (km)
+            float: distancia entre el radar y el avión (km)
         """
         # Coordenadas de referencia (radar)
         lat_ref, lon_ref = ac.RADAR_POSITION

@@ -17,6 +17,8 @@ class ParquetProcessor:
         """
         Carga un archivo Parquet, lo divide por fecha y hora y guarda los resultados,
         fusionando datos si ya existe un archivo de la misma hora.
+
+        :param file: Nombre del archivo Parquet.
         """
         try:
             df = pd.read_parquet(file, engine="pyarrow")

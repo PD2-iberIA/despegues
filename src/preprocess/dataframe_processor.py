@@ -1,8 +1,6 @@
-import numpy as np
 import pandas as pd
 from datetime import timedelta
 import preprocess.utilities as ut
-
 
 class DataframeProcessor:
     """Clase que permite realizar operaciones de procesamiento y análisis de datos con los dataframes de Pandas."""
@@ -17,7 +15,7 @@ class DataframeProcessor:
         Devuelve:
             df_status: DataFrame transformado.
         """
-        # Conseguimos el df con todos los datos necesarios->flight status en todos los callsign
+        # Conseguimos el df con todos los datos necesarios -> flight status en todos los callsign
         df1 = DataframeProcessor.getVelocities(df)
         df2 = DataframeProcessor.getFlights(df)
 
@@ -27,21 +25,22 @@ class DataframeProcessor:
         t = pd.Timedelta('10 minute')
         dff = pd.merge_asof(df1_s, df2_s, on="Timestamp (date)", by="ICAO", direction="nearest", tolerance=t)
 
-        # Ensure timestamp is in datetime format
+        # Aseguramos que la columna de la fecha sea del tipo correcto
         dff['Timestamp (date)'] = pd.to_datetime(dff['Timestamp (date)'])
 
-        # Extract hour
+        # Extraemos l ahora
         dff = ut.extractHour(dff)
 
-        # Day of the week
+        # Extraemos el día de la semana
         dff = ut.extractDaysOfTheWeek(dff)
 
         df_status = dff.groupby(['hour', 'Flight status', 'Callsign']).size().unstack(fill_value=0)
-        # Sumammos el número de vuelos, no el número de mensajes
+        
+        # Sumamos el número de vuelos, no el número de mensajes
         df_status['count_nonzero'] = (df_status.ne(0)).sum(axis=1)
         df_status = df_status.reset_index()
         
-        # Summarize data: count_nonzero per hour divided by Flight status
+        # Calculamos el número de vuelos por hora y estado de vuelo
         df_status = df_status.groupby(['hour', 'Flight status'])['count_nonzero'].sum().reset_index()
         
         return df_status
@@ -65,10 +64,10 @@ class DataframeProcessor:
         t = pd.Timedelta('10 minute')
         dff = pd.merge_asof(df1_s, df2_s, on="Timestamp (date)", by="ICAO", direction="nearest", tolerance=t)
 
-        # Ensure data is sorted by Flight ID and timestamp
+        # Ordenamos los datos por callsign y fecha
         dff = dff.sort_values(by=["Callsign", "Timestamp (date)"])
 
-        # Define runways
+        # Definimos las pistas
         RUNWAYS = [
             {"name": "1", "position": (40.463, -3.554)},
             {"name": "2", "position": (40.473, -3.536)},
@@ -79,7 +78,7 @@ class DataframeProcessor:
         def find_nearest_runway(lat, lon):
             return min(RUNWAYS, key=lambda r: (r["position"][0] - lat) ** 2 + (r["position"][1] - lon) ** 2)["name"]
 
-        # Separate on-ground and airborne events
+        # Separamos on-ground y airborne
         on_ground = dff[(dff["Flight status"] == "on-ground") & (dff["Speed"]==0)].groupby(["Callsign", "ICAO"])["Timestamp (date)"].min()
         on_ground = pd.DataFrame(on_ground).reset_index()
         on_ground.columns = ["Callsign", "ICAO", "ts ground"]
@@ -104,7 +103,7 @@ class DataframeProcessor:
     @staticmethod
     def getAirplaneCategories(df):
         """
-        Genera un DataFrame solo con los datos de la categoría de los aviones.
+        Genera un DataFrame con la categoría de cada aeronave.
         
         Parámetros:
             df: DataFrame de datos.
@@ -118,6 +117,7 @@ class DataframeProcessor:
         # Nos quedamos con los ICAOs y su tipo de avión
         df = df[df["TurbulenceCategory"].notna()]
         df = df[["ICAO", "TurbulenceCategory"]].drop_duplicates().reset_index(drop=True)
+
         return df
 
     @staticmethod
@@ -137,6 +137,7 @@ class DataframeProcessor:
         # Seleccionamos las filas que contengan información relativa al identificador de vuelo
         df_flights = df[df["Callsign"].notna() & (df["Callsign"] != NULL_CALLSIGN)]
         df_flights = df_flights[flightColumns].reset_index(drop=True)
+
         return df_flights
     
     @staticmethod
@@ -205,13 +206,14 @@ class DataframeProcessor:
     @staticmethod
     def getFlightsInfo(df):
         """
-        Genera un dataframe con los datos necesarios para visualizar la  información de vuelo.
+        Genera un dataframe con los datos necesarios para visualizar toda la información sobre un vuelo.
 
         Parámetros:
             df: DataFrame de datos.
 
         Devuelve:
-            DataFrame con las siguientes columnas: "Timestamp (date)", "ICAO", "Flight status", "lat", "lon", "Callsign", "TurbulenceCategory".
+            DataFrame con las siguientes columnas: "Timestamp (date)", "ICAO", "Flight status", "lat", "lon",
+            "Callsign", "TurbulenceCategory", "Speed", "Altitude (ft).
         """
         df_pos = DataframeProcessor.getPositions(df)
         df_flights = DataframeProcessor.getFlights(df)
@@ -258,13 +260,13 @@ class DataframeProcessor:
     @staticmethod
     def getAltitudes(df):
         """
-        Genera un Dataframe con los datos necesarios para visualizar las altitudes por trayectoria.
+        Genera un Dataframe con los datos necesarios para visualizar las altitudes.
         
         Parámetros:
             df: DataFrame de datos.
 
         Devuelve:
-            DataFrame con las siguientes columnas: "Timestamp (date)", "ICAO", "Flight status", "lat", "lon", "Callsign", "TurbulenceCategory".
+            DataFrame con las siguientes columnas: "Timestamp (date)", "ICAO", "Callsign", "Flight status", "Altitude (ft)", "lat", "lon".
         """
         # DataFrame filtrando las filas que contienen una altitud no nula
         df_alt = df[df["Altitude (ft)"].notna()]
@@ -276,7 +278,8 @@ class DataframeProcessor:
     def removeOutlierFlights(df):
         """
         Elimina vuelos considerados outliers de un DataFrame. Consideramos como outlier un vuelo si recorre una distancia
-        mayor a 200km en menos de 1 minuto.
+        mayor a 200km en menos de 10 minutos. Para que esta función se aplique correctamente es necesario que el DataFrame
+        de entrada haya sido procesado con la función `getFlightsInfo`.
 
         Parámetros:
             df: DataFrame de datos.

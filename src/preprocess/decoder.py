@@ -1,13 +1,14 @@
 from collections import defaultdict
 from datetime import datetime
-import preprocess.airport_constants as ac
-from preprocess.utilities import separateCoordinates, separateVelocity, processStaticAirTemperature
 import pyModeS as pms
 import base64
 from enum import Enum
+from preprocess.utilities import separateCoordinates, separateVelocity, processStaticAirTemperature
+import preprocess.airport_constants as ac
+
 class MessageType(Enum):
     """
-    Enum para los diferentes tipos de mensajes que pueden ser procesados.
+    Enumerado para los diferentes tipos de mensajes que pueden ser procesados.
 
     Los tipos de mensaje incluyen:
         ALTITUDE: Mensajes relacionados con la altitud.
@@ -35,6 +36,8 @@ class Decoder:
     AIRBORNE = "airborne"
     
     # Diccionarios de mapeo para diferentes tipos de mensajes y estados
+
+    # Identifica qué tipo de mensaje se recibe
     MAP_DF = defaultdict(lambda: [MessageType.NONE], {  
         4: [MessageType.ALTITUDE],
         5: [MessageType.IDENTITY],
@@ -44,6 +47,7 @@ class Decoder:
         21: [MessageType.MODE_S, MessageType.IDENTITY]
     })
 
+    # Estado de vuelo del avión
     MAP_CA = defaultdict(lambda: float('nan'), {
         4: ON_GROUND,
         5: AIRBORNE
@@ -56,6 +60,7 @@ class Decoder:
         3: ON_GROUND
     })
 
+    # Categorías de turbulencias
     MAP_WTC = {
         (4, 1): "Light",
         (4, 2): "Medium 1",
@@ -63,6 +68,7 @@ class Decoder:
         (4, 5): "Heavy",
     }
 
+    # Categorías de las aeronaves
     MAP_AIRCRAFT_CATEGORY = {
         (1, 0): 'Reserved',
         (0, 0): 'No category information',
@@ -304,10 +310,12 @@ class Decoder:
 
         typecode = pms.adsb.typecode(msg)
         status_byte = byteData[4]
-        try:
-            return Decoder.MAP_WTC[(typecode, status_byte)]
-        except KeyError:
-            return None
+        ca = (status_byte >> 5) & 0b111  # Bits 6-8
+
+        if typecode == 1:
+            ca = 0
+
+        return Decoder.MAP_AIRCRAFT_CATEGORY.get((typecode, ca))
     
     @staticmethod
     def processADS_B(msg):
@@ -320,8 +328,47 @@ class Decoder:
         Returns:
             dict: Un diccionario con la información de ADS-B extraída.
         """
-        # Aquí puedes implementar el procesamiento de ADS-B
-        return {}
+        data = {}
+        
+        typecode = pms.adsb.typecode(msg)
+        
+        if not typecode:
+            return {}
+        
+        data["Typecode"] = typecode
+        data['TurbulenceCategory'] = Decoder.getWakeTurbulenceCategory(msg)
+
+        if typecode <= 4:
+            data["Callsign"] = pms.adsb.callsign(msg)
+
+        elif typecode == 19:
+            velocity = pms.adsb.velocity(msg) # maneja mensajes de tipo surface y airborne
+            data.update(separateVelocity(velocity))    
+            data["Speed heading"] = pms.adsb.speed_heading(msg)
+            data["Flight status"] = Decoder.AIRBORNE
+        
+        elif 5 <= typecode <= 22:
+            lat_ref, lon_ref = ac.RADAR_POSITION
+
+            posRef = pms.adsb.position_with_ref(msg, lat_ref, lon_ref) # maneja mensajes de tipo surface y airborne
+            data["Position with ref (RADAR)"] = posRef
+            data.update(separateCoordinates(posRef))
+        
+            # Surface - Typecode 5-8
+            if 5 <= typecode <= 8:
+                velocity = pms.adsb.velocity(msg)
+                data.update(separateVelocity(velocity))
+
+                if pms.adsb.surface_position_with_ref(msg, lat_ref, lon_ref):
+                    data["Flight status"] = Decoder.ON_GROUND
+
+            # Airborne
+            elif pms.adsb.airborne_position_with_ref(msg, lat_ref, lon_ref):
+                data["Flight status"] = Decoder.AIRBORNE
+
+            data["Altitude (ft)"] = pms.adsb.altitude(msg)
+
+        return data
 
     @staticmethod
     def processMODE_S(msg):
@@ -334,5 +381,63 @@ class Decoder:
         Returns:
             dict: Un diccionario con la información de MODE-S extraída.
         """
-        # Aquí puedes implementar el procesamiento de MODE-S
-        return {}
+        data = {}
+        
+        bds = pms.bds.infer(msg, mrar=True)
+        data["BDS"] = bds
+        
+        # BDS 1,0
+        if pms.bds.bds10.is10(msg):
+            data["Overlay capability"] = pms.commb.ovc10(msg)
+            
+        # BDS 1,7
+        if pms.bds.bds17.is17(msg):
+            data["GICB capability"] = pms.commb.cap17(msg)
+            
+        # BDS 2,0
+        if pms.bds.bds20.is20(msg):
+            data["Callsign"] = pms.commb.cs20(msg)
+            
+        # BDS 4,0
+        if pms.bds.bds40.is40(msg):
+            data["MCP/FCU selected altitude (ft)"] = pms.commb.selalt40mcp(msg)
+            data["FMS selected altitude (ft)"] = pms.commb.selalt40fms(msg)
+            data["Barometric pressure (mb)"] = pms.commb.p40baro(msg)
+        
+        # BDS 4,4
+        if pms.bds.bds44.is44(msg):
+            data["Wind speed (kt) and direction (true) (deg)"] = pms.commb.wind44(msg)
+            sat = pms.commb.temp44(msg)
+            data["Static air temperature (C)"] = processStaticAirTemperature(sat)
+            data["Average static pressure (hPa)"] = pms.commb.p44(msg)
+            data["Humidity (%)"] = pms.commb.hum44(msg)
+        
+        # BDS 4,5
+        if pms.bds.bds45.is45(msg):
+            data["Turbulence level (0-3)"] = pms.commb.turb45(msg)
+            data["Wind shear level (0-3)"] = pms.commb.ws45(msg)
+            data["Microburst level (0-3)"] = pms.commb.mb45(msg)
+            data["Icing level (0-3)"] = pms.commb.ic45(msg)
+            data["Wake vortex level (0-3)"] = pms.commb.wv45(msg)
+            sat = pms.commb.temp45(msg)
+            data["Static air temperature (C)"] = processStaticAirTemperature(sat)
+            data["Average static pressure (hPa)"] = pms.commb.p45(msg)
+            data["Radio height (ft)"] = pms.commb.rh45(msg)
+
+        # BDS 5,0
+        if pms.bds.bds50.is50(msg):
+            data["Roll angle (deg)"] = pms.commb.roll50(msg)
+            data["True track angle (deg)"] = pms.commb.trk50(msg)
+            data["Ground speed (kt)"] = pms.commb.gs50(msg)
+            data["Track angle rate (deg/sec)"] = pms.commb.rtrk50(msg)
+            data["True airspeed (kt)"] = pms.commb.tas50(msg)
+
+        # BDS 6,0
+        if pms.bds.bds60.is60(msg):
+            data["Magnetic heading (deg)"] = pms.commb.hdg60(msg)
+            data["Indicated airspeed (kt)"] = pms.commb.ias60(msg)
+            data["Mach number (-)"] = pms.commb.mach60(msg)
+            data["Barometric altitude rate (ft/min)"] = pms.commb.vr60baro(msg)   
+            data["Inertial vertical speed (ft/min)"] = pms.commb.vr60ins(msg)
+        
+        return data

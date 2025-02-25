@@ -6,37 +6,52 @@ import gc
 from decoder import Decoder
 
 # Configuración
+CHUNK_SIZE = 2_000_000 # tamaño de cada chunk
+SAVE_EVERY = 10 # guardamos cada 10 chunks (~5M filas por Parquet)
+START_ROW = 0 # fila de inicio de lectura
 
-CHUNK_SIZE = 2_000_000
-SAVE_EVERY = 10 # Guardar cada 10 chunks (~5M filas por Parquet)
-START_ROW = 0
-
-# Procesamiento en paralelo
 def apply_parallel(df, func, num_workers=mp.cpu_count()):
-    """Divide el DataFrame y aplica la función en paralelo usando ProcessPoolExecutor."""
+    """Divide el DataFrame y aplica la función para procesamiento en paralelo usando ProcessPoolExecutor.
+    
+    Args:
+        df (DataFrame): Datos.
+        func: Función a ejecutar.
+        num_workers: Número de CPUs.
+    Returns:
+        (DataFrame)
+    """
     with concurrent.futures.ProcessPoolExecutor(max_workers=num_workers) as executor:
         chunks = [df.iloc[i::num_workers, :].copy() for i in range(num_workers)]
         results = executor.map(func, chunks)
     return pd.concat(results, ignore_index=True)
 
-
 def process_chunk(chunk):
-    """Procesa un solo chunk en paralelo."""
+    """Procesa un solo chunk en paralelo.
+    
+    Args:
+        chunk: Chunk de datos leído del archivo csv.
+    Returns:
+        (dict): Diccionario resultante del procesamiento del chunk.
+    """
     return chunk.apply(lambda x: safe_process_message(x["message"], x["ts_kafka"]), axis=1).apply(pd.Series)
 
-
-def read_data(TAR_PATH, FILE_NAME):
-    """Lee el archivo TAR y procesa los datos en chunks con paralelismo."""
+def read_data(tar_path, file_name):
+    """Lee el archivo TAR y procesa los datos en chunks con paralelismo.
+    
+    Args:
+        tar_path (str): Ruta al archivo .tar que contiene los datos comprimidos.
+        file_path (str): Ruta al archivo .csv que está contenido en el .tar.
+    """
     dfs = []
     num_chunks = 0
     part = 0
 
-    with tarfile.open(TAR_PATH, "r") as tar:
-        csv_file = tar.extractfile(FILE_NAME)
+    with tarfile.open(tar_path, "r") as tar:
+        csv_file = tar.extractfile(file_name)
 
         for chunk in pd.read_csv(csv_file, chunksize=CHUNK_SIZE, sep=';', skiprows=range(1, START_ROW + 1), header=0):
             try:
-                chunk.index += START_ROW  # Ajustar índices manualmente
+                chunk.index += START_ROW 
                 num_chunks += 1
                 print(f"🔹 Procesando chunk {num_chunks}...")
 
@@ -68,16 +83,20 @@ def read_data(TAR_PATH, FILE_NAME):
                     dfs = []  # Vaciar lista después de guardar
 
             except Exception as e:
-                print(f"❌ Error procesando el chunk {num_chunks}: {e}")
+                print(f"Error procesando el chunk {num_chunks}: {e}")
 
         # Guardar el último bloque pendiente
         if dfs:
             part += 1
             save_parquet(dfs, part)
 
-
 def save_parquet(dfs, part):
-    """Guarda los datos en un archivo Parquet, manejando errores de conversión."""
+    """Guarda los datos en un archivo Parquet, manejando errores de conversión.
+    
+    Args:
+        dfs (list): Lista de DataFrames.
+        part (int): Número de partición.
+    """
     try:
         final_df = pd.concat(dfs, ignore_index=True)
 
@@ -89,21 +108,27 @@ def save_parquet(dfs, part):
                 final_df[col] = pd.to_numeric(final_df[col].replace({None: float("nan")}), errors="coerce").fillna(0)
 
         final_df.to_parquet(f"data/part_{part}.parquet")
-        print(f"✅ Guardado: data/part_{part}.parquet")
+        print(f"Guardado: data/part_{part}.parquet")
 
         # Liberar memoria
         del final_df
         gc.collect()
 
     except Exception as e:
-        print(f"❌ Error guardando Parquet (parte {part}): {e}")
+        print(f"Error guardando Parquet (parte {part}): {e}")
 
 
 def safe_process_message(message, ts_kafka):
-    """Envuelve Decoder.processMessage en un try-except para manejar errores."""
+    """Envuelve Decoder.processMessage en un try-except para manejar errores.
+    
+    Args:
+        message: Mensaje enviado por una aeronave.
+        ts_kafka: Timestamp del mensaje.
+    Returns:
+        (dict): Diccionario con el mensaje codificado o en caso de error un diccionario vacío.
+    """
     try:
         return Decoder.processMessage(message, ts_kafka)
     except Exception as e:
-        print(f"⚠️ Error en processMessage: {e}")
+        print(f"Error en processMessage: {e}")
         return {}  # Devuelve un diccionario vacío en caso de error
-
