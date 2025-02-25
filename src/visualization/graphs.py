@@ -1,5 +1,6 @@
 import plotly.express as px
 from preprocess.dataframe_processor import DataframeProcessor
+from preprocess.data_procesor import DataProcessor
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -73,23 +74,7 @@ def df_wait_times(df):
     dff = dff.sort_values(by=["Callsign", "Timestamp (date)"])
 
     # Separate on-ground and airborne events
-    on_ground = dff[(dff["Flight status"] == "on-ground") & (dff["Speed"]==0)].groupby("Callsign")["Timestamp (date)"].min()
-    airborne = dff[dff["Flight status"] == "airborne"].groupby("Callsign")["Timestamp (date)"].min()
-
-    # Create new dataframes and rename timestamp columns
-    on_ground = pd.DataFrame(on_ground)
-    on_ground.columns = ["ts ground"]
-
-    airborne = pd.DataFrame(airborne)
-    airborne.columns = ["ts airborne"]
-
-    # Merge them into a new dataframe and extract the waiting seconds
-    df_wait_times = on_ground.merge(airborne, how="inner", on="Callsign")
-    df_wait_times = df_wait_times[df_wait_times["ts airborne"] > df_wait_times["ts ground"]]
-    df_wait_times["Wait time"] = df_wait_times["ts airborne"] - df_wait_times["ts ground"]
-    df_wait_times["Wait time (s)"] = df_wait_times["Wait time"].dt.total_seconds()
-
-    return df_wait_times
+    return DataProcessor.separate_on_ground_and_airborne(dff)
 
 def histogram_wait_times(df):
     fig_hist = px.histogram(df, x="Wait time (s)", nbins=20, title="Wait Time Distribution")

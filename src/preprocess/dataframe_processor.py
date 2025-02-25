@@ -1,6 +1,7 @@
 import pandas as pd
 from datetime import timedelta
 import preprocess.utilities as ut
+from data_processor import DataProcessor
 
 class DataframeProcessor:
     """Clase que permite realizar operaciones de procesamiento y análisis de datos con los dataframes de Pandas."""
@@ -16,34 +17,9 @@ class DataframeProcessor:
             df_status: DataFrame transformado.
         """
         # Conseguimos el df con todos los datos necesarios -> flight status en todos los callsign
-        df1 = DataframeProcessor.getVelocities(df)
-        df2 = DataframeProcessor.getFlights(df)
+        dff = DataProcessor.get_dff(df)
 
-        df1_s = df1.sort_values(["Timestamp (date)", "ICAO"])
-        df2_s = df2.sort_values(["Timestamp (date)", "ICAO"])
-
-        t = pd.Timedelta('10 minute')
-        dff = pd.merge_asof(df1_s, df2_s, on="Timestamp (date)", by="ICAO", direction="nearest", tolerance=t)
-
-        # Aseguramos que la columna de la fecha sea del tipo correcto
-        dff['Timestamp (date)'] = pd.to_datetime(dff['Timestamp (date)'])
-
-        # Extraemos l ahora
-        dff = ut.extractHour(dff)
-
-        # Extraemos el día de la semana
-        dff = ut.extractDaysOfTheWeek(dff)
-
-        df_status = dff.groupby(['hour', 'Flight status', 'Callsign']).size().unstack(fill_value=0)
-        
-        # Sumamos el número de vuelos, no el número de mensajes
-        df_status['count_nonzero'] = (df_status.ne(0)).sum(axis=1)
-        df_status = df_status.reset_index()
-        
-        # Calculamos el número de vuelos por hora y estado de vuelo
-        df_status = df_status.groupby(['hour', 'Flight status'])['count_nonzero'].sum().reset_index()
-        
-        return df_status
+        return DataProcessor.get_status(dff)
     
     @staticmethod
     def getWaitTimes(df):
