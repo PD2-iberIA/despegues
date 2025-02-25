@@ -8,9 +8,8 @@
 
 1. [Descripción del proyecto](#1-descripción-del-proyecto)
 2. [Instrucciones de instalación](#2-instrucciones-de-instalación)
-3. [Uso](#3-instrucciones-de-uso)
-4. [Estructura del repositorio](#4-estructura-del-repositorio)
-5. [Crédito](#5-crédito)
+3. [Estructura del código](#3-estructura-del-código)
+4. [Crédito](#4-crédito)
 
 ## 1. Descripción del proyecto
 
@@ -48,28 +47,7 @@ Por último, instala las dependencias necesarias:
 pip install -r requirements.txt
 ```
 
-## 3. Instrucciones de uso
-
-### 3.1. Convenio commits
-
-A la hora de realizar commits, hemos tratado de adoptar el siguiente convenio para facilitar el trabajo en grupo:
-
-- Para mantener la historia del repositorio más legible, si un commit aborda múltiples aspectos o cambios, se deben dividir en commits individuales que traten de separar lo máximo posible estos. Por lo tanto, es preferible realizar commits frecuentes y pequeños en lugar de grandes commits que abarquen múltiples cambios.
-
-- Los commits deben contener código que no rompa la compilación ni la funcionalidad del código anterior.
-
-En general, los commits deben cumplir las siguientes pautas:
-
-- Empezar en imperativo
-- No tener punto final
-- No superar los 72 caracteres
-- No incluir el nombre del fichero que modifican
-- Primera palabra capitalizada
-- Si es preciso, rellenar la descripción con información adicional
-- No poner prefijos del estilo 'ADD, EDIT...'
-- Describir el cambio realizado de forma precisa y concisa
-
-## 4. Estructura del repositorio
+## 3. Estructura del código
 
 En la carpeta `src` se encuentra el código principal del proyecto. En su interior se encuentran los siguientes directorios con sus correspondientes módulos:
 
@@ -121,7 +99,7 @@ Este directorio contiene los módulos necesarios para la visualización de los d
 
     Define la clase *Maps* que genera disitintos mapas de Folium que pueden ser almacenados como archivos _html_.
 
-## 5. Crédito
+## 4. Crédito
 
 Integrantes del equipo *iberIA*:
 
