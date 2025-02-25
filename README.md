@@ -49,6 +49,31 @@ pip install -r requirements.txt
 
 ## 3. Estructura del código
 
+```
+📦 despegues
+├─ [otros ficheros y directorios]
+└─ src
+   ├─ airstrip
+   │  ├─ airplane.py
+   │  └─ data_reader.py
+   ├─ preprocess
+   │  ├─ __init__.py
+   │  ├─ airport_constants.py
+   │  ├─ data_processor.py
+   │  ├─ dataframe_processor.py
+   │  ├─ decoder.py
+   │  ├─ parquet_processor.py
+   │  ├─ reader.py
+   │  └─ utilities.py
+   └─ visualization
+      ├─ custom_icons
+      │  ├─ radar_icon.png
+      │  └─ runway_icon.png
+      ├─ dash.py
+      ├─ graphs.py
+      └─ maps.py
+```
+
 En la carpeta `src` se encuentra el código principal del proyecto. En su interior se encuentran los siguientes directorios con sus correspondientes módulos:
 
 `preprocess`
