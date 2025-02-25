@@ -95,19 +95,21 @@ class DataProcessor:
 
     @staticmethod
     def readWithColumnsFilter(file_pattern, selected_columns):
-        # Obtener lista de archivos parquet
+        """
+        Lee múltiples archivos Parquet, selecciona columnas específicas y procesa los datos.
+
+        Parámetros:
+            file_pattern (str): Patrón de búsqueda para encontrar los archivos Parquet.
+            selected_columns (list): Lista de columnas a seleccionar de los archivos.
+
+        Devuelve:
+            pd.DataFrame: DataFrame consolidado con los datos filtrados y procesados.
+        """
         file_list = sorted(glob.glob(file_pattern))
-
-        # Cargar, filtrar y limpiar datos en un bucle
         df_list = [stringToNan(pd.read_parquet(file)[selected_columns]) for file in file_list]
-
-        # Concatenar todos los DataFrames
         df = pd.concat(df_list, ignore_index=True)
 
-        # Convertir Timestamp a datetime
         df['Timestamp (date)'] = pd.to_datetime(df['Timestamp (date)'])
-
-        # Extraer hora y día de la semana
         df['hour'] = df['Timestamp (date)'].dt.floor('h')
         df['day_of_week'] = df['Timestamp (date)'].dt.strftime('%a')
 
@@ -115,7 +117,15 @@ class DataProcessor:
 
     @staticmethod
     def get_dff(df):
-        # Conseguimos el df con todos los datos necesarios->flight status en todos los callsign
+        """
+        Fusiona los datos de velocidad y estado de vuelo en un solo DataFrame basado en la proximidad temporal.
+
+        Parámetros:
+            df (pd.DataFrame): DataFrame con los datos de vuelo sin procesar.
+
+        Devuelve:
+            pd.DataFrame: DataFrame combinado con información de velocidad y estado de vuelo.
+        """
         df1 = DataframeProcessor.getVelocities(df)
         df2 = DataframeProcessor.getFlights(df)
 
@@ -125,39 +135,47 @@ class DataProcessor:
         t = pd.Timedelta('10 minute')
         dff = pd.merge_asof(df1_s, df2_s, on="Timestamp (date)", by="ICAO", direction="nearest", tolerance=t)
 
-        # Ensure timestamp is in datetime format
         dff['Timestamp (date)'] = pd.to_datetime(dff['Timestamp (date)'])
-
-        # Extract hour
         dff = ut.extractHour(dff)
-
-        # Day of the week
         dff = ut.extractDaysOfTheWeek(dff)
 
         return dff
 
     @staticmethod
     def get_status(df):
+        """
+        Calcula el número de vuelos por estado de vuelo y hora del día.
 
+        Parámetros:
+            df (pd.DataFrame): DataFrame con los datos de vuelos.
+
+        Devuelve:
+            pd.DataFrame: DataFrame con la cantidad de vuelos agrupados por hora y estado de vuelo.
+        """
         df_status = df.groupby(['hour', 'Flight status', 'Callsign']).size().unstack(fill_value=0)
-        # Sumammos el número de vuelos, no el número de mensajes
         df_status['count_nonzero'] = (df_status.ne(0)).sum(axis=1)
         df_status = df_status.reset_index()
-
-        # Summarize data: count_nonzero per hour divided by Flight status
         df_status = df_status.groupby(['hour', 'Flight status'])['count_nonzero'].sum().reset_index()
 
         return df_status
 
     @staticmethod
     def get_wait_times(dff):
-        # Separate on-ground and airborne events
+        """
+        Calcula los tiempos de espera en tierra antes del despegue para cada vuelo.
+
+        Parámetros:
+            dff (pd.DataFrame): DataFrame con datos de vuelos combinados.
+
+        Devuelve:
+            pd.DataFrame: DataFrame con los tiempos de espera en tierra y otras métricas asociadas.
+        """
         on_ground = dff[(dff["Flight status"] == "on-ground") & (dff["Speed"] == 0)].groupby("Callsign")[
             "Timestamp (date)"].min()
         airborne = dff[dff["Flight status"] == "airborne"].groupby("Callsign")["Timestamp (date)"].min()
+
         on_ground = pd.DataFrame(on_ground)
         on_ground.columns = ["ts ground"]
-
         airborne = pd.DataFrame(airborne)
         airborne.columns = ["ts airborne"]
 
@@ -168,4 +186,5 @@ class DataProcessor:
         df_wait_times['day_of_week'] = df_wait_times['ts ground'].dt.strftime('%a')
 
         return df_wait_times
+
 
