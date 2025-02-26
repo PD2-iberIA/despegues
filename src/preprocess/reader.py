@@ -12,6 +12,94 @@ CHUNK_SIZE = 2_000_000 # tamaño de cada chunk
 SAVE_EVERY = 10 # guardamos cada 10 chunks (~5M filas por Parquet)
 START_ROW = 0 # fila de inicio de lectura
 
+import numpy as np
+import os
+import pandas as pd
+import importlib
+from visualization.maps import Maps
+import preprocess.utilities as ut
+import preprocess.dataframe_processor as dp
+from preprocess.dataframe_processor import DataframeProcessor
+
+importlib.reload(dp)
+
+def procesar_y_guardar_particiones(df, transformacion, groupby_columns, output_dir, name):
+    """
+    Procesa por particiones de un DataFrame aplicando una transformación específica,
+    permitiendo definir las columnas para la agrupación.
+
+    Parámetros:
+    df (pd.DataFrame): DataFrame con los datos a procesar.
+    transformacion (function): Función a aplicar a cada partición del DataFrame.
+    groupby_columns (list): Lista de columnas por las cuales se agruparán los datos.
+    output_dir (str): Nombre del directorio donde se guardarán las particiones. 
+    name (str): Nombre del archivo final combinado.
+
+    Return:
+    str: Ruta del archivo Parquet consolidado tras aplicar la transformación.
+
+    Funcionalidad:
+    - Convierte valores de cadena a NaN en el DataFrame.
+    - Crea una carpeta auxiliar `output_dir` si no existe.
+    - Agrupa por las columnas definidas en `groupby_columns` y asigna particiones basadas en el módulo 10.
+    - Aplica la función `transformacion` a cada partición.
+    - Guarda cada partición como un archivo Parquet.
+    - Combina todas las particiones en un solo archivo Parquet final (`name.parquet`).
+    """
+
+    # Procesamos los datos de la forma adecuada
+    df = ut.stringToNan(df)
+
+    # Crear la carpeta auxiliar si no existe
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Agrupar por las columnas especificadas y asignar número de partición
+    df['partition'] = (df.groupby(groupby_columns).ngroup() % 10)
+
+    # Guardar cada partición en un archivo Parquet aplicando la función de transformación
+    for partition_num in range(10):
+        partition_df = df[df['partition'] == partition_num]
+        print(partition_df.shape)
+        
+        # Aplicar la transformación recibida como parámetro
+        processed_df = transformacion(partition_df)
+        print(processed_df.shape)
+        
+        # Eliminar la columna 'partition'
+        if 'partition' in processed_df.columns:
+            processed_df = processed_df.drop(columns=['partition'])
+        
+        # Definir la ruta del archivo Parquet
+        partition_file_path = os.path.join(output_dir, f'partition_{partition_num}.parquet')
+        
+        # Guardar el DataFrame procesado en formato Parquet
+        processed_df.to_parquet(partition_file_path, index=False)
+
+    print(f"Particiones procesadas y guardadas en formato Parquet en la carpeta {output_dir}.")
+
+    # Inicializar una lista para almacenar los DataFrames
+    dataframes = []
+
+    # Recorrer las particiones y cargar cada archivo Parquet
+    for partition_num in range(10):
+        partition_file_path = os.path.join(output_dir, f'partition_{partition_num}.parquet')
+        
+        if os.path.exists(partition_file_path):
+            partition_df = pd.read_parquet(partition_file_path)
+            dataframes.append(partition_df)
+
+    # Combinar todos los DataFrames en uno solo
+    combined_df = pd.concat(dataframes, ignore_index=True)
+
+    # Guardar el DataFrame combinado en formato Parquet
+    combined_file_path = f'{name}.parquet'
+    combined_df.to_parquet(combined_file_path, index=False)
+
+    print(f"Todas las particiones han sido combinadas y guardadas en '{name}.parquet'.")
+
+    return combined_file_path
+
+
 def consolidar_parquet(directory):
     """
     Consolida múltiples archivos Parquet de subcarpetas en un único archivo Parquet.
