@@ -21,6 +21,8 @@ La motivación detrás de este proyecto es mejorar la eficiencia operativa de lo
 
 Al llevar a cabo este proyecto, aprenderemos a trabajar en equipo, gestionar grandes conjuntos de datos, realizar visualizaciones interactivas y aplicar técnicas de análisis de datos para obtener conclusiones valiosas sobre la eficiencia del tráfico aéreo, además de presentar todo ello públicamente.
 
+Para más detalles, puedes consultar toda la documentación en la [Wiki](https://github.com/PD2-iberIA/despegues/wiki) de nuestro repositorio.
+
 ### Entrega 1 - Visualización
 
 Para la primera entrega decodificamos y preprocesamos los datos para después construir visualizaciones como histogramas, boxplots y mapas de calor. Buscamos ofrecer un primer acercamiento que permita identificar patrones y tendencias generales en los datos.
