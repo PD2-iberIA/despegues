@@ -335,6 +335,18 @@ class Maps:
 
     @staticmethod
     def detailedTrajectoriesMap(df, title="Flight Trajectories with Velocities", date=""):
+        """
+        Genera un mapa detallado de trayectorias de vuelo con velocidades y filtrado basado en distancia al radar.
+
+        Parámetros:
+        df (pd.DataFrame): DataFrame con datos de trayectoria, incluyendo columnas 'lat', 'lon', 'Speed', 
+                        'Timestamp (date)', 'Callsign', 'ICAO' y 'TurbulenceCategory'.
+        title (str, opcional): Título del mapa. Por defecto "Flight Trajectories with Velocities".
+        date (str, opcional): Fecha a incluir en el título del mapa.
+
+        Retorna:
+        mapclassify.TrajectoryCollection.explore: Mapa interactivo de folium con las trayectorias visualizadas.
+        """
         # Calculamos la distancia de cada punto al radar
         def calculate_distance_to_radar(lat, lon, radar_position):
             return geopy.distance.distance((lat, lon), radar_position).km

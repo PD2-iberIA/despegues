@@ -58,8 +58,19 @@ def graph_hourly_flight_status(df):
 
     return fig
 
-# Sacar df de los tiempos de espera
 def df_wait_times(df):
+    """
+    Genera un DataFrame con los tiempos de espera de vuelos, combinando información 
+    de velocidades y estados de vuelo.
+
+    Parámetros:
+    df (pd.DataFrame): DataFrame con los datos de vuelos, incluyendo información de 
+                       velocidades y estado.
+
+    Retorna:
+    pd.DataFrame: DataFrame procesado con los tiempos de espera, donde se separan los 
+                  eventos de "on-ground" y "airborne".
+    """
     # Extraemos las columnas necesarias y creamos un df nuevo
     df1 = DataframeProcessor.getVelocities(df)
     df2 = DataframeProcessor.getFlights(df)
@@ -77,14 +88,46 @@ def df_wait_times(df):
     return DataProcessor.separate_on_ground_and_airborne(dff)
 
 def histogram_wait_times(df):
+    """
+    Genera un histograma de la distribución de los tiempos de espera.
+
+    Parámetros:
+    df (pd.DataFrame): DataFrame con una columna "Wait time (s)" que contiene 
+                       los tiempos de espera en segundos.
+
+    Retorna:
+    plotly.graph_objects.Figure: Figura de Plotly con el histograma generado.
+
+    """
     fig_hist = px.histogram(df, x="Wait time (s)", nbins=20, title="Wait Time Distribution")
     return fig_hist
 
 def boxplot_wait_times(df):
+    """
+    Genera un boxplot de los tiempos de espera.
+
+    Parámetros:
+    df (pd.DataFrame): DataFrame con una columna "Wait time (s)" que contiene 
+                       los tiempos de espera en segundos.
+
+    Retorna:
+    plotly.graph_objects.Figure: Figura de Plotly con el boxplot generado.
+    """
+    
     fig_box = px.box(df, y="Wait time (s)", title="Boxplot de Valores")
     return fig_box
 
 def heatmap_wait_times(df):
+    """
+    Genera un mapa de calor del tiempo de espera por hora y día del mes.
+
+    Parámetros:
+    df (pd.DataFrame): DataFrame con las columnas "ts ground" (timestamp del evento en tierra) 
+                       y "Wait time (s)" (tiempo de espera en segundos).
+
+    Retorna:
+    plotly.graph_objects.Figure: Figura de Plotly con el heatmap generado.
+    """
     # Extraer fecha y hora
     df["Date"] = df["ts ground"].dt.date
     df["Hour"] = df["ts ground"].dt.hour
@@ -105,14 +148,36 @@ def heatmap_wait_times(df):
     return fig_heatmap
 
 
-def waits_by_categories_and_runways(df):
+def waits_by_categories_and_runways(df, umbral):
+    """
+    Genera visualizaciones de los tiempos de espera en pistas 3 y 4, 
+    segmentados por categorías de aeronaves y turbulencia.
+
+    Parámetros:
+    df (pd.DataFrame): DataFrame con información de vuelos, incluyendo columnas 
+                       relacionadas con tiempos de espera, pistas y categorías de aeronaves.
+    umbral (int): límite superior de los tiempos de espera en los vuelos del df
+
+    Retorna:
+    None: La función genera y muestra gráficos de distribución y comparación de tiempos de espera.
+
+    Descripción:
+    - Filtra los datos para incluir solo aterrizajes en las pistas 3 y 4.
+    - Fusiona la información de tiempos de espera con categorías de aeronaves.
+    - Filtra tiempos de espera menores a 5000 segundos.
+    - Genera boxplots para visualizar la relación entre tiempos de espera y la categoría de turbulencia:
+      - Según la aeronave anterior en la misma pista.
+      - Según la aeronave misma.
+    - Genera histogramas y boxplots comparando la distribución de tiempos de espera por pista.
+    """
 
     df_espera = DataframeProcessor.getWaitTimes(df)
     df_aterrizajes = df_espera[df_espera["runway"].isin(["3","4"])]
     df_tipos = DataframeProcessor.getAirplaneCategories(df)
     df_aterrizajes = df_aterrizajes.merge(df_tipos, on="ICAO")
 
-    df_aterrizajes = df_aterrizajes[df_aterrizajes["Wait time (s)"] < 5000]
+    # Selecciona los vuelos con un tiempo de espera por debajo del umbral establecido
+    df_aterrizajes = df_aterrizajes[df_aterrizajes["Wait time (s)"] < umbral]
     df_aterrizajes = df_aterrizajes.sort_values(by="ts airborne")
 
     # - Boxplot de tiempo de espera según la categoría del avión anterior y la pista -
