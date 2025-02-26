@@ -112,6 +112,7 @@ def waits_by_categories_and_runways(df):
     df_tipos = DataframeProcessor.getAirplaneCategories(df)
     df_aterrizajes = df_aterrizajes.merge(df_tipos, on="ICAO")
 
+    df_aterrizajes = df_aterrizajes[df_aterrizajes["Wait time (s)"] < 5000]
     df_aterrizajes = df_aterrizajes.sort_values(by="ts airborne")
 
     # - Boxplot de tiempo de espera según la categoría del avión anterior y la pista -
@@ -180,6 +181,7 @@ def waits_by_categories_and_runways(df):
 
     # - Distribución de tiempos de espera por pista -
     
+    # Configurar la figura y los ejes
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 12), sharex=True)
 
     # Crear el histograma por pista
@@ -219,8 +221,6 @@ def waits_by_categories_and_runways(df):
     fig.suptitle("2024-12-07", fontsize=12, color="gray", y=0.92)
 
     plt.show()
-
-import pandas as pd
 
 def get_flight_stats(df, status):
     """ 
