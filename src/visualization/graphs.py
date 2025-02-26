@@ -219,3 +219,49 @@ def waits_by_categories_and_runways(df):
     fig.suptitle("2024-12-07", fontsize=12, color="gray", y=0.92)
 
     plt.show()
+
+import pandas as pd
+
+def get_flight_stats(df, status):
+    """ 
+    Genera un DataFrame con estadísticas del número máximo, mínimo y medio de vuelos 
+    para aviones según su estado.
+
+    Parámetros:
+    df (pd.DataFrame): DataFrame con datos de vuelos, incluyendo columnas 'Flight status', 
+                        'day_of_week', 'count_nonzero' y 'hour'.
+    status (str): Estado del vuelo ('on-ground' o 'airborne').
+
+    Excepciones:
+    ValueError: Si `status` no es 'on-ground' ni 'airborne'.
+    
+    Retorna:
+    pd.DataFrame: DataFrame con las estadísticas de vuelos por día de la semana.
+    """
+    # Verifica que el estado del vuelo sea válido
+    if status not in ["on-ground", "airborne"]:
+        raise ValueError("El parámetro 'status' debe ser 'on-ground' o 'airborne'.")
+
+    # Filtra el df por estado
+    df1 = df[df['Flight status'] == status]
+
+    # Genera el df de estadísticas
+    df_stats = df1.groupby("day_of_week").apply(lambda x: pd.Series({
+        "max_hour": x.loc[x['count_nonzero'].idxmax(), 'hour'],
+        "max_count": x["count_nonzero"].max(),
+        "min_hour": x.loc[x['count_nonzero'].idxmin(), 'hour'],
+        "min_count": x["count_nonzero"].min(),
+        "avg_airborne": x[x["Flight status"] == "airborne"]["count_nonzero"].mean() if "airborne" in x["Flight status"].values else None,
+        "avg_on_ground": x[x["Flight status"] == "on-ground"]["count_nonzero"].mean() if "on-ground" in x["Flight status"].values else None
+    })).reset_index()
+
+    # Elimina la columna del estado contrario
+    if (status == 'airborne'):
+        df_stats = df_stats.drop(columns=["avg_on_ground"])
+    else:
+        df_stats = df_stats.drop(columns=["avg_airborne"])
+
+    return df_stats
+
+
+

@@ -4,11 +4,68 @@ import multiprocessing as mp
 import concurrent.futures
 import gc
 from decoder import Decoder
+import os
+import pyarrow.parquet as pq
 
 # Configuración
 CHUNK_SIZE = 2_000_000 # tamaño de cada chunk
 SAVE_EVERY = 10 # guardamos cada 10 chunks (~5M filas por Parquet)
 START_ROW = 0 # fila de inicio de lectura
+
+def consolidar_parquet(directory):
+    """
+    Consolida múltiples archivos Parquet de subcarpetas en un único archivo Parquet.
+
+    Parámetros:
+    directory (str): Ruta de la carpeta principal que contiene las subcarpetas con archivos Parquet.
+
+    Retorna:
+    str: Ruta del archivo Parquet consolidado.
+
+    Excepciones:
+    - FileNotFoundError: Si el directorio base no existe.
+    - ValueError: Si no se encuentran archivos Parquet en las subcarpetas.s
+
+    Funcionalidad:
+    - Recorre todas las subcarpetas dentro de `directory`.
+    - Busca y lee los archivos Parquet dentro de cada subcarpeta.
+    - Concatena todos los DataFrames en un único DataFrame.
+    - Guarda el DataFrame consolidado en un archivo Parquet en `directory.parquet`.
+    """
+    if not os.path.exists(directory):
+        raise FileNotFoundError(f"El directorio '{directory}' no existe.")
+
+    # Definir la ruta de salida
+    output_file = f"{directory}.parquet"
+
+    # Lista para almacenar DataFrames
+    dataframes = []
+
+    # Recorrer las subcarpetas dentro de la carpeta principal
+    for subfolder in os.listdir(directory):
+        subfolder_path = os.path.join(directory, subfolder)
+
+        if os.path.isdir(subfolder_path):  # Verificar que sea una carpeta
+            parquet_files = [f for f in os.listdir(subfolder_path) if f.endswith(".parquet")]
+
+            for parquet_file in parquet_files:
+                parquet_path = os.path.join(subfolder_path, parquet_file)
+                df = pd.read_parquet(parquet_path)
+                dataframes.append(df)
+
+    if not dataframes:
+        raise ValueError("No se encontraron archivos Parquet en las subcarpetas.")
+
+    # Concatenar todos los DataFrames
+    df_final = pd.concat(dataframes, ignore_index=True)
+
+    # Guardar el resultado en un único archivo Parquet
+    df_final.to_parquet(output_file, index=False)
+
+    print(f"Parquet consolidado guardado en: {output_file}")
+
+    return output_file
+
 
 def apply_parallel(df, func, num_workers=mp.cpu_count()):
     """Divide el DataFrame y aplica la función para procesamiento en paralelo usando ProcessPoolExecutor.
@@ -132,3 +189,4 @@ def safe_process_message(message, ts_kafka):
     except Exception as e:
         print(f"Error en processMessage: {e}")
         return {}  # Devuelve un diccionario vacío en caso de error
+    
