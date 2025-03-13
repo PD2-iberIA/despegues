@@ -168,7 +168,7 @@ class DataProcessor:
         Returns:
             (bool): True si el avión está en un punto de espera, False en caso contrario.
         """
-        TOLERANCE_RADIUS = 10 # metros
+        TOLERANCE_RADIUS = 0.01 # km (10 metros)
 
         for point in ac.HOLDING_POINTS:
 
@@ -180,7 +180,7 @@ class DataProcessor:
             distancia = ut.haversine(point_lat, point_lon, lat, lon)
 
             if distancia <= TOLERANCE_RADIUS:
-                #print(f"El avión en posición ({lat}, {lon}) está en el punto de espera ({point_lat}, {point_lon}) a una distancia de: {distancia:.2f} m)")
+                #print(f"El avión en posición ({lat}, {lon}) está en el punto de espera ({point_lat}, {point_lon}) a una distancia de: {distancia:.2f} km)")
                 return True
             
         return False
