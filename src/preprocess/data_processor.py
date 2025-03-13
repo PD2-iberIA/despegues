@@ -1,9 +1,6 @@
 import preprocess.airport_constants as ac
 import math
-import plotly.express as px
-from preprocess.utilities import stringToNan
 import preprocess.utilities as ut
-from preprocess.dataframe_processor import DataframeProcessor
 import pandas as pd
 import glob
 
@@ -106,7 +103,7 @@ class DataProcessor:
             pd.DataFrame: DataFrame consolidado con los datos filtrados y procesados.
         """
         file_list = sorted(glob.glob(file_pattern))
-        df_list = [stringToNan(pd.read_parquet(file)[selected_columns]) for file in file_list]
+        df_list = [ut.stringToNan(pd.read_parquet(file)[selected_columns]) for file in file_list]
         df = pd.concat(df_list, ignore_index=True)
 
         df['Timestamp (date)'] = pd.to_datetime(df['Timestamp (date)'])
@@ -114,32 +111,6 @@ class DataProcessor:
         df['day_of_week'] = df['Timestamp (date)'].dt.strftime('%a')
 
         return df
-
-    @staticmethod
-    def get_dff(df):
-        """
-        Fusiona los datos de velocidad y estado de vuelo en un solo DataFrame basado en la proximidad temporal.
-
-        Parámetros:
-            df (pd.DataFrame): DataFrame con los datos de vuelo sin procesar.
-
-        Devuelve:
-            pd.DataFrame: DataFrame combinado con información de velocidad y estado de vuelo.
-        """
-        df1 = DataframeProcessor.getVelocities(df)
-        df2 = DataframeProcessor.getFlights(df)
-
-        df1_s = df1.sort_values(["Timestamp (date)", "ICAO"])
-        df2_s = df2.sort_values(["Timestamp (date)", "ICAO"])
-
-        t = pd.Timedelta('10 minute')
-        dff = pd.merge_asof(df1_s, df2_s, on="Timestamp (date)", by="ICAO", direction="nearest", tolerance=t)
-
-        dff['Timestamp (date)'] = pd.to_datetime(dff['Timestamp (date)'])
-        dff = ut.extractHour(dff)
-        dff = ut.extractDaysOfTheWeek(dff)
-
-        return dff
 
     @staticmethod
     def get_status(df):
@@ -187,4 +158,29 @@ class DataProcessor:
 
         return df_wait_times
 
+    @staticmethod
+    def is_in_holding_point(lat, lon):
+        """Indica si un avión se encuentra en un punto de espera del aeropuerto.
+        
+        Args:
+            lat (float): Latitud del avión.
+            lon (float): Longitud del avión.
+        Returns:
+            (bool): True si el avión está en un punto de espera, False en caso contrario.
+        """
+        TOLERANCE_RADIUS = 10 # metros
 
+        for point in ac.HOLDING_POINTS:
+
+            # Coordenadas del punto de espera
+            point_lat = point[1]
+            point_lon = point[0]
+
+            # Distancia entre el punto de espera y el avión
+            distancia = ut.haversine(point_lat, point_lon, lat, lon)
+
+            if distancia <= TOLERANCE_RADIUS:
+                #print(f"El avión en posición ({lat}, {lon}) está en el punto de espera ({point_lat}, {point_lon}) a una distancia de: {distancia:.2f} m)")
+                return True
+            
+        return False
