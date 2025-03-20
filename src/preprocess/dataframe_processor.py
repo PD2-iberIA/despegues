@@ -1,7 +1,7 @@
 import pandas as pd
 from datetime import timedelta
 import preprocess.utilities as ut
-from data_processor import DataProcessor
+from preprocess.data_processor import DataProcessor
 
 class DataframeProcessor:
     """Clase que permite realizar operaciones de procesamiento y análisis de datos con los dataframes de Pandas."""
@@ -249,6 +249,32 @@ class DataframeProcessor:
         df_alt = df_alt[["Timestamp (date)", "ICAO", "Callsign", "Flight status", "Altitude (ft)", "lat", "lon"]]
 
         return df_alt
+    
+    @staticmethod
+    def get_dff(df):
+        """
+        Fusiona los datos de velocidad y estado de vuelo en un solo DataFrame basado en la proximidad temporal.
+
+        Parámetros:
+            df (pd.DataFrame): DataFrame con los datos de vuelo sin procesar.
+
+        Devuelve:
+            pd.DataFrame: DataFrame combinado con información de velocidad y estado de vuelo.
+        """
+        df1 = DataframeProcessor.getVelocities(df)
+        df2 = DataframeProcessor.getFlights(df)
+
+        df1_s = df1.sort_values(["Timestamp (date)", "ICAO"])
+        df2_s = df2.sort_values(["Timestamp (date)", "ICAO"])
+
+        t = pd.Timedelta('10 minute')
+        dff = pd.merge_asof(df1_s, df2_s, on="Timestamp (date)", by="ICAO", direction="nearest", tolerance=t)
+
+        dff['Timestamp (date)'] = pd.to_datetime(dff['Timestamp (date)'])
+        dff = ut.extractHour(dff)
+        dff = ut.extractDaysOfTheWeek(dff)
+
+        return dff
 
     @staticmethod
     def removeOutlierFlights(df):

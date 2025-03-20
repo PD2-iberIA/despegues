@@ -1,3 +1,6 @@
+import json
+import os
+
 # Posición del radar (lat, lon)
 RADAR_POSITION = (40.51, -3.53)
 
@@ -18,3 +21,14 @@ RUNWAY_4 = {
     'position': (40.507, -3.559),
     'orientation': '36R/18L'
 }
+
+ruta_base = os.path.dirname(os.path.abspath(__file__))
+ruta_geojson = os.path.join(ruta_base, "..", "puntosespera", "holding_points.geojson")
+
+with open(ruta_geojson, "r") as file:
+    geojson_data = json.load(file)
+
+# Coordenadas de los puntos de espera
+HOLDING_POINTS = [
+    feature["geometry"]["coordinates"] for feature in geojson_data["features"]
+]

@@ -1,6 +1,6 @@
 import plotly.express as px
 from preprocess.dataframe_processor import DataframeProcessor
-from preprocess.data_procesor import DataProcessor
+from preprocess.data_processor import DataProcessor
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
