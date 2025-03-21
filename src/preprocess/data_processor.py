@@ -1,8 +1,7 @@
 import preprocess.airport_constants as ac
 import math
 import preprocess.utilities as ut
-import pandas as pd
-import glob
+import pyspark.sql.functions as f
 
 # Radio de la Tierra (km)
 EARTH_RADIUS = 6378
@@ -102,20 +101,19 @@ class DataProcessor:
         Devuelve:
             pd.DataFrame: DataFrame consolidado con los datos filtrados y procesados.
         """
-        file_list = sorted(glob.glob(file_pattern))
-        df_list = [ut.stringToNan(pd.read_parquet(file)[selected_columns]) for file in file_list]
-        df = pd.concat(df_list, ignore_index=True)
+        # Leemos todos los archivos Parquet coincidentes con el patrón
+        df = spark.read.parquet(file_pattern).select(*selected_columns)
 
-        df['Timestamp (date)'] = pd.to_datetime(df['Timestamp (date)'])
-        df['hour'] = df['Timestamp (date)'].dt.floor('h')
-        df['day_of_week'] = df['Timestamp (date)'].dt.strftime('%a')
+        df = df.withColumn("Timestamp (date)", f.to_timestamp(f.col("Timestamp (date)")))
+        df = df.withColumn("hour", f.date_format(f.col("Timestamp (date)"), "yyyy-MM-dd HH:00:00"))
+        df = df.withColumn("day_of_week", f.date_format(f.col("Timestamp (date)"), "E"))
 
         return df
 
     @staticmethod
     def get_status(df):
         """
-        Calcula el número de vuelos por estado de vuelo y hora del día.
+        Calcula el número de vuelos únicos por estado de vuelo y hora del día.
 
         Parámetros:
             df (pd.DataFrame): DataFrame con los datos de vuelos.
@@ -123,10 +121,7 @@ class DataProcessor:
         Devuelve:
             pd.DataFrame: DataFrame con la cantidad de vuelos agrupados por hora y estado de vuelo.
         """
-        df_status = df.groupby(['hour', 'Flight status', 'Callsign']).size().unstack(fill_value=0)
-        df_status['count_nonzero'] = (df_status.ne(0)).sum(axis=1)
-        df_status = df_status.reset_index()
-        df_status = df_status.groupby(['hour', 'Flight status'])['count_nonzero'].sum().reset_index()
+        df_status = df.groupBy("hour", "Flight status").agg(f.countDistinct("Callsign").alias("count_nonzero"))
 
         return df_status
 
@@ -141,20 +136,33 @@ class DataProcessor:
         Devuelve:
             pd.DataFrame: DataFrame con los tiempos de espera en tierra y otras métricas asociadas.
         """
-        on_ground = dff[(dff["Flight status"] == "on-ground") & (dff["Speed"] == 0)].groupby("Callsign")[
-            "Timestamp (date)"].min()
-        airborne = dff[dff["Flight status"] == "airborne"].groupby("Callsign")["Timestamp (date)"].min()
+        # Filtra vuelos en tierra (on-ground, velocidad = 0) y obtener el primer timestamp por Callsign
+        on_ground = (
+            dff.filter((f.col("Flight status") == "on-ground") & (f.col("Speed") == 0))
+            .groupBy("Callsign")
+            .agg(min("Timestamp (date)").alias("ts_ground"))
+        )
 
-        on_ground = pd.DataFrame(on_ground)
-        on_ground.columns = ["ts ground"]
-        airborne = pd.DataFrame(airborne)
-        airborne.columns = ["ts airborne"]
+        # Filtra vuelos en el aire (airborne) y obtener el primer timestamp por Callsign
+        airborne = (
+            dff.filter(f.col("Flight status") == "airborne")
+            .groupBy("Callsign")
+            .agg(min("Timestamp (date)").alias("ts_airborne"))
+        )
 
-        df_wait_times = on_ground.merge(airborne, how="inner", on="Callsign")
-        df_wait_times = df_wait_times[df_wait_times["ts airborne"] > df_wait_times["ts ground"]]
-        df_wait_times["Wait time"] = df_wait_times["ts airborne"] - df_wait_times["ts ground"]
-        df_wait_times["Wait time (s)"] = df_wait_times["Wait time"].dt.total_seconds()
-        df_wait_times['day_of_week'] = df_wait_times['ts ground'].dt.strftime('%a')
+        # Une ambas tablas por Callsign
+        df_wait_times = on_ground.join(airborne, "Callsign", "inner")
+
+        # Filtra solo los casos donde el vuelo realmente despegó después de estar en tierra
+        df_wait_times = df_wait_times.filter(f.col("ts_airborne") > f.col("ts_ground"))
+
+        # Calcula tiempo de espera en segundos
+        df_wait_times = df_wait_times.withColumn(
+            "Wait time (s)", f.unix_timestamp("ts_airborne") - f.unix_timestamp("ts_ground")
+        )
+
+        # Extrae el día de la semana
+        df_wait_times = df_wait_times.withColumn("day_of_week", f.date_format(f.col("ts_ground"), "E"))
 
         return df_wait_times
 
