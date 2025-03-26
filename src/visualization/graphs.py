@@ -5,328 +5,284 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, hour, dayofweek, count, unix_timestamp, lag
+from pyspark.sql.functions import max as spark_max, min as spark_min, avg, when
+from pyspark.sql.window import Window
+
+# Inicializar Spark
+spark = SparkSession.builder.appName("FlightVisualization").getOrCreate()
 
 # Gráfica por horas de aviones en tierra y aterrizados
-def graph_hourly_flight_status(df):
+def graph_hourly_flight_status(df_spark):
     """
     Generates an interactive stacked bar chart showing the hourly distribution of flights 
     based on their status (e.g., on-ground or airborne).
-
+    
     Args:
-        df (pd.DataFrame): A DataFrame containing flight data with at least two columns:
+        df_spark (pyspark.sql.DataFrame): Spark DataFrame containing flight data with at least two columns:
             - 'Timestamp (date)': Datetime column representing flight event timestamps.
             - 'Flight status': Categorical column indicating the flight's status.
-
+    
     Returns:
         plotly.graph_objects.Figure: A Plotly figure object displaying the stacked bar chart.
     """
-    # Ensure timestamp is in datetime format
-    df['Timestamp (date)'] = pd.to_datetime(df['Timestamp (date)'])
-
-    df["day_of_week"] = df["hour"].dt.day_name()
-
-    # Extraer solo la hora sin fecha
-    df["hour"] = df["hour"].dt.strftime('%H:00')
-
-    # Group by hour and flight status
-    #traffic_by_hour = df.groupby(['hour', 'Flight status']).size().unstack(fill_value=0)
-
-    # Reset index for plotting
-    #traffic_by_hour_reset = traffic_by_hour.reset_index()
-
-    # Melt the DataFrame for Plotly
-    #traffic_melted = traffic_by_hour_reset.melt(id_vars=['hour'], var_name='Flight Status', value_name='Count')
-
+    # Convertir Timestamp a formato datetime
+    df_spark = df_spark.withColumn("hour", hour(col("Timestamp (date)")))
+    df_spark = df_spark.withColumn("day_of_week", dayofweek(col("Timestamp (date)")))
     
     # Agrupar por hora y estado de vuelo
-    df_grouped = df.groupby(["hour", "Flight status"], as_index=False).sum()
-
-    # Crear el gráfico de barras apiladas horizontal con eje y invertido
-    fig = px.bar(df_grouped, x="count_nonzero", y="hour", color="Flight status", barmode="stack",
-                labels={"count_nonzero": "Número de vuelos", "hour": "Hora", "Flight status": "Estado del vuelo"},
-                title="Número de vuelos por hora y estado",
-                color_discrete_sequence=px.colors.qualitative.Plotly,
-                category_orders={"hour": df_grouped["hour"].sort_values(ascending=False)})
-
-    # Update layout for better visualization
+    df_grouped = df_spark.groupBy("hour", "Flight status").agg(count("Flight status").alias("count"))
+    
+    # Convertir a pandas para visualización
+    df_pandas = df_grouped.toPandas()
+    
+    # Crear el gráfico
+    fig = px.bar(df_pandas, x="count", y="hour", color="Flight status", barmode="stack",
+                 labels={"count": "Número de vuelos", "hour": "Hora", "Flight status": "Estado del vuelo"},
+                 title="Número de vuelos por hora y estado",
+                 color_discrete_sequence=px.colors.qualitative.Plotly,
+                 category_orders={"hour": sorted(df_pandas["hour"].unique(), reverse=True)})
+    
+    # Ajustar diseño
     fig.update_layout(
-        xaxis_title="Hour",
-        yaxis_title="Number of Flights",
+        xaxis_title="Número de Vuelos",
+        yaxis_title="Hora",
         xaxis_tickangle=-45,
-        legend_title="Flight Status"
+        legend_title="Estado del vuelo"
     )
-
+    
     return fig
 
-def df_wait_times(df):
+
+def df_wait_times(df_spark):
     """
     Genera un DataFrame con los tiempos de espera de vuelos, combinando información 
     de velocidades y estados de vuelo.
 
-    Parámetros:
-    df (pd.DataFrame): DataFrame con los datos de vuelos, incluyendo información de 
-                       velocidades y estado.
+    Args:
+        df_spark (pyspark.sql.DataFrame): DataFrame con los datos de vuelos, incluyendo información de 
+                                          velocidades y estado.
 
-    Retorna:
-    pd.DataFrame: DataFrame procesado con los tiempos de espera, donde se separan los 
-                  eventos de "on-ground" y "airborne".
+    Returns:
+        pyspark.sql.DataFrame: DataFrame procesado con los tiempos de espera.
     """
-    # Extraemos las columnas necesarias y creamos un df nuevo
-    df1 = DataframeProcessor.getVelocities(df)
-    df2 = DataframeProcessor.getFlights(df)
+    df1 = DataframeProcessor.getVelocities(df_spark)
+    df2 = DataframeProcessor.getFlights(df_spark)
 
-    df1_s = df1.sort_values(["Timestamp (date)", "ICAO"])
-    df2_s = df2.sort_values(["Timestamp (date)", "ICAO"])
-
-    t = pd.Timedelta('10 minute')
-    dff = pd.merge_asof(df1_s, df2_s, on="Timestamp (date)", by="ICAO", direction="nearest", tolerance=t)
-
-    # Ensure data is sorted by Flight ID and timestamp
-    dff = dff.sort_values(by=["Callsign", "Timestamp (date)"])
-
-    # Separate on-ground and airborne events
+    df1_s = df1.orderBy(["Timestamp (date)", "ICAO"])
+    df2_s = df2.orderBy(["Timestamp (date)", "ICAO"])
+    
+    t = 600  # 10 minutos en segundos
+    df1_s = df1_s.withColumn("timestamp_unix", unix_timestamp(col("Timestamp (date)")))
+    df2_s = df2_s.withColumn("timestamp_unix", unix_timestamp(col("Timestamp (date)")))
+    
+    dff = df1_s.join(df2_s, [df1_s.ICAO == df2_s.ICAO, 
+                              abs(df1_s.timestamp_unix - df2_s.timestamp_unix) <= t], 
+                     how="inner").drop("timestamp_unix")
+    
     return DataProcessor.separate_on_ground_and_airborne(dff)
 
-def histogram_wait_times(df):
+def histogram_wait_times(df_spark):
     """
     Genera un histograma de la distribución de los tiempos de espera.
 
-    Parámetros:
-    df (pd.DataFrame): DataFrame con una columna "Wait time (s)" que contiene 
-                       los tiempos de espera en segundos.
+    Args:
+        df_spark (pyspark.sql.DataFrame): DataFrame con una columna "Wait time (s)".
 
-    Retorna:
-    plotly.graph_objects.Figure: Figura de Plotly con el histograma generado.
-
+    Returns:
+        plotly.graph_objects.Figure: Figura de Plotly con el histograma generado.
     """
-    fig_hist = px.histogram(df, x="Wait time (s)", nbins=20, title="Wait Time Distribution")
+    df_pandas = df_spark.toPandas()
+    fig_hist = px.histogram(df_pandas, x="Wait time (s)", nbins=20, title="Wait Time Distribution")
     return fig_hist
 
-def boxplot_wait_times(df):
+def boxplot_wait_times(df_spark):
     """
     Genera un boxplot de los tiempos de espera.
 
-    Parámetros:
-    df (pd.DataFrame): DataFrame con una columna "Wait time (s)" que contiene 
-                       los tiempos de espera en segundos.
+    Args:
+        df_spark (pyspark.sql.DataFrame): DataFrame con una columna "Wait time (s)".
 
-    Retorna:
-    plotly.graph_objects.Figure: Figura de Plotly con el boxplot generado.
+    Returns:
+        plotly.graph_objects.Figure: Figura de Plotly con el boxplot generado.
     """
-    
-    fig_box = px.box(df, y="Wait time (s)", title="Boxplot de Valores")
+    df_pandas = df_spark.toPandas()
+    fig_box = px.box(df_pandas, y="Wait time (s)", title="Boxplot de Valores")
     return fig_box
 
-def heatmap_wait_times(df):
+def heatmap_wait_times(df_spark):
     """
     Genera un mapa de calor del tiempo de espera por hora y día del mes.
 
-    Parámetros:
-    df (pd.DataFrame): DataFrame con las columnas "ts ground" (timestamp del evento en tierra) 
-                       y "Wait time (s)" (tiempo de espera en segundos).
+    Args:
+        df_spark (pyspark.sql.DataFrame): DataFrame con las columnas "ts ground" y "Wait time (s)".
 
-    Retorna:
-    plotly.graph_objects.Figure: Figura de Plotly con el heatmap generado.
+    Returns:
+        plotly.graph_objects.Figure: Figura de Plotly con el heatmap generado.
     """
-    # Extraer fecha y hora
-    df["Date"] = df["ts ground"].dt.date
-    df["Hour"] = df["ts ground"].dt.hour
-
-    # Crear tabla pivote para el heatmap
-    heatmap_data = df.pivot_table(index="Date", columns="Hour", values="Wait time (s)", aggfunc="mean")
-
-    # Crear el mapa de calor con Plotly
+    df_spark = df_spark.withColumn("Date", col("ts ground").cast("date"))
+    df_spark = df_spark.withColumn("Hour", hour(col("ts ground")))
+    
+    heatmap_data = df_spark.groupBy("Date", "Hour").avg("Wait time (s)").toPandas()
+    
     fig_heatmap = px.imshow(
-        heatmap_data.values,
+        heatmap_data.pivot(index="Date", columns="Hour", values="avg(Wait time (s))").values,
         labels=dict(x="Hora", y="Fecha", color="Tiempo de espera (s)"),
-        x=heatmap_data.columns,
-        y=heatmap_data.index,
+        x=heatmap_data["Hour"].unique(),
+        y=heatmap_data["Date"].unique(),
         color_continuous_scale="RdYlGn_r",
         title="Mapa de calor del tiempo de espera por hora y día del mes"
     )
-
+    
     return fig_heatmap
 
 
-def waits_by_categories_and_runways(df, umbral):
+def waits_by_categories_and_runways(sdf, umbral):
     """
     Genera visualizaciones de los tiempos de espera en pistas 3 y 4, 
     segmentados por categorías de aeronaves y turbulencia.
 
-    Parámetros:
-    df (pd.DataFrame): DataFrame con información de vuelos, incluyendo columnas 
-                       relacionadas con tiempos de espera, pistas y categorías de aeronaves.
-    umbral (int): límite superior de los tiempos de espera en los vuelos del df
+    :param sdf (pyspark.sql.DataFrame): DataFrame con información de vuelos.
+    :param umbral (int): límite superior de los tiempos de espera.
 
-    Retorna:
-    None: La función genera y muestra gráficos de distribución y comparación de tiempos de espera.
-
-    Descripción:
-    - Filtra los datos para incluir solo aterrizajes en las pistas 3 y 4.
-    - Fusiona la información de tiempos de espera con categorías de aeronaves.
-    - Filtra tiempos de espera menores a 5000 segundos.
-    - Genera boxplots para visualizar la relación entre tiempos de espera y la categoría de turbulencia:
-      - Según la aeronave anterior en la misma pista.
-      - Según la aeronave misma.
-    - Genera histogramas y boxplots comparando la distribución de tiempos de espera por pista.
+    :returns None: Genera y muestra gráficos de distribución y comparación de tiempos de espera.
     """
 
-    df_espera = DataframeProcessor.getWaitTimes(df)
-    df_aterrizajes = df_espera[df_espera["runway"].isin(["3","4"])]
-    df_tipos = DataframeProcessor.getAirplaneCategories(df)
-    df_aterrizajes = df_aterrizajes.merge(df_tipos, on="ICAO")
+    # Obtener tiempos de espera y categorías de aeronaves
+    df_espera = DataframeProcessor.getWaitTimes(sdf)
+    df_tipos = DataframeProcessor.getAirplaneCategories(sdf)
 
-    # Selecciona los vuelos con un tiempo de espera por debajo del umbral establecido
-    df_aterrizajes = df_aterrizajes[df_aterrizajes["Wait time (s)"] < umbral]
-    df_aterrizajes = df_aterrizajes.sort_values(by="ts airborne")
+    df_aterrizajes = df_espera.filter(col("runway").isin(["3", "4"]))
+    df_aterrizajes = df_aterrizajes.join(df_tipos, on="ICAO")
 
-    # - Boxplot de tiempo de espera según la categoría del avión anterior y la pista -
+    # Filtrar tiempos de espera menores al umbral
+    df_aterrizajes = df_aterrizajes.filter(col("Wait time (s)") < umbral)
 
-    df_aterrizajes2 = df_aterrizajes.sort_values(by="ts airborne")
+    # Ordenar por timestamp de airborne
+    df_aterrizajes = df_aterrizajes.orderBy("ts airborne")
 
-    df_aterrizajes2["Prev_Turbulence"] = df_aterrizajes2.groupby("runway")["TurbulenceCategory"].shift(1)
-    df_aterrizajes2 = df_aterrizajes2.dropna(subset=["Prev_Turbulence"])
+    # Obtener categoría de turbulencia del avión anterior en la misma pista
+    window_spec = Window.partitionBy("runway").orderBy("ts airborne")
+    df_aterrizajes = df_aterrizajes.withColumn("Prev_Turbulence", lag("TurbulenceCategory").over(window_spec))
 
-    df_aterrizajes2["Prev_Turbulence"] = df_aterrizajes2["Prev_Turbulence"].str.replace(r'\s*\(.*?\)', '', regex=True)
+    # Eliminar valores nulos en Prev_Turbulence
+    df_aterrizajes = df_aterrizajes.filter(col("Prev_Turbulence").isNotNull())
 
-    df_aterrizajes2["Prev_Turbulence"] = pd.Categorical(
-        df_aterrizajes2["Prev_Turbulence"], 
-        categories=sorted(df_aterrizajes2["Prev_Turbulence"].unique()), 
-        ordered=True
-    )
+    # Convertir a Pandas para visualización
+    pdf = df_aterrizajes.toPandas()
+    pdf["Prev_Turbulence"] = pdf["Prev_Turbulence"].str.replace(r'\s*\(.*?\)', '', regex=True)
+    pdf["TurbulenceCategory"] = pdf["TurbulenceCategory"].str.replace(r'\s*\(.*?\)', '', regex=True)
 
+    # --- Boxplot de tiempo de espera según la turbulencia del avión anterior ---
     plt.figure(figsize=(12, 6))
     sns.boxplot(
-        data=df_aterrizajes2,
+        data=pdf,
         y="Prev_Turbulence",
         x="Wait time (s)",
         hue="runway",
-        palette=sns.color_palette("viridis", n_colors=len(df_aterrizajes["runway"].unique()))
+        palette="viridis"
     )
-
     plt.title("Tiempo de espera según la categoría de turbulencia de la aeronave anterior y la pista", fontweight="bold")
-    plt.suptitle("2024-12-07", fontsize=12, color="gray", y=0.95)
-    plt.xlabel("Tiempo de espera (s)", fontsize=12, color="gray")
-    plt.ylabel("Categoría de turbulencia de la aeronave anterior", fontsize=12, color="gray")
+    plt.xlabel("Tiempo de espera (s)")
+    plt.ylabel("Categoría de turbulencia de la aeronave anterior")
     plt.legend(title="Pista")
     plt.grid(axis="x", linestyle="--", alpha=0.7)
-
     plt.show()
 
-    # - Boxplot de tiempo de espera según la categoría del avión anterior y la pista -
-
-    df_aterrizajes3 = df_aterrizajes.copy()
-
-    df_aterrizajes3["TurbulenceCategory"] = df_aterrizajes3["TurbulenceCategory"].str.replace(r'\s*\(.*?\)', '', regex=True)
-
-    df_aterrizajes3["TurbulenceCategory"] = pd.Categorical(
-        df_aterrizajes3["TurbulenceCategory"], 
-        categories=sorted(df_aterrizajes3["TurbulenceCategory"].unique()), 
-        ordered=True
-    )
-
+    # --- Boxplot de tiempo de espera según la turbulencia del propio avión ---
     plt.figure(figsize=(12, 6))
     sns.boxplot(
-        data=df_aterrizajes3,
+        data=pdf,
         y="TurbulenceCategory",
         x="Wait time (s)",
         hue="runway",
-        palette=sns.color_palette("viridis", n_colors=len(df_aterrizajes["runway"].unique()))
+        palette="viridis"
     )
-
     plt.title("Tiempo de espera según la categoría de turbulencia de la aeronave y la pista", fontweight="bold")
-    plt.suptitle("2024-12-07", fontsize=12, color="gray", y=0.95)
-    plt.xlabel("Tiempo de espera (s)", fontsize=12, color="gray")
-    plt.ylabel("Categoría de turbulencia", fontsize=12, color="gray")
+    plt.xlabel("Tiempo de espera (s)")
+    plt.ylabel("Categoría de turbulencia")
     plt.legend(title="Pista")
     plt.grid(axis="x", linestyle="--", alpha=0.7)
-
     plt.show()
 
-
-    # - Distribución de tiempos de espera por pista -
-    
-    # Configurar la figura y los ejes
+    # --- Distribución de tiempos de espera por pista ---
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 12), sharex=True)
 
-    # Crear el histograma por pista
     sns.histplot(
-        data=df_aterrizajes,
+        data=pdf,
         x="Wait time (s)",
         hue="runway",
-        kde=True,  # Añadir la estimación de densidad
-        bins=30,  # Número de bins
-        palette=sns.color_palette("viridis", n_colors=len(df_aterrizajes["runway"].unique())),
+        kde=True,
+        bins=30,
+        palette="viridis",
         alpha=0.6,
-        stat="density",  # Usar densidad para normalizar el histograma
-        ax=ax1  # Especificar el eje
+        stat="density",
+        ax=ax1
     )
-
     ax1.set_title("Tiempo de espera según la pista", fontweight="bold")
-    ax1.set_ylabel("Densidad", fontsize=12, color="gray")
+    ax1.set_ylabel("Densidad")
     ax1.grid(axis="x", linestyle="--", alpha=0.7)
 
-
-    # Crear el boxplot
     sns.boxplot(
-        data=df_aterrizajes,
+        data=pdf,
         x="Wait time (s)",
         y="runway",
-        palette=sns.color_palette("viridis", n_colors=len(df_aterrizajes["runway"].unique())),
-        whis=np.inf,  # Para mostrar todos los puntos
-        width=0.4,  # Ancho del boxplot
-        ax=ax2  # Especificar el eje
+        palette="viridis",
+        whis=np.inf,
+        width=0.4,
+        ax=ax2
     )
-
-    # Añadir títulos y etiquetas
-    ax2.set_xlabel("Tiempo de Espera (s)", fontsize=12, color="gray")
-    ax2.set_ylabel("Pista", fontsize=12, color="gray")
+    ax2.set_xlabel("Tiempo de Espera (s)")
+    ax2.set_ylabel("Pista")
     ax2.grid(axis="x", linestyle="--", alpha=0.7)
-
-    fig.suptitle("2024-12-07", fontsize=12, color="gray", y=0.92)
 
     plt.show()
 
-def get_flight_stats(df, status):
+def get_flight_stats(sdf, status):
     """ 
     Genera un DataFrame con estadísticas del número máximo, mínimo y medio de vuelos 
     para aviones según su estado.
 
-    Parámetros:
-    df (pd.DataFrame): DataFrame con datos de vuelos, incluyendo columnas 'Flight status', 
-                        'day_of_week', 'count_nonzero' y 'hour'.
-    status (str): Estado del vuelo ('on-ground' o 'airborne').
+    :param sdf (pyspark.sql.DataFrame): DataFrame con datos de vuelos, incluyendo columnas 'Flight status', 
+                                  'day_of_week', 'count_nonzero' y 'hour'.
+    :param status (str): Estado del vuelo ('on-ground' o 'airborne').
 
-    Excepciones:
-    ValueError: Si `status` no es 'on-ground' ni 'airborne'.
+    :raises ValueError: Si `status` no es 'on-ground' ni 'airborne'.
     
-    Retorna:
-    pd.DataFrame: DataFrame con las estadísticas de vuelos por día de la semana.
+    :returns pyspark.sql.DataFrame: DataFrame con las estadísticas de vuelos por día de la semana.
     """
     # Verifica que el estado del vuelo sea válido
     if status not in ["on-ground", "airborne"]:
         raise ValueError("El parámetro 'status' debe ser 'on-ground' o 'airborne'.")
 
-    # Filtra el df por estado
-    df1 = df[df['Flight status'] == status]
+    # Filtrar el DataFrame por estado
+    sdf_filtered = sdf.filter(col("Flight status") == status)
 
-    # Genera el df de estadísticas
-    df_stats = df1.groupby("day_of_week").apply(lambda x: pd.Series({
-        "max_hour": x.loc[x['count_nonzero'].idxmax(), 'hour'],
-        "max_count": x["count_nonzero"].max(),
-        "min_hour": x.loc[x['count_nonzero'].idxmin(), 'hour'],
-        "min_count": x["count_nonzero"].min(),
-        "avg_airborne": x[x["Flight status"] == "airborne"]["count_nonzero"].mean() if "airborne" in x["Flight status"].values else None,
-        "avg_on_ground": x[x["Flight status"] == "on-ground"]["count_nonzero"].mean() if "on-ground" in x["Flight status"].values else None
-    })).reset_index()
+    # Calcular estadísticas
+    sdf_stats = sdf_filtered.groupBy("day_of_week").agg(
+        spark_max("count_nonzero").alias("max_count"),
+        spark_min("count_nonzero").alias("min_count"),
+        avg(when(col("Flight status") == "airborne", col("count_nonzero"))).alias("avg_airborne"),
+        avg(when(col("Flight status") == "on-ground", col("count_nonzero"))).alias("avg_on_ground")
+    )
 
-    # Elimina la columna del estado contrario
-    if (status == 'airborne'):
-        df_stats = df_stats.drop(columns=["avg_on_ground"])
+    # Agregar la hora correspondiente a los valores máximos y mínimos
+    sdf_max_hour = sdf_filtered.groupBy("day_of_week", "hour").agg(spark_max("count_nonzero").alias("max_count"))
+    sdf_min_hour = sdf_filtered.groupBy("day_of_week", "hour").agg(spark_min("count_nonzero").alias("min_count"))
+
+    sdf_stats = sdf_stats.join(sdf_max_hour, ["day_of_week"], "left")
+    sdf_stats = sdf_stats.withColumnRenamed("hour", "max_hour")
+    sdf_stats = sdf_stats.join(sdf_min_hour, ["day_of_week"], "left")
+    sdf_stats = sdf_stats.withColumnRenamed("hour", "min_hour")
+
+    # Eliminar la columna del estado contrario
+    if status == "airborne":
+        sdf_stats = sdf_stats.drop("avg_on_ground")
     else:
-        df_stats = df_stats.drop(columns=["avg_airborne"])
+        sdf_stats = sdf_stats.drop("avg_airborne")
 
-    return df_stats
+    return sdf_stats
 
 
 
