@@ -1,3 +1,4 @@
+%livy3.pyspark
 import numpy as np
 import pandas as pd
 
@@ -40,43 +41,55 @@ def processStaticAirTemperature(temperature):
         temperature = np.nan
     return temperature
 
-def stringToNan(df):
-    """Transforma todos los strings 'nan' o 'None' de un dataframe a nulos de Numpy.
-    
+from pyspark.sql.functions import when, col
+from pyspark.sql import DataFrame
+
+def string_to_nan_spark(df: DataFrame) -> DataFrame:
+    """Transforma todos los strings 'nan' o 'None' de un DataFrame de Spark a nulos.
+
     Args:
-        df (DataFrame): DataFrame de datos.
-    
+        df (DataFrame): DataFrame de Spark.
+
     Returns:
-        df (DataFrame): DataFrame con los nulos en su tipo correcto.
+        DataFrame: DataFrame con los valores nulos en su tipo correcto.
     """
-    df.replace("nan", np.nan, inplace=True)
-    df.replace("None", np.nan, inplace=True)
+    for column in df.columns:
+        df = df.withColumn(column, when(col(column).isin("nan", "None"), None).otherwise(col(column)))
     return df
 
-def extractDaysOfTheWeek(df, col='Timestamp (date)'):
+
+from pyspark.sql.functions import date_format
+from pyspark.sql import DataFrame
+
+def extract_days_of_the_week(df: DataFrame, col: str = 'Timestamp (date)') -> DataFrame:
     """Crea una nueva columna 'day_of_week' con las tres primeras letras del día de la semana.
-    
+
     Args:
-        df (DataFrame): DataFrame de datos.
+        df (DataFrame): DataFrame de Spark.
+        col (str): Nombre de la columna de fecha.
 
     Returns:
-        df (DataFrame): Contiene la nueva columna 'day_of_week'.
+        DataFrame: DataFrame con la nueva columna 'day_of_week'.
     """
-    df['day_of_week'] = df[col].dt.strftime('%a')
-    return df
+    return df.withColumn("day_of_week", date_format(col, "EEE"))
 
-def extractHour(df):
-    """Asegura que el DataFrame está en formato timestamp y extrae una columna 'hour' con la hora a partir de la fecha.
-    
+
+from pyspark.sql.functions import to_timestamp, hour
+from pyspark.sql import DataFrame
+
+def extract_hour(df: DataFrame, col: str = 'Timestamp (date)') -> DataFrame:
+    """Asegura que la columna de fecha está en formato timestamp y extrae la hora en una nueva columna 'hour'.
+
     Args:
-        df (DataFrame): DataFrame de datos.
+        df (DataFrame): DataFrame de Spark.
+        col (str): Nombre de la columna de fecha.
 
     Returns:
-        df (DataFrame): Contiene la nueva columna 'hour'.
+        DataFrame: DataFrame con la nueva columna 'hour'.
     """
-    df['Timestamp (date)'] = pd.to_datetime(df['Timestamp (date)'], format='mixed', errors='coerce')
-    df['hour'] = df['Timestamp (date)'].dt.floor('H')
-    return df
+    df = df.withColumn(col, to_timestamp(col))
+    return df.withColumn("hour", hour(col))
+
 
 def haversine(lat1, lon1, lat2, lon2):
     """Calcula la distancia entre dos puntos. Para ello utilizamos la fórmula de Haversine.
