@@ -1,15 +1,16 @@
 import os
-import pandas as pd
-import numpy as np
+from pyspark.sql import SparkSession, DataFrame
+from pyspark.sql.functions import col, date_format, to_timestamp, lit, concat_ws, when
 
 class ParquetProcessor:
     def __init__(self, filepaths, output_folder="processed_data"):
         """
         Inicializa el procesador con una lista de rutas a archivos Parquet.
-        
+
         :param filepaths: Lista de rutas de archivos Parquet.
         :param output_folder: Carpeta donde se guardarán los archivos procesados.
         """
+        self.spark = SparkSession.builder.appName("ParquetProcessor").getOrCreate()
         self.filepaths = filepaths
         self.output_folder = output_folder
 
@@ -21,35 +22,39 @@ class ParquetProcessor:
         :param file: Nombre del archivo Parquet.
         """
         try:
-            df = pd.read_parquet(file, engine="pyarrow")
+            df = self.spark.read.parquet(file)
 
-            # Convertir la columna "Static air temperature (C)" a string en el DataFrame nuevo
+            # Convertir la columna "Static air temperature (C)" a string si existe
             if "Static air temperature (C)" in df.columns:
-                df["Static air temperature (C)"] = df["Static air temperature (C)"].astype(str)
+                df = df.withColumn("Static air temperature (C)", col("Static air temperature (C)").cast("string"))
 
-            # Asegurar que la columna Timestamp esté en formato datetime y eliminar filas con valores nulos
-            df["Timestamp (date)"] = pd.to_datetime(df["Timestamp (date)"], errors="coerce")
-            df.dropna(subset=["Timestamp (date)"], inplace=True)
+            # Asegurar que la columna Timestamp está en formato timestamp
+            df = df.withColumn("Timestamp (date)", to_timestamp("Timestamp (date)"))
 
-            # Extraer fecha y hora en formato string limpio
-            df["date"] = df["Timestamp (date)"].dt.strftime("%Y-%m-%d").str.strip()
-            df["hour"] = df["Timestamp (date)"].dt.strftime("%H").str.strip()
+            # Filtrar valores nulos en "Timestamp (date)"
+            df = df.na.drop(subset=["Timestamp (date)"])
 
-            # Guardar o actualizar datos por día y hora
-            for (date, hour), group in df.groupby(["date", "hour"]):
+            # Extraer fecha y hora
+            df = df.withColumn("date", date_format("Timestamp (date)", "yyyy-MM-dd"))
+            df = df.withColumn("hour", date_format("Timestamp (date)", "HH"))
+
+            # Guardar por día y hora
+            for date, hour in df.select("date", "hour").distinct().collect():
                 folder_path = os.path.join(self.output_folder, date, hour)
                 os.makedirs(folder_path, exist_ok=True)
                 output_filepath = os.path.join(folder_path, f"data_{date}_{hour}.parquet")
 
-                # Si ya existe un archivo para esa fecha y hora, cargarlo y concatenar
-                if os.path.exists(output_filepath):
-                    existing_df = pd.read_parquet(output_filepath, engine="pyarrow")
-                    # Asegurarse de que la columna "Static air temperature (C)" en el DataFrame existente sea string
-                    if "Static air temperature (C)" in existing_df.columns:
-                        existing_df["Static air temperature (C)"] = existing_df["Static air temperature (C)"].astype(str)
-                    group = pd.concat([existing_df, group], ignore_index=True)
+                # Filtrar datos de esa fecha y hora
+                df_filtered = df.filter((col("date") == date) & (col("hour") == hour))
 
-                group.to_parquet(output_filepath, engine="pyarrow")
+                # Si existe, fusionar datos
+                if os.path.exists(output_filepath):
+                    existing_df = self.spark.read.parquet(output_filepath)
+                    if "Static air temperature (C)" in existing_df.columns:
+                        existing_df = existing_df.withColumn("Static air temperature (C)", col("Static air temperature (C)").cast("string"))
+                    df_filtered = existing_df.union(df_filtered)
+
+                df_filtered.write.mode("overwrite").parquet(output_filepath)
                 print(f"Actualizado {output_filepath}")
 
         except Exception as e:
@@ -63,76 +68,73 @@ class ParquetProcessor:
             print(f"Procesando {file}...")
             self.process_file(file)
 
-    def clean_data(self):
+    def clean_data(self, df: DataFrame) -> DataFrame:
         """
         Limpia los datos reemplazando valores nulos y no convertibles.
-        """
-        if self.df is None:
-            print("No hay datos cargados para limpiar.")
-            return
-        
-        # Reemplazar valores que deberían ser NaN
-        self.df.replace(["null", "None", "", "nan"], np.nan, inplace=True)
 
-    def convert_data_types(self):
+        :param df: DataFrame de Spark.
+        :return: DataFrame limpio.
+        """
+        return df.replace(["null", "None", "", "nan"], None)
+
+    def convert_data_types(self, df: DataFrame) -> DataFrame:
         """
         Convierte las columnas del df a los tipos de datos correctos.
+
+        :param df: DataFrame de Spark.
+        :return: DataFrame con los tipos convertidos.
         """
-        dtypes_correctos = {
-            "Timestamp (kafka)": "int64",
-            "Timestamp (date)": "datetime64[ns]",
-            "Message (base64)": "object",
-            "Message (hex)": "object",
-            "ICAO": "object",
-            "Downlink Format": "int64",
-            "Flight status": "object",
-            "BDS": "object",
-            "Roll angle (deg)": "float64",
-            "True track angle (deg)": "float64",
-            "Ground speed (kt)": "float64",
-            "Track angle rate (deg/sec)": "float64",
-            "True airspeed (kt)": "float64",
-            "Altitude (ft)": "float64",
-            "Typecode": "float64",
-            "TurbulenceCategory": "object",
-            "Position with ref (RADAR)": "object",
-            "lat": "float64",
-            "lon": "float64",
-            "Speed": "float64",
-            "Angle": "float64",
-            "Vertical rate": "float64",
-            "Speed type": "object",
-            "Callsign": "object",
-            "MCP/FCU selected altitude (ft)": "float64",
-            "FMS selected altitude (ft)": "float64",
-            "Barometric pressure (mb)": "float64",
-            "Speed heading": "object",
-            "Magnetic heading (deg)": "float64",
-            "Indicated airspeed (kt)": "float64",
-            "Mach number (-)": "float64",
-            "Barometric altitude rate (ft/min)": "float64",
-            "Inertial vertical speed (ft/min)": "float64",
-            "Squawk code": "object",
-            "GICB capability": "object",
-            "Turbulence level (0-3)": "float64",
-            "Wind shear level (0-3)": "float64",
-            "Microburst level (0-3)": "float64",
-            "Icing level (0-3)": "float64",
-            "Wake vortex level (0-3)": "float64",
-            "Static air temperature (C)": "float64",
-            "Average static pressure (hPa)": "float64",
-            "Radio height (ft)": "float64",
-            "Overlay capability": "float64",
-            "Wind speed (kt) and direction (true) (deg)": "object",
-            "Humidity (%)": "float64"
+        dtype_mapping = {
+            "Timestamp (kafka)": "bigint",
+            "Timestamp (date)": "timestamp",
+            "Message (base64)": "string",
+            "Message (hex)": "string",
+            "ICAO": "string",
+            "Downlink Format": "int",
+            "Flight status": "string",
+            "BDS": "string",
+            "Roll angle (deg)": "double",
+            "True track angle (deg)": "double",
+            "Ground speed (kt)": "double",
+            "Track angle rate (deg/sec)": "double",
+            "True airspeed (kt)": "double",
+            "Altitude (ft)": "double",
+            "Typecode": "double",
+            "TurbulenceCategory": "string",
+            "Position with ref (RADAR)": "string",
+            "lat": "double",
+            "lon": "double",
+            "Speed": "double",
+            "Angle": "double",
+            "Vertical rate": "double",
+            "Speed type": "string",
+            "Callsign": "string",
+            "MCP/FCU selected altitude (ft)": "double",
+            "FMS selected altitude (ft)": "double",
+            "Barometric pressure (mb)": "double",
+            "Speed heading": "string",
+            "Magnetic heading (deg)": "double",
+            "Indicated airspeed (kt)": "double",
+            "Mach number (-)": "double",
+            "Barometric altitude rate (ft/min)": "double",
+            "Inertial vertical speed (ft/min)": "double",
+            "Squawk code": "string",
+            "GICB capability": "string",
+            "Turbulence level (0-3)": "double",
+            "Wind shear level (0-3)": "double",
+            "Microburst level (0-3)": "double",
+            "Icing level (0-3)": "double",
+            "Wake vortex level (0-3)": "double",
+            "Static air temperature (C)": "double",
+            "Average static pressure (hPa)": "double",
+            "Radio height (ft)": "double",
+            "Overlay capability": "double",
+            "Wind speed (kt) and direction (true) (deg)": "string",
+            "Humidity (%)": "double"
         }
 
-        for col, dtype in dtypes_correctos.items():
-            if dtype == "datetime64[ns]":
-                self.df[col] = pd.to_datetime(self.df[col], errors="coerce")  # Convierte a fecha
-                self.df[col] = pd.to_datetime(self.df['Timestamp (kafka)'] // 1000, unit='s', errors='coerce')
-            elif dtype == "float64":
-                self.df[col] = pd.to_numeric(self.df[col], errors="coerce")  # Convierte a float, poniendo NaN si falla
-            else:
-                self.df[col] = self.df[col].astype(dtype)  # Convierte a int64 u object sin ignorar errores
+        for col_name, dtype in dtype_mapping.items():
+            if col_name in df.columns:
+                df = df.withColumn(col_name, col(col_name).cast(dtype))
 
+        return df
