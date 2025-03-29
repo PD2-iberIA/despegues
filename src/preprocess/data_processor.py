@@ -99,7 +99,7 @@ class DataProcessor:
             selected_columns (list): Lista de columnas a seleccionar de los archivos.
 
         Devuelve:
-            pd.DataFrame: DataFrame consolidado con los datos filtrados y procesados.
+            df (pyspark.sql.DataFrame): DataFrame consolidado con los datos filtrados y procesados.
         """
         # Leemos todos los archivos Parquet coincidentes con el patrón
         df = spark.read.parquet(file_pattern).select(*selected_columns)
@@ -116,10 +116,10 @@ class DataProcessor:
         Calcula el número de vuelos únicos por estado de vuelo y hora del día.
 
         Parámetros:
-            df (pd.DataFrame): DataFrame con los datos de vuelos.
+            df (pyspark.sql.DataFrame): DataFrame con los datos de vuelos.
 
         Devuelve:
-            pd.DataFrame: DataFrame con la cantidad de vuelos agrupados por hora y estado de vuelo.
+            df_status (pyspark.sql.DataFrame): DataFrame con la cantidad de vuelos agrupados por hora y estado de vuelo.
         """
         df_status = df.groupBy("hour", "Flight status").agg(f.countDistinct("Callsign").alias("count_nonzero"))
 
@@ -131,10 +131,10 @@ class DataProcessor:
         Calcula los tiempos de espera en tierra antes del despegue para cada vuelo.
 
         Parámetros:
-            dff (pd.DataFrame): DataFrame con datos de vuelos combinados.
+            dff (pyspark.sql.DataFrame): DataFrame con datos de vuelos combinados.
 
         Devuelve:
-            pd.DataFrame: DataFrame con los tiempos de espera en tierra y otras métricas asociadas.
+            df_wait_times (pyspark.sql.DataFrame): DataFrame con los tiempos de espera en tierra y otras métricas asociadas.
         """
         # Filtra vuelos en tierra (on-ground, velocidad = 0) y obtener el primer timestamp por Callsign
         on_ground = (
