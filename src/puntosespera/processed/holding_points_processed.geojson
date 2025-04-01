@@ -1,0 +1,27 @@
+{
+"type": "FeatureCollection",
+"name": "holding_points_processed",
+"features": [
+{ "type": "Feature", "properties": { "Designator": "Z1", "Runway": "36L/18R", "Latitude": 40.490653160130186, "Longitude": -3.5730931148315621 }, "geometry": { "type": "Point", "coordinates": [ -3.573093114831562, 40.490653160130186 ] } },
+{ "type": "Feature", "properties": { "Designator": "KA6", "Runway": "32R/14L", "Latitude": 40.472076292010001, "Longitude": -3.537524367869231 }, "geometry": { "type": "Point", "coordinates": [ -3.537524367869231, 40.472076292010001 ] } },
+{ "type": "Feature", "properties": { "Designator": "KA8", "Runway": "32R/14L", "Latitude": 40.466622566754253, "Longitude": -3.5366534853372742 }, "geometry": { "type": "Point", "coordinates": [ -3.536653485337274, 40.466622566754253 ] } },
+{ "type": "Feature", "properties": { "Designator": "K3", "Runway": "32R/14L", "Latitude": 40.494122669084419, "Longitude": -3.5589596069544491 }, "geometry": { "type": "Point", "coordinates": [ -3.558959606954449, 40.494122669084419 ] } },
+{ "type": "Feature", "properties": { "Designator": "K2", "Runway": "32R/14L", "Latitude": 40.4945961819448, "Longitude": -3.559326044131887 }, "geometry": { "type": "Point", "coordinates": [ -3.559326044131887, 40.4945961819448 ] } },
+{ "type": "Feature", "properties": { "Designator": "K1", "Runway": "32R/14L", "Latitude": 40.495554592925956, "Longitude": -3.560411408421098 }, "geometry": { "type": "Point", "coordinates": [ -3.560411408421098, 40.495554592925956 ] } },
+{ "type": "Feature", "properties": { "Designator": "Y1", "Runway": "36R/18L", "Latitude": 40.499431092287409, "Longitude": -3.560656492186808 }, "geometry": { "type": "Point", "coordinates": [ -3.560656492186808, 40.499431092287409 ] } },
+{ "type": "Feature", "properties": { "Designator": "Y2", "Runway": "36R/18L", "Latitude": 40.500298406173002, "Longitude": -3.5606457851669369 }, "geometry": { "type": "Point", "coordinates": [ -3.560645785166937, 40.500298406173002 ] } },
+{ "type": "Feature", "properties": { "Designator": "Y3", "Runway": "36R/18L", "Latitude": 40.501183565039504, "Longitude": -3.5606600611934431 }, "geometry": { "type": "Point", "coordinates": [ -3.560660061193443, 40.501183565039504 ] } },
+{ "type": "Feature", "properties": { "Designator": "Y7", "Runway": "36R/18L", "Latitude": 40.533391949745102, "Longitude": -3.5608004499060328 }, "geometry": { "type": "Point", "coordinates": [ -3.560800449906033, 40.533391949745102 ] } },
+{ "type": "Feature", "properties": { "Designator": "Z6", "Runway": "36L/18R", "Latitude": 40.495184843931881, "Longitude": -3.5761293073041509 }, "geometry": { "type": "Point", "coordinates": [ -3.576129307304151, 40.495184843931881 ] } },
+{ "type": "Feature", "properties": { "Designator": "Z4", "Runway": "36L/18R", "Latitude": 40.492555539298088, "Longitude": -3.5760341290031818 }, "geometry": { "type": "Point", "coordinates": [ -3.576034129003182, 40.492555539298088 ] } },
+{ "type": "Feature", "properties": { "Designator": "Z2", "Runway": "36L/18R", "Latitude": 40.491865496230126, "Longitude": -3.5759032579410062 }, "geometry": { "type": "Point", "coordinates": [ -3.575903257941006, 40.491865496230126 ] } },
+{ "type": "Feature", "properties": { "Designator": "Z3", "Runway": "36L/18R", "Latitude": 40.491819096186241, "Longitude": -3.57319305240692 }, "geometry": { "type": "Point", "coordinates": [ -3.57319305240692, 40.491819096186241 ] } },
+{ "type": "Feature", "properties": { "Designator": "LF", "Runway": "32L/14R", "Latitude": 40.479721203031424, "Longitude": -3.5725666589559268 }, "geometry": { "type": "Point", "coordinates": [ -3.572566658955927, 40.479721203031424 ] } },
+{ "type": "Feature", "properties": { "Designator": "L1", "Runway": "32L/14R", "Latitude": 40.483565816902733, "Longitude": -3.57652786733783 }, "geometry": { "type": "Point", "coordinates": [ -3.57652786733783, 40.483565816902733 ] } },
+{ "type": "Feature", "properties": { "Designator": "LA", "Runway": "32L/14R", "Latitude": 40.484251101106899, "Longitude": -3.577181028787666 }, "geometry": { "type": "Point", "coordinates": [ -3.577181028787666, 40.484251101106899 ] } },
+{ "type": "Feature", "properties": { "Designator": "LB", "Runway": "32L/14R", "Latitude": 40.484873329796898, "Longitude": -3.5775534137105871 }, "geometry": { "type": "Point", "coordinates": [ -3.577553413710587, 40.484873329796898 ] } },
+{ "type": "Feature", "properties": { "Designator": "LC", "Runway": "32L/14R", "Latitude": 40.486690643924192, "Longitude": -3.575750378154376 }, "geometry": { "type": "Point", "coordinates": [ -3.575750378154376, 40.486690643924192 ] } },
+{ "type": "Feature", "properties": { "Designator": "LD", "Runway": "32L/14R", "Latitude": 40.486522892072891, "Longitude": -3.575150753600524 }, "geometry": { "type": "Point", "coordinates": [ -3.575150753600524, 40.486522892072891 ] } },
+{ "type": "Feature", "properties": { "Designator": "LE", "Runway": "32L/14R", "Latitude": 40.485580625293494, "Longitude": -3.5749151865869639 }, "geometry": { "type": "Point", "coordinates": [ -3.574915186586964, 40.485580625293494 ] } }
+]
+}
