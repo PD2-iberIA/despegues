@@ -11,3 +11,4 @@ seaborn==0.13.2
 jupyter>=1.1.1
 geopandas>=1.0.1
 dash>=2.18.2
+shapely==2.0.7
