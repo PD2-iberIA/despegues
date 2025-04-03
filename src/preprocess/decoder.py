@@ -5,6 +5,12 @@ import base64
 from enum import Enum
 from preprocess.utilities import separateCoordinates, separateVelocity, processStaticAirTemperature
 import preprocess.airport_constants as ac
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import udf, col
+from pyspark.sql.types import StructType, StructField, StringType, IntegerType, FloatType
+import base64
+import pyModeS as pms
+from datetime import datetime
 
 class MessageType(Enum):
     """
@@ -150,7 +156,8 @@ class Decoder:
         Returns:
             datetime: El timestamp convertido a un objeto datetime.
         """
-        return datetime.fromtimestamp(tsKafka / 1000)
+        return datetime.fromtimestamp(tsKafka / 1000).strftime("%Y-%m-%d %H:%M:%S")
+
         
     @staticmethod
     def base64toHex(msg):
@@ -164,6 +171,7 @@ class Decoder:
             str: El mensaje convertido a hexadecimal.
         """
         return base64.b64decode(msg).hex().upper()
+
     
     @staticmethod
     def getICAO(msg):
