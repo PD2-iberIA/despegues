@@ -307,7 +307,7 @@ class DataframeProcessor:
         df = df.withColumn("prev_time", F.lag("Timestamp (date)").over(window_spec))
 
         # Calcular distancia y diferencia de tiempo
-        df = df.withColumn("distance", ut.haversine("lat", "lon", "prev_lat", "prev_lon"))
+        df = df.withColumn("distance", ut.haversine_spark("lat", "lon", "prev_lat", "prev_lon"))
         df = df.withColumn("time_diff", F.unix_timestamp("Timestamp (date)") - F.unix_timestamp("prev_time"))
 
         # Filtrar outliers

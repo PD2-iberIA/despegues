@@ -187,6 +187,8 @@ class DataProcessor:
             # Distancia entre el punto de espera y el avión
             distancia = ut.haversine(point_lat, point_lon, lat, lon)
 
+            if distancia is None:
+                return False
             if distancia <= TOLERANCE_RADIUS:
                 #print(f"El avión en posición ({lat}, {lon}) está en el punto de espera ({point_lat}, {point_lon}) a una distancia de: {distancia:.2f} km)")
                 return True

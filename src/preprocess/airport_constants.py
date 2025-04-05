@@ -23,7 +23,7 @@ RUNWAY_4 = {
 }
 
 ruta_base = os.path.dirname(os.path.abspath(__file__))
-ruta_geojson = os.path.join(ruta_base, "..", "puntosespera", "holding_points.geojson")
+ruta_geojson = os.path.join(ruta_base, "..", "puntosespera", "processed", "holding_points_processed.geojson")
 
 with open(ruta_geojson, "r") as file:
     geojson_data = json.load(file)
