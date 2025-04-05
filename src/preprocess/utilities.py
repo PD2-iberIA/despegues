@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import pyspark.sql.functions as F
 
 def separateCoordinates(coord):
     """Obtiene la latitud y longitud a partir de la tupla de posición.
@@ -102,12 +103,40 @@ def haversine(lat1, lon1, lat2, lon2):
     """
     EARTH_RADIUS = 6378 # radio de la Tierra (km)
 
+    if lat1 is None or lon1 is None or lat2 is None or lon2 is None:
+        return None
+
     phi1, phi2 = np.radians(lat1), np.radians(lat2)
     delta_phi = np.radians(lat2 - lat1)
     delta_lambda = np.radians(lon2 - lon1)
 
     a = np.sin(delta_phi / 2)**2 + np.cos(phi1) * np.cos(phi2) * np.sin(delta_lambda / 2)**2
     c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
+    distance = EARTH_RADIUS * c # km
+    return distance
+
+def haversine_spark(lat1, lon1, lat2, lon2):
+    """Calcula la distancia entre dos puntos geográficos en un DataFrame de PySpark usando la fórmula de Haversine.
+    
+    Parámetros:
+        lat1 (str): Nombre de la columna con la latitud del punto 1.
+        lon1 (str): Nombre de la columna con la longitud del punto 1.
+        lat2 (str): Nombre de la columna con la latitud del punto 2.
+        lon2 (str): Nombre de la columna con la longitud del punto 2.
+
+    Devuelve:
+        distance: Objeto Column que representa la distancia en kilómetros entre los dos puntos, calculada para cada fila del DataFrame.
+    """
+    EARTH_RADIUS = 6378  # radio de la Tierra (km)
+
+    lat1_rad = F.radians(F.col(lat1))
+    lat2_rad = F.radians(F.col(lat2))
+
+    delta_lat = F.radians(F.col(lat2) - F.col(lat1))
+    delta_lon = F.radians(F.col(lon2) - F.col(lon1))
+
+    a = F.pow(F.sin(delta_lat / 2), 2) + F.cos(lat1_rad) * F.cos(lat2_rad) * F.pow(F.sin(delta_lon / 2), 2)
+    c = 2 * F.atan2(F.sqrt(a), F.sqrt(1 - a))
     distance = EARTH_RADIUS * c # km
     return distance
 
