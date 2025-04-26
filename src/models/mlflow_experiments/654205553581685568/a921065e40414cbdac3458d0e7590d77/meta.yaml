@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/javimartinfuentes/Documents/GitHub/despegues/src/models/mlflow_experiments/654205553581685568/a921065e40414cbdac3458d0e7590d77/artifacts
+end_time: 1745671878905
+entry_point_name: ''
+experiment_id: '654205553581685568'
+lifecycle_stage: active
+run_id: a921065e40414cbdac3458d0e7590d77
+run_name: bold-shrimp-370
+run_uuid: a921065e40414cbdac3458d0e7590d77
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1745671878848
+status: 4
+tags: []
+user_id: javimartinfuentes
