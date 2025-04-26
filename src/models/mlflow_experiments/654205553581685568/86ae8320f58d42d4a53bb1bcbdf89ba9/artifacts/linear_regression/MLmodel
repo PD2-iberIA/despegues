@@ -1,0 +1,20 @@
+artifact_path: linear_regression
+flavors:
+  python_function:
+    data: sparkml
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.spark
+    python_version: 3.12.3
+  spark:
+    code: null
+    model_class: pyspark.ml.pipeline.PipelineModel
+    model_data: sparkml
+    pyspark_version: 3.5.5
+mlflow_version: 2.22.0
+model_size_bytes: 52447
+model_uuid: 0ede7824062e400698df6bc48aa728aa
+prompts: null
+run_id: 86ae8320f58d42d4a53bb1bcbdf89ba9
+utc_time_created: '2025-04-26 15:07:51.975474'

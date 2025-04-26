@@ -1,0 +1,1 @@
+{"class":"org.apache.spark.ml.feature.OneHotEncoderModel","timestamp":1745680077045,"sparkVersion":"3.5.5","uid":"OneHotEncoder_ab3c866f24aa","paramMap":{"outputCol":"holding_point_ohe","inputCol":"holding_point_indexed"},"defaultParamMap":{"outputCol":"OneHotEncoder_ab3c866f24aa__output","handleInvalid":"error","dropLast":true}}

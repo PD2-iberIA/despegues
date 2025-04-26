@@ -1,0 +1,6 @@
+artifact_location: file:///Users/javimartinfuentes/Documents/GitHub/despegues/src/models/mlruns/311577555100652332
+creation_time: 1745671813004
+experiment_id: '311577555100652332'
+last_update_time: 1745671813004
+lifecycle_stage: active
+name: takeoff_time_prediction
