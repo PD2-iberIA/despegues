@@ -1,0 +1,1 @@
+{"class":"org.apache.spark.ml.feature.StringIndexerModel","timestamp":1745680073124,"sparkVersion":"3.5.5","uid":"StringIndexer_c487b1f4bb2a","paramMap":{"handleInvalid":"keep","outputCol":"holding_point_indexed","inputCol":"holding_point"},"defaultParamMap":{"stringOrderType":"frequencyDesc","handleInvalid":"error","outputCol":"StringIndexer_c487b1f4bb2a__output"}}
