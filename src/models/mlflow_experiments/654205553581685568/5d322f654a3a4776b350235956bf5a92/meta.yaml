@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/javimartinfuentes/Documents/GitHub/despegues/src/models/mlflow_experiments/654205553581685568/5d322f654a3a4776b350235956bf5a92/artifacts
+end_time: 1745696295941
+entry_point_name: ''
+experiment_id: '654205553581685568'
+lifecycle_stage: active
+run_id: 5d322f654a3a4776b350235956bf5a92
+run_name: abundant-roo-679
+run_uuid: 5d322f654a3a4776b350235956bf5a92
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1745696288465
+status: 4
+tags: []
+user_id: maria

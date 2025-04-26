@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/javimartinfuentes/Documents/GitHub/despegues/src/models/mlflow_experiments/654205553581685568/29114cd34b9442e08713b16ac10f165f/artifacts
+end_time: 1745696396194
+entry_point_name: ''
+experiment_id: '654205553581685568'
+lifecycle_stage: active
+run_id: 29114cd34b9442e08713b16ac10f165f
+run_name: invincible-goose-56
+run_uuid: 29114cd34b9442e08713b16ac10f165f
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1745696391008
+status: 4
+tags: []
+user_id: maria
