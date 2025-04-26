@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/yushanyang/Desktop/PD2/src/models/mlflow_experiments/522618869924295803/8a8d1e575741469f92072b77512ca26d/artifacts
+end_time: 1745689248532
+entry_point_name: ''
+experiment_id: '522618869924295803'
+lifecycle_stage: active
+run_id: 8a8d1e575741469f92072b77512ca26d
+run_name: carefree-ape-918
+run_uuid: 8a8d1e575741469f92072b77512ca26d
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1745689235322
+status: 3
+tags: []
+user_id: yushanyang
