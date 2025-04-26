@@ -1,0 +1,18 @@
+artifact_path: "Heur\xEDstica II"
+flavors:
+  python_function:
+    cloudpickle_version: 3.0.0
+    code: null
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.pyfunc.model
+    python_model: python_model.pkl
+    python_version: 3.12.7
+    streamable: false
+mlflow_version: 2.21.3
+model_size_bytes: 2982
+model_uuid: cef2c1c5611b4a11a506e7b837210923
+prompts: null
+run_id: e1f277fda1074dc981eb3f9357866d77
+utc_time_created: '2025-04-26 17:31:22.806032'

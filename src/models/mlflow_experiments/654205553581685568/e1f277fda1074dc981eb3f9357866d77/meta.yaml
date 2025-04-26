@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/javimartinfuentes/Documents/GitHub/despegues/src/models/mlflow_experiments/654205553581685568/e1f277fda1074dc981eb3f9357866d77/artifacts
+end_time: 1745688686124
+entry_point_name: ''
+experiment_id: '654205553581685568'
+lifecycle_stage: active
+run_id: e1f277fda1074dc981eb3f9357866d77
+run_name: rebellious-perch-880
+run_uuid: e1f277fda1074dc981eb3f9357866d77
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1745688682716
+status: 3
+tags: []
+user_id: javimartinfuentes
