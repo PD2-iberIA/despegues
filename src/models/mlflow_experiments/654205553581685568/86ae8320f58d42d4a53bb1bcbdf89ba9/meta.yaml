@@ -1,0 +1,15 @@
+artifact_uri: file:///home/carmenfdez/PD2/despegues/src/models/mlflow_experiments/552874948965222186/86ae8320f58d42d4a53bb1bcbdf89ba9/artifacts
+end_time: 1745680122184
+entry_point_name: ''
+experiment_id: '654205553581685568'
+lifecycle_stage: active
+run_id: 86ae8320f58d42d4a53bb1bcbdf89ba9
+run_name: loud-worm-11
+run_uuid: 86ae8320f58d42d4a53bb1bcbdf89ba9
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1745680071431
+status: 3
+tags: []
+user_id: carmenfdez

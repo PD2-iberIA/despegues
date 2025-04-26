@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/javimartinfuentes/Documents/GitHub/despegues/src/models/mlflow_experiments/654205553581685568/84c309a653744552b7833cf2f2efeb96/artifacts
+end_time: 1745671918376
+entry_point_name: ''
+experiment_id: '654205553581685568'
+lifecycle_stage: active
+run_id: 84c309a653744552b7833cf2f2efeb96
+run_name: tasteful-gull-570
+run_uuid: 84c309a653744552b7833cf2f2efeb96
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1745671913992
+status: 3
+tags: []
+user_id: javimartinfuentes

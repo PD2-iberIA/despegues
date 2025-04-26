@@ -1,5 +1,5 @@
 import dash
-import dash_core_components as dcc
+from dash import dcc
 from dash import html
 from dash.dependencies import Output, Input
 import plotly.graph_objects as go
@@ -213,7 +213,7 @@ class Evaluator:
 
             # Global metrics
             mae = mean_absolute_error(df['takeoff_time'], df['prediction'])
-            rmse = mean_squared_error(df['takeoff_time'], df['prediction'], squared=False)
+            rmse = mean_squared_error(df['takeoff_time'], df['prediction'])
             r2 = r2_score(df['takeoff_time'], df['prediction'])
             mape = self.mape
 

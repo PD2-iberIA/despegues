@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/javimartinfuentes/Documents/GitHub/despegues/src/models/mlflow_experiments/654205553581685568/54f7571275c04fb4ab36b895f2f55af0/artifacts
+end_time: 1745688534312
+entry_point_name: ''
+experiment_id: '654205553581685568'
+lifecycle_stage: active
+run_id: 54f7571275c04fb4ab36b895f2f55af0
+run_name: popular-dolphin-435
+run_uuid: 54f7571275c04fb4ab36b895f2f55af0
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1745688534302
+status: 4
+tags: []
+user_id: javimartinfuentes

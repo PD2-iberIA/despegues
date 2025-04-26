@@ -1,0 +1,83 @@
+/* Fuente Roboto para todo el app */
+body, html, .dash-graph, .dash-dropdown, .dash-radioitems {
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Padding global */
+body {
+    padding: 20px;
+}
+
+/* Contenedor para el título y el nombre del modelo */
+.title-container {
+    display: flex;
+    width: 500px;
+    height: 30px;
+    background: linear-gradient(45deg, #8e44ad, #2c3e50); /* Fondo con gradiente */
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    margin: 0 auto;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra sutil para darle profundidad */
+}
+
+/* Estilo para el título principal */
+h1 {
+    font-size: 2.5em;
+    font-weight: 600;
+    text-align: center;
+    color: #fff;
+    text-transform: uppercase;
+    margin: 0;
+    font-family: 'Roboto', sans-serif; /* Tipografía moderna */
+    letter-spacing: 1px; /* Espaciado de letras para un look más limpio */
+}
+
+
+/* Subtítulo con el nombre del modelo */
+.model-name {
+    text-align: center;  /* Centra el texto dentro del div */
+    font-size: 1.2em;
+    color: #2c3e50;
+    background-color: #ecf0f1;
+    padding: 8px 16px;
+    border-radius: 8px;
+    max-width: 400px;
+    margin: 0 auto;  /* Esto asegura que el div se centre horizontalmente */
+    display: block;  /* Cambia a bloque para que tome toda la línea y pueda ser centrado */
+    margin-bottom: 10px;
+}
+
+.sticky-radio-items-container {
+    position: sticky;
+    top: 0; /* Esto lo hace pegar al top de la ventana cuando haces scroll */
+    background-color: white; /* Cambia el color de fondo si es necesario */
+    z-index: 100; /* Asegura que esté por encima de otros elementos */
+    padding: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra para un efecto visual agradable */
+
+    display: flex;
+    justify-content: space-evenly;
+    gap: 30px;
+}
+
+
+/* Mejorar la apariencia de los títulos secundarios */
+h2 {
+    font-size: 1.6em;
+    font-weight: 600; /* Aumenta el grosor de la fuente para darle más presencia */
+    color: #34495e; /* Color gris moderno */
+    margin-top: 20px;
+    margin-bottom: 15px;
+    text-align: center;
+    text-transform: uppercase; /* Hace que el texto sea mayúsculas para mayor impacto */
+    border-bottom: 3px solid #3498db; /* Línea de color azul debajo para un toque moderno */
+    padding-bottom: 10px; /* Espacio entre el texto y la línea */
+}
+
+/* Opciones del radio input mejor presentadas */
+.dash-radioitems label {
+    font-size: 1.1em;
+    margin-right: 20px;
+}
