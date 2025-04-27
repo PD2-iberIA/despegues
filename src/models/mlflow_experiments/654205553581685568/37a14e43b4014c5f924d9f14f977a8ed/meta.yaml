@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/yushanyang/Desktop/PD2/src/models/mlflow_yu/560220491265926248/37a14e43b4014c5f924d9f14f977a8ed/artifacts
+end_time: 1745756141084
+entry_point_name: ''
+experiment_id: '560220491265926248'
+lifecycle_stage: active
+run_id: 37a14e43b4014c5f924d9f14f977a8ed
+run_name: grandiose-donkey-680
+run_uuid: 37a14e43b4014c5f924d9f14f977a8ed
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1745756138652
+status: 3
+tags: []
+user_id: yushanyang
