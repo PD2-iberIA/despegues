@@ -1,0 +1,20 @@
+artifact_path: LSTM-Low
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.11.5
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.4.2
+mlflow_version: 2.11.3
+model_size_bytes: 43308743
+model_uuid: 88d2bdeb1bf84d26a9e2f8a3f3237035
+run_id: ddb1137d5bb342dd84ab73f7cfbf6e38
+utc_time_created: '2025-04-27 19:32:26.138783'
