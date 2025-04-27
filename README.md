@@ -27,6 +27,10 @@ Para más detalles, puedes consultar toda la documentación en la [Wiki](https:/
 
 Para la primera entrega decodificamos y preprocesamos los datos para después construir visualizaciones como histogramas, boxplots y mapas de calor. Buscamos ofrecer un primer acercamiento que permita identificar patrones y tendencias generales en los datos.
 
+### Entrega 2 - Entrenamiento
+
+En la segunda entrega, partiendo del conjunto de datos completo (comprende unos 3 meses), tratamos de entrenar modelos para, dado un avión parado en un punto de espera del aeropuerto, predecir en cuántos segundos despegará. También construímos modelos probabilistas para clasificar los aviones según su categoría de turbulencia, calcular la probabilidad de que un avión haya despegado en el siguiente estado...
+
 ## 2. Instrucciones de instalación
 
 En primer lugar, clona el repositorio de este proyecto en la carpeta local de tu dispositivo donde desees guardarlo. Utiliza el siguiente comando:
@@ -53,30 +57,64 @@ pip install -r requirements.txt
 
 ```
 📦 despegues
-├─ [otros ficheros y directorios]
-└─ src
-   ├─ airstrip
-   │  ├─ airplane.py
-   │  └─ data_reader.py
-   ├─ preprocess
-   │  ├─ __init__.py
-   │  ├─ airport_constants.py
-   │  ├─ data_processor.py
-   │  ├─ dataframe_processor.py
-   │  ├─ decoder.py
-   │  ├─ parquet_processor.py
-   │  ├─ reader.py
-   │  └─ utilities.py
-   └─ visualization
-      ├─ custom_icons
-      │  ├─ radar_icon.png
-      │  └─ runway_icon.png
-      ├─ dash.py
-      ├─ graphs.py
-      └─ maps.py
+├─ [otros ficheros y directorios]
+├─ src
+│  ├─ airstrip
+│  │  ├─ airplane.py
+│  │  └─ data_reader.py
+│  ├─ data
+│  │  ├─ [ficheros de datos]
+│  ├─ models
+│  │  ├─ evaluation
+│  │  │  ├─ evaluator.py
+│  │  │  └─ assets
+│  │  ├─ mlflow_experiments
+│  │  ├─ [notebooks de los distintos modelos]
+│  ├─ notebooks
+│  │  ├─ [notebooks varios]
+│  ├─ preprocess
+│  │  ├─ __init__.py
+│  │  ├─ airport_constants.py
+│  │  ├─ data_processor.py
+│  │  ├─ dataframe_processor.py
+│  │  ├─ decoder.py
+│  │  ├─ parquet_processor.py
+│  │  ├─ reader.py
+│  │  └─ utilities.py
+│  ├─ puntosespera
+│  │  ├─ processed
+│  │  │  ├─ holding_points_processed.json
+│  │  │  └─ runways_processed.json
+│  │  ├─ raw
+│  │  │  ├─ holding_points.json
+│  │  │  ├─ runways.json
+│  │  │  └─ taxiways.json
+│  └─ visualization
+│     ├─ custom_icons
+│     │  ├─ radar_icon.png
+│     │  └─ runway_icon.png
+│     ├─ dash.py
+│     ├─ graphs.py
+│     └─ maps.py
 ```
 
 En la carpeta `src` se encuentra el código principal del proyecto. En su interior se encuentran los siguientes directorios con sus correspondientes módulos:
+
+`models`
+
+Este directorio contiene notebooks para cada modelo entrenado, además de los experimentos de MLFlow y un dashboard para visualizar los resultados de cada modelo:
+
+- `evaluation`
+
+    Incluye el script `evaluator.py` que contiene el código necesario para visualizar un dashboard de Plotly con distintas gráficas. Este dashboard puede ser ejecutado con cualquiera de los modelos entrenados.
+
+- `mlflow_experiments`
+
+    Contiene el experimento de MLFlow en el cual hemos almacenado las diferentes ejecuciones hechas con los modelos. Cada run contiene información relevante como los hiperparámetros, el tiempo de ejecución...
+
+- `model_*.ipynb`
+
+    Cada uno de estos notebooks corresponde a un modelo diferente. Todos los notebooks siguen una plantilla por lo que son similares. Se diferencian principalmente en el preprocesamiento de los datos y el entrenamiento y evaluación del modelo, que son aspectos diferenciados según el modelo.
 
 `preprocess`
 
