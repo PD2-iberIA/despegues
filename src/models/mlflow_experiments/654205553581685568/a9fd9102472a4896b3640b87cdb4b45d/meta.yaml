@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/yushanyang/Desktop/PD2/src/models/mlflow_yu/560220491265926248/a9fd9102472a4896b3640b87cdb4b45d/artifacts
+end_time: 1745697782518
+entry_point_name: ''
+experiment_id: '560220491265926248'
+lifecycle_stage: active
+run_id: a9fd9102472a4896b3640b87cdb4b45d
+run_name: languid-whale-617
+run_uuid: a9fd9102472a4896b3640b87cdb4b45d
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1745697779702
+status: 3
+tags: []
+user_id: yushanyang

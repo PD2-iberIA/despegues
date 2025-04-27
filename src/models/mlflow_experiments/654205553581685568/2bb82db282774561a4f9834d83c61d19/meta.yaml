@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/yushanyang/Desktop/PD2/src/models/mlflow_yu/560220491265926248/2bb82db282774561a4f9834d83c61d19/artifacts
+end_time: 1745698471411
+entry_point_name: ''
+experiment_id: '560220491265926248'
+lifecycle_stage: active
+run_id: 2bb82db282774561a4f9834d83c61d19
+run_name: vaunted-squid-538
+run_uuid: 2bb82db282774561a4f9834d83c61d19
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1745698468885
+status: 3
+tags: []
+user_id: yushanyang
