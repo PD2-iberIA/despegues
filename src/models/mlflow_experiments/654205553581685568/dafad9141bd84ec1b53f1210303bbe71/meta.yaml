@@ -1,0 +1,16 @@
+artifact_uri: file:///Users/javimartinfuentes/Documents/GitHub/despegues/src/models/mlflow_experiments/654205553581685568/dafad9141bd84ec1b53f1210303bbe71/artifacts
+deleted_time: 1745705401129
+end_time: 1745705317605
+entry_point_name: ''
+experiment_id: '654205553581685568'
+lifecycle_stage: deleted
+run_id: dafad9141bd84ec1b53f1210303bbe71
+run_name: gregarious-stag-12
+run_uuid: dafad9141bd84ec1b53f1210303bbe71
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1745705295706
+status: 3
+tags: []
+user_id: javimartinfuentes

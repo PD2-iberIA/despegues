@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/javimartinfuentes/Documents/GitHub/despegues/src/models/mlflow_experiments/654205553581685568/6f9a2301a8514f20b42636cecdbcd0eb/artifacts
+end_time: 1745707627374
+entry_point_name: ''
+experiment_id: '654205553581685568'
+lifecycle_stage: active
+run_id: 6f9a2301a8514f20b42636cecdbcd0eb
+run_name: legendary-conch-732
+run_uuid: 6f9a2301a8514f20b42636cecdbcd0eb
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1745707601845
+status: 3
+tags: []
+user_id: javimartinfuentes

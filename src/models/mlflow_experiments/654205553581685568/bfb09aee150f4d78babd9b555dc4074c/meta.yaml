@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/javimartinfuentes/Documents/GitHub/despegues/src/models/mlflow_experiments/654205553581685568/bfb09aee150f4d78babd9b555dc4074c/artifacts
+end_time: 1745760232262
+entry_point_name: ''
+experiment_id: '654205553581685568'
+lifecycle_stage: active
+run_id: bfb09aee150f4d78babd9b555dc4074c
+run_name: secretive-wren-835
+run_uuid: bfb09aee150f4d78babd9b555dc4074c
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1745760224037
+status: 3
+tags: []
+user_id: javimartinfuentes

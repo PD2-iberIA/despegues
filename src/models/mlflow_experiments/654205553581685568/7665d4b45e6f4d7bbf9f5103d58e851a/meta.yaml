@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/javimartinfuentes/Documents/GitHub/despegues/src/models/mlflow_experiments/654205553581685568/7665d4b45e6f4d7bbf9f5103d58e851a/artifacts
+end_time: 1745711349842
+entry_point_name: ''
+experiment_id: '654205553581685568'
+lifecycle_stage: active
+run_id: 7665d4b45e6f4d7bbf9f5103d58e851a
+run_name: clean-shoat-871
+run_uuid: 7665d4b45e6f4d7bbf9f5103d58e851a
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1745711342032
+status: 3
+tags: []
+user_id: javimartinfuentes

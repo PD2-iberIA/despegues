@@ -1,0 +1,19 @@
+artifact_path: model_runway_32R/14L
+flavors:
+  keras:
+    data: data
+    keras_backend: tensorflow
+    keras_version: 3.9.2
+    save_exported_model: false
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.keras
+    python_version: 3.12.7
+mlflow_version: 2.21.3
+model_size_bytes: 423964
+model_uuid: 76539331ed9a4b66847a9b6523e8bec8
+prompts: null
+run_id: dafad9141bd84ec1b53f1210303bbe71
+utc_time_created: '2025-04-26 22:08:27.878929'

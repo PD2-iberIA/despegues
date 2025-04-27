@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/javimartinfuentes/Documents/GitHub/despegues/src/models/mlflow_experiments/654205553581685568/fe7ad090466b4e76abe32b6f96c5d587/artifacts
+end_time: 1745702294088
+entry_point_name: ''
+experiment_id: '654205553581685568'
+lifecycle_stage: active
+run_id: fe7ad090466b4e76abe32b6f96c5d587
+run_name: handsome-turtle-367
+run_uuid: fe7ad090466b4e76abe32b6f96c5d587
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1745702285329
+status: 3
+tags: []
+user_id: javimartinfuentes
