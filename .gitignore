@@ -171,8 +171,6 @@ cython_debug/
 .pypirc
 
 # CSV files
-*.csv
-*.parquet
 
 # DS Store (MacOS)
 .DS_Store
