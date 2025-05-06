@@ -7,6 +7,7 @@
 ## Índice
 
 1. [Descripción del proyecto](#1-descripción-del-proyecto)
+    1.1 [Documentación](#11-documentación)
 2. [Instrucciones de instalación](#2-instrucciones-de-instalación)
 3. [Estructura del código](#3-estructura-del-código)
 4. [Crédito](#4-crédito)
@@ -21,6 +22,7 @@ La motivación detrás de este proyecto es mejorar la eficiencia operativa de lo
 
 Al llevar a cabo este proyecto, aprenderemos a trabajar en equipo, gestionar grandes conjuntos de datos, realizar visualizaciones interactivas y aplicar técnicas de análisis de datos para obtener conclusiones valiosas sobre la eficiencia del tráfico aéreo, además de presentar todo ello públicamente.
 
+#### 1.1 Documentación
 Para más detalles, puedes consultar toda la documentación en la [Wiki](https://github.com/PD2-iberIA/despegues/wiki) de nuestro repositorio.
 
 ### Entrega 1 - Visualización
@@ -30,6 +32,7 @@ Para la primera entrega decodificamos y preprocesamos los datos para después co
 ### Entrega 2 - Entrenamiento
 
 En la segunda entrega, partiendo del conjunto de datos completo (comprende unos 3 meses), tratamos de entrenar modelos para, dado un avión parado en un punto de espera del aeropuerto, predecir en cuántos segundos despegará. También construímos modelos probabilistas para clasificar los aviones según su categoría de turbulencia, calcular la probabilidad de que un avión haya despegado en el siguiente estado...
+
 
 ## 2. Instrucciones de instalación
 
@@ -57,112 +60,147 @@ pip install -r requirements.txt
 
 ```
 📦 despegues
-├─ [otros ficheros y directorios]
-├─ src
-│  ├─ airstrip
-│  │  ├─ airplane.py
-│  │  └─ data_reader.py
-│  ├─ data
-│  │  ├─ [ficheros de datos]
-│  ├─ models
-│  │  ├─ evaluation
-│  │  │  ├─ evaluator.py
-│  │  │  └─ assets
-│  │  ├─ mlflow_experiments
-│  │  ├─ [notebooks de los distintos modelos]
-│  ├─ notebooks
-│  │  ├─ [notebooks varios]
-│  ├─ preprocess
-│  │  ├─ __init__.py
-│  │  ├─ airport_constants.py
-│  │  ├─ data_processor.py
-│  │  ├─ dataframe_processor.py
-│  │  ├─ decoder.py
-│  │  ├─ parquet_processor.py
-│  │  ├─ reader.py
-│  │  └─ utilities.py
-│  ├─ puntosespera
-│  │  ├─ processed
-│  │  │  ├─ holding_points_processed.json
-│  │  │  └─ runways_processed.json
-│  │  ├─ raw
-│  │  │  ├─ holding_points.json
-│  │  │  ├─ runways.json
-│  │  │  └─ taxiways.json
-│  └─ visualization
-│     ├─ custom_icons
-│     │  ├─ radar_icon.png
-│     │  └─ runway_icon.png
-│     ├─ dash.py
-│     ├─ graphs.py
-│     └─ maps.py
+├─ .gitignore
+├─ README.md
+├─ data
+├─ img
+├─ requirements.txt
+└─ src
+   ├─ exploratory_analysis
+   │  ├─ datosICAO.ipynb
+   │  ├─ demo_decoder.ipynb
+   │  ├─ variable_exploration.ipynb
+   │  └─ visualization
+   │     ├─ custom_icons
+   │     │  ├─ radar_icon.png
+   │     │  └─ runway_icon.png
+   │     ├─ dash.py
+   │     ├─ graphs.py
+   │     ├─ maps.py
+   │     └─ visualization_e1.ipynb
+   ├─ models
+   │  ├─ probabilistic_models
+   │  │  ├─ classifications
+   │  │  │  ├─ model_categoria_turb.ipynb
+   │  │  │  └─ model_dia_semana.ipynb
+   │  │  └─ takeoff_prediction
+   │  │     ├─ model_HMM.ipynb
+   │  │     └─ model_Naive_Bayes.ipynb
+   │  └─ takeoff_time_prediction
+   │     ├─ model_transformer.ipynb
+   │     ├─ model_dual_transformer.ipynb
+   │     ├─ evaluation
+   │     │  └─ evaluator.py
+   │     ├─ mlflow_experiments
+   │     ├─ model_LSTM.ipynb
+   │     ├─ model_TEMPLATE.ipynb
+   │     ├─ model_XG_boost.ipynb
+   │     ├─ model_ada_boost.ipynb
+   │     ├─ model_dense_nw.ipynb
+   │     ├─ model_dense_nw_by_runway.ipynb
+   │     ├─ model_heuristic_1.ipynb
+   │     ├─ model_heuristic_2.ipynb
+   │     ├─ model_linear_regression.ipynb
+   │     └─ model_random_forest.ipynb
+   ├─ preprocess
+   │  ├─ cleaning
+   │  │  ├─ cleaner.py
+   │  │  └─ cleaning.ipynb
+   │  ├─ cluster
+   │  │  ├─ convert.py
+   │  │  ├─ pipeline_decoder.json
+   │  │  └─ pipeline_preprocess.json
+   │  ├─ decoding
+   │  │  ├─ data_reader.py
+   │  │  ├─ decoder.py
+   │  │  ├─ parquet_processor.py
+   │  │  └─ reader.py
+   │  ├─ enrichment
+   │  │  ├─ airport_constants.py
+   │  │  ├─ data_processor.py
+   │  │  ├─ dataframe_processor.py
+   │  │  ├─ geometry_processor.ipynb
+   │  │  ├─ holidays_to_json.py
+   │  │  ├─ meteo.py
+   │  │  ├─ pipeline.ipynb
+   │  │  ├─ pipeline.py
+   │  │  └─ utilities.py
+   │  └─ train_test_split.ipynb
+   └─ test
+      ├─ predictions.ipynb
+      └─ preprocess_scenarios.ipynb
 ```
 
-En la carpeta `src` se encuentra el código principal del proyecto. En su interior se encuentran los siguientes directorios con sus correspondientes módulos:
+## `src`
 
-`models`
+La carpeta `src` contiene el **código fuente principal del proyecto**, organizado en subdirectorios que reflejan distintas fases del flujo de trabajo: preprocesamiento, modelado, análisis exploratorio, visualización y pruebas. A continuación, se describe la función de cada subdirectorio:
 
-Este directorio contiene notebooks para cada modelo entrenado, además de los experimentos de MLFlow y un dashboard para visualizar los resultados de cada modelo:
 
-- `evaluation`
 
-    Incluye el script `evaluator.py` que contiene el código necesario para visualizar un dashboard de Plotly con distintas gráficas. Este dashboard puede ser ejecutado con cualquiera de los modelos entrenados.
+---
 
-- `mlflow_experiments`
+### `preprocess/`
 
-    Contiene el experimento de MLFlow en el cual hemos almacenado las diferentes ejecuciones hechas con los modelos. Cada run contiene información relevante como los hiperparámetros, el tiempo de ejecución...
+Contiene todos los **scripts y notebooks dedicados al preprocesamiento** de datos brutos, enriquecimiento, y transformación.
 
-- `model_*.ipynb`
+- **`cluster/`**
+  - Pipelines empleados para decodificar y preprocesar los datos en el clúster Cloudera.
 
-    Cada uno de estos notebooks corresponde a un modelo diferente. Todos los notebooks siguen una plantilla por lo que son similares. Se diferencian principalmente en el preprocesamiento de los datos y el entrenamiento y evaluación del modelo, que son aspectos diferenciados según el modelo.
+- **`decoding/`**
+  - `decoder.py`: Clase *Decoder* para transformar mensajes de radar en datos estructurados.
+  - `reader.py`, `parquet_processor.py`, `data_reader.py`: Funciones para leer, procesar y guardar datos en formato `.parquet`.
 
-`preprocess`
+- **`enrichment/`**
+  - Scripts para agregar contexto adicional a los datos: meteorología, feriados, posiciones geográficas.
+  - `airport_constants.py`: Posiciones fijas del radar y pistas.
+  - `pipeline.py`: Script principal que integra todo el proceso de enriquecimiento.
 
-En este directorio se encuentran todos los módulos encargados del preprocesamiento de los datos:
+- **`cleaning/`**
+  - Scripts y notebooks para limpiar y validar los datos.
 
-- `airport_constants.py`
+- **`train_test_split.ipynb`**  
+  Notebook para dividir los datos en conjuntos de entrenamiento y prueba.
 
-    Contiene variables constantes con las posiciones de las pistas y el radar.
+---
 
-- `data_processor.py`
+### `exploratory_analysis/`
 
-    Define la clase *DataProcessor* encargada de preprocesar los datos. Filtra las posiciones de los aviones según si son válidas o no.
+Contiene notebooks usados para explorar los datos en las etapas iniciales del proyecto. Incluye análisis preliminares, pruebas de decodificación, y visualización básica.
 
-- `dataframe_processor.py`
+- **`datosICAO.ipynb` / `demo_decoder.ipynb` /**  
+  Notebooks con exploraciones específicas sobre variables, formatos de datos, y decodificación.
 
-    Define la clase *DataframeProcessor* encargada de realizar operaciones sobre DataFrames de Pandas para después realizar visualizaciones.
+- **`visualization/`**  
+  Subcarpeta con los módulos de visualización usados para la Entrega I.
+  - `dash.py`, `graphs.py`, `maps.py`: Scripts para generar dashboards interactivos y mapas.
 
-- `decoder.py`
+- **`variable_exploration.ipynb`**  
+    Exploración de variables del conjunto de datos final.
 
-    Define la clase *Decoder* encargada de la decodificación de los datos partiendo de los mensajes en base64 enviados por las distintas aeronaves y captados por el radar.
+---
 
-- `parquet_processor.py`
+### `models/`
 
-    Define la clase *ParquetProcessor* encargada de procesar los archivos _parquet_.
+Contiene todos los notebooks y scripts relacionados con la **creación, entrenamiento y evaluación de modelos**.
 
-- `reader.py`
+- **`probabilistic_models/`**
+  - `classifications/`: Modelos probabilísticos simples como Naive Bayes para clasificar categorías de despegue o días de semana.
+  - `takeoff_prediction/`: Modelos secuenciales como HMM para predecir el momento del despegue.
 
-    Incluye funciones para la lectura de los datos. Los datos están almacenados en un archivo _.tar_ y se leen y decodifican por _chunks_, para después ser almacenados como _.parquet_. También incluye una función para aplicar paralelismo y así reducir el tiempo de procesamiento.
+- **`takeoff_time_prediction/`**
+  - Incluye modelos de regresión (lineal, XGBoost, Random Forest, redes neuronales, heurísticos).
+  - `evaluation/evaluator.py`: Contiene el código necesario para visualizar un dashboard de Plotly con distintas gráficas. Este dashboard puede ser ejecutado con cualquiera de los modelos entrenados.
+  - `mlflow_experiments/`: Directorio de experimentación con MLflow para seguimiento de ejecuciones.
+  - `model_*.ipynb`: Cada uno de estos notebooks corresponde a un modelo diferente. Todos los notebooks siguen una plantilla por lo que son similares. Se diferencian principalmente en el preprocesamiento de los datos y el entrenamiento y evaluación del modelo, que son aspectos diferenciados según el modelo.
 
-- `utilities.py`
+---
 
-    Incluye distintas funciones que nos han sido útiles durante el procesamiento de los datos.
+### `test/`
 
-`visualization`
+Notebooks para **generar las predicciones de los escenarios**:
 
-Este directorio contiene los módulos necesarios para la visualización de los datos:
-
-- `dash.py`
-
-    Incluye el código necesario para visualizar las gráficas mediante una aplicación Dash.
-
-- `graphs.py`
-
-    Contiene las funciones necesarias para construir y mostrar las gráficas correspondientes al ejercicio 1 de la entrega.
-
-- `maps.py`
-
-    Define la clase *Maps* que genera disitintos mapas de Folium que pueden ser almacenados como archivos _html_.
+- `predictions.ipynb`: Verifica las predicciones generadas por modelos.
+- `preprocess_scenarios.ipynb`: Evalúa escenarios específicos del flujo.
 
 ## 4. Crédito
 
