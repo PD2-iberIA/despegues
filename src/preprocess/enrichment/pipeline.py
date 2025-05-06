@@ -11,6 +11,7 @@ from pyspark import StorageLevel
 
 
 class Pipeline:
+    """Clase que contiene el pipeline de enriquecimiento de datos para el análisis de vuelos en el aeropuerto de Barajas (MAD)."""
     AIRPORT_CENTER_LAT = 40.49291
     AIRPORT_CENTER_LON = -3.56974 
     RADIUS_AIRPORT = 5000 # 5 km
@@ -160,6 +161,7 @@ class Pipeline:
     HOLIDAY_DATES = set(item["date"] for item in HOLIDAY_LIST_JSON)
 
     def __init__(self):
+        """Inicializa el pipeline de enriquecimiento de datos."""
 
         # Esquema para la UDF
         self.schema = StructType([
@@ -178,6 +180,7 @@ class Pipeline:
     # Función para calcular la distancia de Haversine
     @staticmethod
     def haversine_distance(lat1, lon1, lat2, lon2):
+        """Calcula la distancia entre dos puntos en la superficie de la Tierra usando la fórmula de Haversine."""
         R = 6371000  # Radio de la Tierra en metros
         lat1_rad = math.radians(float(lat1))
         lon1_rad = math.radians(float(lon1))
@@ -192,6 +195,7 @@ class Pipeline:
     # UDF para asignar Designator y Runway basado en la distancia
     @staticmethod
     def assign_designator_runway(lat, lon, holding_points):
+        """Asigna un Designator y Runway a un punto basado en la distancia a los puntos de espera."""
         # Inicializamos el valor de retorno como None
         
         DIST_THRESHOLD = 20
@@ -353,6 +357,7 @@ class Pipeline:
     #### 4. Combinar posiciones con callsigns
     # Merge de posiciones y estado de vuelo
     def combinePsitionsFlights(self, df_pos_airport, df_flights):
+        """Combina los DataFrames de posiciones y vuelos para asignar un callsign a cada posición."""
         
         TOLERANCE_CALLSIGN_ASSIGNMENT = 600  # 10 minutos en segundos
         
@@ -377,6 +382,7 @@ class Pipeline:
     #### 5. Detección de aeronaves situados en puntos de espera
     
     def assignHoldingPoint(self, df_pos_callsign):
+        """Asigna un Designator y Runway a cada posición de vuelo en función de su latitud y longitud."""
         # Asignamos puntos de espera
         df_with_hp = df_pos_callsign.withColumn(
             "Designator_Runway", 
@@ -397,6 +403,8 @@ class Pipeline:
     #### 7. Eliminamos todos los vuelos que no se les ha detectado en un punto de espera
 
     def filterFlights(self, df_with_hp_tc):
+        """Filtra los vuelos que no han pasado por un punto de espera y asigna la categoría de turbulencia."""
+
         # Filtramos solo los vuelos que alguna vez tuvieron un Designator no nulo
         df_holding_count = df_with_hp_tc.groupBy("Callsign").agg(
             count(when(col("Designator").isNotNull(), True)).alias("holding_count")
@@ -413,6 +421,7 @@ class Pipeline:
     #### 8. Nos quedamos con las posiciones desde que se le detecta en un punto de espera hasta la primera vez que se le detecta en el aire
 
     def filterPositions(self, df_valid_flights):
+        """Filtra las posiciones desde que se detecta en un punto de espera hasta la primera vez que se detecta en el aire."""
         # Ventana por Callsign
         window_spec = Window.partitionBy("Callsign")
         
@@ -446,6 +455,7 @@ class Pipeline:
 
     # Merge de posiciones y velocidades
     def mergePositionsVelocities(self, df_takeoff_segment, df_speed):
+        """Combina los DataFrames de posiciones y velocidades para asignar la velocidad a cada posición."""
         TOLERANCE_VELOCITY_ASSIGNMENT = 1  # 1 segundo
         
         df_takeoff_segment = df_takeoff_segment.withColumn("Timestamp_sec", F.unix_timestamp("Timestamp"))
@@ -467,6 +477,7 @@ class Pipeline:
     #### 10. Filtramos para quedarnos solo con las aeronaves que en algún momento se paran en un punto de espera y recalculamos primer timestamp
 
     def importantTakeoffs(self, df_with_velocities):
+        """Filtra los vuelos que tienen velocidad 0 y un Designator no nulo."""
         # Filtrar los callsigns con velocidad 0 y punto de espera no nulo
         df_callsigns_zero_speed = df_with_velocities.filter(
             (col("Speed") == 0) & 
@@ -496,6 +507,7 @@ class Pipeline:
     
     #### 11. Calculamos tiempos de espera
     def calculateHoldingTime(self, df_important_takeoffs):
+        """Calcula los tiempos de espera en los puntos de espera."""
         df_holding = df_important_takeoffs.filter(
             (col("Speed") == 0) & 
             (col("Designator").isNotNull())
@@ -520,6 +532,7 @@ class Pipeline:
 
     
     def occupaidEach10s(self, dfA):
+        """Genera un DataFrame que indica los puntos de espera ocupados y las pistas ocupadas por cada intervalo de 10 segundos."""
         # Redondear el timestamp a bloques de 10 segundos
         # La columna time_10s va a contener timestamps redondeados a bloques de 10 segundos en formato UNIX
 
@@ -555,7 +568,7 @@ class Pipeline:
     #### 13. Con dataframe A, creamos otro dataframe que indique todos los despegues / aterrizajes por pista, debe incluir el timestamp y la categoría de turbulencia del avión
 
     def eventsByRunway(self, dfA):
-    
+        """Genera un DataFrame que indica todos los despegues y aterrizajes por pista, incluyendo el timestamp y la categoría de turbulencia del avión."""
         window_spec = Window.partitionBy("ICAO").orderBy("Timestamp")
         
         dfA = dfA.withColumn("Runway", F.coalesce("Runway", "RunwayFromPosition"))
@@ -580,6 +593,7 @@ class Pipeline:
     #### 14. Agrupamos D por minuto para conseguir tasa de despegues y de aterrizajes por minuto
 
     def eventsMinuteRate(self, dfD):
+        """Agrupa el DataFrame de eventos por minuto para calcular la tasa de despegues y aterrizajes por minuto."""
         dfE = dfD.withColumn(
             "Minute", 
             F.from_unixtime(
@@ -596,6 +610,7 @@ class Pipeline:
     
     #### 15. Combinamos B con C, D y E
     def combineBCDE(self, dfB, dfC, dfD, dfE):
+        """Combina los DataFrames B, C, D y E para obtener el DataFrame final con la información enriquecida."""
         # Redondeamos a múltiplos de 10 segundos
         dfB = dfB.withColumn(
             "time_10s",
@@ -642,7 +657,8 @@ class Pipeline:
     
     #### 16. Extraemos la hora, día de la semana y si es festivo o no
     def dateColumns(self, df_final):
-    # Añadir columnas a dfE
+        """Extrae la hora, día de la semana y si es festivo o no del DataFrame final."""
+        # Añadir columnas a dfE
         df_final = df_final.withColumn("Hour", hour("Minute")) \
                 .withColumn("Weekday", F.date_format("Minute", "E")) \
                 .withColumn("Date", F.to_date("Minute")) \
@@ -654,6 +670,7 @@ class Pipeline:
     #### 17. Extraemos la aerolínea
     #### 18. Renombramos y reordenamos columnas
     def cleanColumns(self, df_final):
+        """Renombra y reordena las columnas del DataFrame final."""
         # Suponiendo que df es tu DataFrame original
         df_final_clean = df_final.select(
             F.col('takeoff time').alias('takeoff_time'),
@@ -688,6 +705,8 @@ class Pipeline:
     
     # Aplicamos el pipeline
     def apply_pipeline(self, df):
+        """
+        Aplica el pipeline de enriquecimiento de datos a un DataFrame de PySpark."""
         # 1.
         # posiciones
         df_pos = self.getPositions(df)

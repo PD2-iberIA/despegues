@@ -1,10 +1,23 @@
 import pandas as pd
 
 class MeteoDataset:
+    """
+    Clase para cargar datos meteorológicos desde un archivo parquet y fusionarlos con otro DataFrame
+    basado en la columna de tiempo.
+    """
     def __init__(self, meteo_path=None):
+        """
+        Inicializa la clase con la ruta del archivo de datos meteorológicos.
+        Si se proporciona una ruta, carga los datos.
+        """
         self.meteo_df = self._load_meteo_data(meteo_path) if meteo_path else None
 
     def _load_meteo_data(self, path):
+        """
+        Carga los datos meteorológicos desde un archivo parquet.
+        Convierte la columna 'time' a tipo datetime.
+        Maneja errores si el archivo no se encuentra o hay otros problemas.
+        """
         try:
             meteo_df = pd.read_parquet(path)
             meteo_df['time'] = pd.to_datetime(meteo_df['time'])
@@ -17,6 +30,11 @@ class MeteoDataset:
             return None
 
     def merge(self, df, on='time', how='inner'):
+        """
+        Fusiona el DataFrame proporcionado con el DataFrame meteorológico usando la columna de tiempo.
+        Convierte 'timestamp' a datetime, lo trunca a la hora y luego hace el merge.
+        Ordena el resultado por timestamp y reinicia el índice.
+        """
         df['timestamp'] = pd.to_datetime(df['timestamp'])
         df['time'] = df['timestamp'].dt.floor('H')  # Truncar a la hora
         
