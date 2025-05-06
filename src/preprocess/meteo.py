@@ -31,10 +31,3 @@ class MeteoDataset:
         # Ordenar por timestamp y reiniciar el índice
         df_merged = df_merged.sort_values(by='timestamp').reset_index(drop=True)
         return df_merged
-
-
-
-if data_df is not None:
-    merged_df = meteo_dataset.merge(data_df)
-    if merged_df is not None:
-        print(merged_df.head())
