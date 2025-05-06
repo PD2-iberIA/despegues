@@ -9,6 +9,7 @@ import math
 from pyspark import StorageLevel
 
 
+
 class Pipeline:
     AIRPORT_CENTER_LAT = 40.49291
     AIRPORT_CENTER_LON = -3.56974 
@@ -155,11 +156,10 @@ class Pipeline:
         "name": "Santiago Ap\u00f3stol"
     }
     ]
-    
-    def __init__(self, df, spark: SparkSession):
-        # Configuración de Spark
-        self.spark = spark
-        self.spark.conf.set("spark.sql.legacy.timeParserPolicy", "LEGACY")
+    # Crear conjunto de fechas festivas (como strings "yyyy-MM-dd")
+    HOLIDAY_DATES = set(item["date"] for item in HOLIDAY_LIST_JSON)
+
+    def __init__(self):
 
         # Esquema para la UDF
         self.schema = StructType([
@@ -168,13 +168,83 @@ class Pipeline:
         ])
 
         # Registrar la UDF con el tipo de retorno correcto (STRUCT)
-        self.assign_udf = udf(lambda lat, lon: self.assign_designator_runway(lat, lon), self.schema)
-        self.get_runway_udf = udf(lambda lat, lon: self.get_runway_for_point(lat, lon), StringType())
-        # Crear conjunto de fechas festivas (como strings "yyyy-MM-dd")
-        self.holiday_dates = set(item["date"] for item in self.HOLIDAY_LIST_JSON)
+        self.assign_udf = udf(lambda lat, lon: Pipeline.assign_designator_runway(lat, lon, Pipeline.HOLDING_POINTS), self.schema)
+        self.get_runway_udf = udf(lambda lat, lon: Pipeline.get_runway_for_point(lat, lon, Pipeline.RUNWAY_POLYGONS), StringType())
+        
         # UDF para marcar si una fecha es festiva
-        self.is_holiday_udf = udf(lambda d: d.strftime("%Y-%m-%d") in self.holiday_dates, BooleanType())
+        self.is_holiday_udf = udf(lambda d: d.strftime("%Y-%m-%d") in Pipeline.HOLIDAY_DATES, BooleanType())
+
+    # Funciones estáticas
+    # Función para calcular la distancia de Haversine
+    @staticmethod
+    def haversine_distance(lat1, lon1, lat2, lon2):
+        R = 6371000  # Radio de la Tierra en metros
+        lat1_rad = math.radians(float(lat1))
+        lon1_rad = math.radians(float(lon1))
+        lat2_rad = math.radians(float(lat2))
+        lon2_rad = math.radians(float(lon2))
+        
+        return R * math.acos(
+            math.sin(lat1_rad) * math.sin(lat2_rad) +
+            math.cos(lat1_rad) * math.cos(lat2_rad) * math.cos(lon1_rad - lon2_rad)
+        )
+
+    # UDF para asignar Designator y Runway basado en la distancia
+    @staticmethod
+    def assign_designator_runway(lat, lon, holding_points):
+        # Inicializamos el valor de retorno como None
+        
+        DIST_THRESHOLD = 20
+        
+        closest_designator = None
+        closest_runway = None
+        min_distance = float("inf")  # Inicializamos con un valor grande
+        
+        # Iteramos sobre los puntos de espera para encontrar el más cercano
+        for hold in holding_points:
+            designator, runway, lon_p, lat_p = hold
+            dist = Pipeline.haversine_distance(lat, lon, lat_p, lon_p)
+            
+            # Si la distancia es menor a 20 metros, devolvemos el primer punto
+            if dist < DIST_THRESHOLD:
+                closest_designator = designator
+                closest_runway = runway
+                break  # Detenemos la búsqueda una vez encontramos el primer punto cercano
+        
+        return (closest_designator, closest_runway)
+
+    #### 12. Con dataframe A, creamos otro dataframe que indique cada 10s qué pistas y puntos de espera están ocupados → dataframe C
+    @staticmethod
+    def point_in_polygon(lat, lon, polygon):
+        """
+        Algoritmo que calcula si un punto está dentro de un polígono.
+        
+        lat, lon: coordenadas del punto
+        polygon: lista de coordenadas [(lon1, lat1), (lon2, lat2), ...] del polígono (ojo al orden lon/lat)
+        """
+        num = len(polygon)
+        j = num - 1
+        inside = False
+        for i in range(num):
+            xi, yi = polygon[i]
+            xj, yj = polygon[j]
+            if ((yi > lat) != (yj > lat)) and \
+            (lon < (xj - xi) * (lat - yi) / (yj - yi + 1e-9) + xi):
+                inside = not inside
+            j = i
+        return inside
+
+    # Obtenemos las pistas ocupadas (geométricamente)
+    @staticmethod
+    def get_runway_for_point(lat, lon, rpolygons):
+        for runway, polygon in rpolygons.items():
+            if Pipeline.point_in_polygon(lat, lon, polygon):
+                return runway
+        return None  # si no está en ninguna pista
+
     
+    #-----------------------------------------------------------------
+
     #### Separamos dataframes de posiciones, callsigns, velocidades y categorías de turbulencia. Decodificamos mensajes y convertimos en dataframe
     def getPositions(self, df):
         """
@@ -305,40 +375,6 @@ class Pipeline:
         return df_pos_callsign
     
     #### 5. Detección de aeronaves situados en puntos de espera
-    # Función para calcular la distancia de Haversine
-    def haversine_distance(self, lat1, lon1, lat2, lon2):
-        R = 6371000  # Radio de la Tierra en metros
-        lat1_rad = math.radians(float(lat1))
-        lon1_rad = math.radians(float(lon1))
-        lat2_rad = math.radians(float(lat2))
-        lon2_rad = math.radians(float(lon2))
-        
-        return R * math.acos(
-            math.sin(lat1_rad) * math.sin(lat2_rad) +
-            math.cos(lat1_rad) * math.cos(lat2_rad) * math.cos(lon1_rad - lon2_rad)
-        )
-    # UDF para asignar Designator y Runway basado en la distancia
-    def assign_designator_runway(self, lat, lon, holding_points):
-        # Inicializamos el valor de retorno como None
-        
-        DIST_THRESHOLD = 20
-        
-        closest_designator = None
-        closest_runway = None
-        min_distance = float("inf")  # Inicializamos con un valor grande
-        
-        # Iteramos sobre los puntos de espera para encontrar el más cercano
-        for hold in holding_points:
-            designator, runway, lon_p, lat_p = hold
-            dist = self.haversine_distance(lat, lon, lat_p, lon_p)
-            
-            # Si la distancia es menor a 20 metros, devolvemos el primer punto
-            if dist < DIST_THRESHOLD:
-                closest_designator = designator
-                closest_runway = runway
-                break  # Detenemos la búsqueda una vez encontramos el primer punto cercano
-        
-        return (closest_designator, closest_runway)
     
     def assignHoldingPoint(self, df_pos_callsign):
         # Asignamos puntos de espera
@@ -479,38 +515,18 @@ class Pipeline:
         
         return dfB
     
-    #### 12. Con dataframe A, creamos otro dataframe que indique cada 10s qué pistas y puntos de espera están ocupados → dataframe C
-    def point_in_polygon(self, lat, lon, polygon):
-        """
-        Algoritmo que calcula si un punto está dentro de un polígono.
-        
-        lat, lon: coordenadas del punto
-        polygon: lista de coordenadas [(lon1, lat1), (lon2, lat2), ...] del polígono (ojo al orden lon/lat)
-        """
-        num = len(polygon)
-        j = num - 1
-        inside = False
-        for i in range(num):
-            xi, yi = polygon[i]
-            xj, yj = polygon[j]
-            if ((yi > lat) != (yj > lat)) and \
-            (lon < (xj - xi) * (lat - yi) / (yj - yi + 1e-9) + xi):
-                inside = not inside
-            j = i
-        return inside
+    #### 12. Creamos un dataframe que indique los puntos de espera ocupados y las pistas ocupadas por cada intervalo de 10 segundos
     
-    # Obtenemos las pistas ocupadas (geométricamente)
-    def get_runway_for_point(self, lat, lon):
-        for runway, polygon in self.RUNWAY_POLYGONS.items():
-            if self.point_in_polygon(lat, lon, polygon):
-                return runway
-        return None  # si no está en ninguna pista
+
     
     def occupaidEach10s(self, dfA):
         # Redondear el timestamp a bloques de 10 segundos
         # La columna time_10s va a contener timestamps redondeados a bloques de 10 segundos en formato UNIX
-        dfA = dfA.withColumn("time_10s", (F.ceil(F.col("Timestamp").cast("long") / 10).cast("long") * 10))
-        dfA = dfA.withColumn("time_10s", F.from_unixtime(F.col("time_10s")))
+
+        dfA = dfA.withColumn("timestamp_unix", unix_timestamp("Timestamp"))
+        dfA = dfA.withColumn("time_10s", F.ceil(F.col("timestamp_unix") / 10) * 10)
+        dfA = dfA.withColumn("time_10s", F.to_timestamp(from_unixtime("time_10s")))
+        dfA = dfA.drop("timestamp_unix")
         
         # Obtenemos los puntos de espera ocupados en cada intervalo
         # collect_set(): Agrupa todos los valores únicos de una columna (en este caso "Designator") dentro de cada grupo definido por un groupBy() o window y devuelve una lista sin duplicados
@@ -671,16 +687,17 @@ class Pipeline:
         return df_final_clean
     
     # Aplicamos el pipeline
-    def apply_pipeline(self):
+    def apply_pipeline(self, df):
         # 1.
         # posiciones
-        df_pos = self.getPositions(self.df)
+        df_pos = self.getPositions(df)
         # vuelos
-        df_flights = self.getFlights(self.df)
+        df_flights = self.getFlights(df)
         # categorías de turbulencia
-        df_types = self.getAirplaneCategories(self.df)
+        df_types = self.getAirplaneCategories(df)
         # velocidades
-        df_speed = self.getVelocities(self.df)
+        df_speed = self.getVelocities(df)
+
         # altitudes
         # df_alt = self.getAltitudes(self.df)
     
@@ -690,17 +707,17 @@ class Pipeline:
     
         # 4.
         df_pos_callsign = self.combinePsitionsFlights(df_pos_airport, df_flights)
-    
+
         # 5.
         df_with_hp = self.assignHoldingPoint(df_pos_callsign)
-    
+
         # 6.
         df_with_hp_tc = df_with_hp.join(df_types, on="ICAO", how="inner")
         dfA = df_with_hp_tc
     
         # 7.
         df_valid_flights = self.filterFlights(df_with_hp_tc)
-    
+       
         # 8.
         df_takeoff_segment = self.filterPositions(df_valid_flights)
     
@@ -712,17 +729,23 @@ class Pipeline:
     
         # 11.
         dfB = self.calculateHoldingTime(df_important_takeoffs)
-    
+
         # 12.
         status_by_interval_final, dfA = self.occupaidEach10s(dfA)
         dfC = status_by_interval_final
-    
+
         # 13.
         dfD = self.eventsByRunway(dfA)
     
         # 14.
         dfE = self.eventsMinuteRate(dfD)
-    
+
+        print(dfA.count())
+        print(dfB.count())
+        print(dfC.count())
+        print(dfD.count())
+        print(dfE.count())
+
         # 15.
         dfA.persist(StorageLevel.MEMORY_AND_DISK)
         dfB.persist(StorageLevel.MEMORY_AND_DISK)
@@ -730,15 +753,24 @@ class Pipeline:
         dfD.persist(StorageLevel.MEMORY_AND_DISK)
         dfE.persist(StorageLevel.MEMORY_AND_DISK)
         df_final = self.combineBCDE(dfB, dfC, dfD, dfE)
-    
+        print("after 15")
+        df_final.show()
+        
         # 16.
         df_final = self.dateColumns(df_final)
-    
+        print("after 16")
+        df_final.show()
+ 
         # 17.
         df_final = df_final.withColumn("operator", F.substring("Callsign", 1, 3))
+        print("after 17")
+        df_final.show()
     
         # 18.
         df_final_clean = self.cleanColumns(df_final)
+        print("after 18")
+        df_final_clean.show()
+
 
         """
         # Guardamos el archivo procesado en el directorio de salida
@@ -753,7 +785,7 @@ class Pipeline:
         dfC.unpersist()
         dfD.unpersist()
         dfE.unpersist()
-        df_final_clean.unpersist()
+        #df_final_clean.unpersist()
 
         return df_final_clean
 
