@@ -11,7 +11,21 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import numpy as np
 
 class Evaluator:
+    """
+    Clase que evalúa el rendimiento de un modelo de predicción comparando los tiempos de despegue predichos
+    contra los reales, y proporciona métricas estadísticas y visualizaciones interactivas utilizando Dash.
+    """
+
     def __init__(self, df, model_name="X", mae_val=None, rmse_val=None):
+        """
+        Inicializa la clase Evaluator con el DataFrame y otras opciones de configuración.
+
+        :param df: DataFrame con los datos de las predicciones y los tiempos de despegue reales.
+        :param model_name: Nombre del modelo que se está evaluando. Por defecto es "X".
+        :param mae_val: Valor de referencia para la métrica MAE, utilizado para calcular el delta. Por defecto es None.
+        :param rmse_val: Valor de referencia para la métrica RMSE, utilizado para calcular el delta. Por defecto es None.
+        """
+
         self.df = df.copy()
         self.model_name = model_name
         self.mae_val = mae_val
@@ -20,6 +34,7 @@ class Evaluator:
             self.df['timestamp'] = pd.to_datetime(self.df['timestamp'])
             self.df['date'] = self.df['timestamp'].dt.date
 
+        # Calculamos métricas
         self.df['error'] = self.df['prediction'] - self.df['takeoff_time']
         self.df['abs_error'] = self.df['error'].abs()
         self.df['squared_error'] = self.df['error'] ** 2
@@ -70,9 +85,14 @@ class Evaluator:
 
 
     def getReport(self):
+        """
+        Genera un informe con métricas de error tanto globales como segmentadas por pista y punto de espera.
+
+        :return: Diccionario con las métricas globales y segmentadas.
+        """
         report = {}
 
-        # Global metrics
+        # Métricas globales
         mae = mean_absolute_error(self.df['takeoff_time'], self.df['prediction'])
         mse = mean_squared_error(self.df['takeoff_time'], self.df['prediction'])
         rmse = np.sqrt(mse)
@@ -87,7 +107,7 @@ class Evaluator:
             'mape': mape
         }
 
-        # Metrics by runway
+        # Métricas por pista
         report['by_runway'] = {}
         for runway, group in self.df.groupby('runway'):
             group_mae = mean_absolute_error(group['takeoff_time'], group['prediction'])
@@ -97,7 +117,7 @@ class Evaluator:
                 'rmse': group_rmse
             }
 
-        # Metrics by holding_point
+        # Métricas por puntos de espera
         report['by_holding_point'] = {}
         for hp, group in self.df.groupby('holding_point'):
             group_mae = mean_absolute_error(group['takeoff_time'], group['prediction'])
@@ -110,6 +130,11 @@ class Evaluator:
         return report
 
     def visualEvaluation(self):
+        """
+        Inicia una aplicación Dash para la visualización interactiva de las métricas de evaluación.
+
+        :return: Ejecuta el servidor Dash.
+        """
         app = dash.Dash(__name__)
 
         app.layout = html.Div([
@@ -209,11 +234,21 @@ class Evaluator:
             Input("error-metric-selector", 'value')
         )
         def update_graphs(mode, error_variable, error_metric):
+            """
+            Actualiza las gráficas de la evaluación según los parámetros seleccionados en la interfaz.
+
+            :param mode: Modo de segmentación de los datos ('runway' o 'holding_point').
+            :param error_variable: Variable seleccionada para analizar el error ('time_at_holding_point', etc.).
+            :param error_metric: Métrica de error seleccionada ('MAE', 'RMSE').
+
+            :return: Tupla con las figuras de las gráficas actualizadas.
+            """
             df = self.df.copy()
 
             # Global metrics
             mae = mean_absolute_error(df['takeoff_time'], df['prediction'])
-            rmse = mean_squared_error(df['takeoff_time'], df['prediction'])
+            mse = mean_squared_error(df['takeoff_time'], df['prediction'])
+            rmse = np.sqrt(mse)
             r2 = r2_score(df['takeoff_time'], df['prediction'])
             mape = self.mape
 
