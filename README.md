@@ -7,10 +7,11 @@
 ## Índice
 
 1. [Descripción del proyecto](#1-descripción-del-proyecto)
-    1.1 [Documentación](#11-documentación)
-2. [Instrucciones de instalación](#2-instrucciones-de-instalación)
-3. [Estructura del código](#3-estructura-del-código)
-4. [Crédito](#4-crédito)
+
+   1.1 [Documentación](#11-documentación)
+3. [Instrucciones de instalación](#2-instrucciones-de-instalación)
+4. [Estructura del código](#3-estructura-del-código)
+5. [Crédito](#4-crédito)
 
 ## 1. Descripción del proyecto
 
