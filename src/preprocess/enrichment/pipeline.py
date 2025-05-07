@@ -479,11 +479,13 @@ class Pipeline:
     def importantTakeoffs(self, df_with_velocities):
         """Filtra los vuelos que tienen velocidad 0 y un Designator no nulo."""
         # Filtrar los callsigns con velocidad 0 y punto de espera no nulo
+
         df_callsigns_zero_speed = df_with_velocities.filter(
             (col("Speed") == 0) & 
             (col("Designator").isNotNull())
         ).select("ICAO").distinct()
-        
+
+
         # Nos quedamos solo con estos vuelos
         df_important_takeoffs = df_with_velocities.join(
             df_callsigns_zero_speed,
@@ -729,6 +731,7 @@ class Pipeline:
 
         # 5.
         df_with_hp = self.assignHoldingPoint(df_pos_callsign)
+        df_with_hp.show()
 
         # 6.
         df_with_hp_tc = df_with_hp.join(df_types, on="ICAO", how="inner")
