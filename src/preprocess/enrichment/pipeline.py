@@ -7,6 +7,7 @@ from pyspark.sql.window import Window
 from pyspark.sql.types import StringType, StructType, StructField, BooleanType
 import math
 from pyspark import StorageLevel
+import builtins
 
 
 
@@ -187,10 +188,12 @@ class Pipeline:
         lat2_rad = math.radians(float(lat2))
         lon2_rad = math.radians(float(lon2))
         
-        return R * math.acos(
+        argumento = (
             math.sin(lat1_rad) * math.sin(lat2_rad) +
             math.cos(lat1_rad) * math.cos(lat2_rad) * math.cos(lon1_rad - lon2_rad)
         )
+        argumento = builtins.min(1, max(-1, argumento))  # Forzar en el dominio [-1, 1]
+        return R * math.acos(argumento)
 
     # UDF para asignar Designator y Runway basado en la distancia
     @staticmethod
@@ -208,7 +211,7 @@ class Pipeline:
         for hold in holding_points:
             designator, runway, lon_p, lat_p = hold
             dist = Pipeline.haversine_distance(lat, lon, lat_p, lon_p)
-            
+    
             # Si la distancia es menor a 20 metros, devolvemos el primer punto
             if dist < DIST_THRESHOLD:
                 closest_designator = designator
@@ -403,7 +406,7 @@ class Pipeline:
     #### 7. Eliminamos todos los vuelos que no se les ha detectado en un punto de espera
 
     def filterFlights(self, df_with_hp_tc):
-        """Filtra los vuelos que no han pasado por un punto de espera y asigna la categoría de turbulencia."""
+        """Filtra los vuelos que han pasado por un punto de espera y asigna la categoría de turbulencia."""
 
         # Filtramos solo los vuelos que alguna vez tuvieron un Designator no nulo
         df_holding_count = df_with_hp_tc.groupBy("Callsign").agg(
@@ -420,7 +423,7 @@ class Pipeline:
     
     #### 8. Nos quedamos con las posiciones desde que se le detecta en un punto de espera hasta la primera vez que se le detecta en el aire
 
-    def filterPositions(self, df_valid_flights):
+    def filterPositions(self, df_valid_flights, scenario = False):
         """Filtra las posiciones desde que se detecta en un punto de espera hasta la primera vez que se detecta en el aire."""
         # Ventana por Callsign
         window_spec = Window.partitionBy("Callsign")
@@ -440,16 +443,19 @@ class Pipeline:
         # Filtramos solo las filas en o después del primer punto de espera
         df_from_hp = df_with_first_holding.filter(col("Timestamp") >= col("first_holding_time"))
         
-        # Encontramos el primer timestamp en que FlightStatus es 'airborne'
-        df_with_first_airborne = df_from_hp.withColumn(
-            "first_airborne_time",
-            F.min(F.when(F.col("Flight status") == "airborne", F.col("Timestamp"))).over(window_spec)
-        )
-        
-        # Filtramos solo las filas en o después del primer estado airborne
-        df_takeoff_segment = df_with_first_airborne.filter(F.col("Timestamp") <= F.col("first_airborne_time"))
-        
-        return df_takeoff_segment
+        if not scenario:
+            # Encontramos el primer timestamp en que FlightStatus es 'airborne'
+            df_with_first_airborne = df_from_hp.withColumn(
+                "first_airborne_time",
+                F.min(F.when(F.col("Flight status") == "airborne", F.col("Timestamp"))).over(window_spec)
+            )
+            
+            # Filtramos solo las filas en o después del primer estado airborne
+            df_takeoff_segment = df_with_first_airborne.filter(F.col("Timestamp") <= F.col("first_airborne_time"))
+    
+            return df_takeoff_segment
+        else:
+            return df_from_hp
     
     #### 9. Combinamos con los mensajes de velocidad
 
@@ -508,16 +514,17 @@ class Pipeline:
         return df_important_takeoffs
     
     #### 11. Calculamos tiempos de espera
-    def calculateHoldingTime(self, df_important_takeoffs):
+    def calculateHoldingTime(self, df_important_takeoffs, scenario=False):
         """Calcula los tiempos de espera en los puntos de espera."""
-        df_holding = df_important_takeoffs.filter(
+        dfB = df_important_takeoffs.filter(
             (col("Speed") == 0) & 
             (col("Designator").isNotNull())
         )
         
-        dfB = df_holding.withColumn("takeoff time", 
-                        (F.unix_timestamp("first_airborne_time") - F.unix_timestamp("Timestamp"))
-                        .cast("double"))
+        if not scenario:
+            dfB = dfB.withColumn("takeoff time", 
+                            (F.unix_timestamp("first_airborne_time") - F.unix_timestamp("Timestamp"))
+                            .cast("double"))
                         
         dfB = dfB.withColumn("time_before_holding_point", 
                         (F.unix_timestamp("first_holding_time") - F.unix_timestamp("first_on_ground_time"))
@@ -611,14 +618,14 @@ class Pipeline:
         return dfE
     
     #### 15. Combinamos B con C, D y E
-    def combineBCDE(self, dfB, dfC, dfD, dfE):
+    def combineBCDE(self, dfB, dfC, dfD, dfE, scenario=False):
         """Combina los DataFrames B, C, D y E para obtener el DataFrame final con la información enriquecida."""
         # Redondeamos a múltiplos de 10 segundos
         dfB = dfB.withColumn(
             "time_10s",
             from_unixtime((unix_timestamp("Timestamp") / 10).cast("long") * 10)
         )
-        
+
         # Paso 2: Join con dfC
         dfF = dfB.join(dfC, on="time_10s", how="inner")
         
@@ -627,21 +634,31 @@ class Pipeline:
             "Minute",
             date_trunc("minute", col("Timestamp"))
         )
-        
+
         # Paso 2: Join con dfE
-        dfF = dfF.join(dfE, on="Minute", how="inner")
-        
-        # Paso 1: Creamos la window
-        w = Window.partitionBy("Runway").orderBy("Timestamp").rangeBetween(Window.unboundedPreceding, Window.currentRow)
+        dfF = dfF.join(dfE, on="Minute", how="left").fillna(0)
+
         
         # Paso 2: Renombramos Timestamp para evitar conflictos en el join
         dfD = dfD.withColumnRenamed("Timestamp", "event_timestamp")
         dfD = dfD.withColumnRenamed("TurbulenceCategory", "last_event_turb_cat")
         dfD = dfD.withColumnRenamed("Event", "last_event")
-        
+
         # Paso 3: Join de los dataframes en base a Runway y evento previo en el tiempo
-        df_combined = dfF.join(dfD, on="Runway", how="left") \
-            .filter(col("event_timestamp") < col("Timestamp"))
+        df_combined = dfF.join(dfD, on="Runway", how="left")
+
+        # Rellenar los nulos de 'last_event_turb_cat' con 'N/C'
+        df_combined = df_combined.fillna({'last_event_turb_cat': 'N/C'})
+        df_combined = df_combined.withColumn(
+            "event_timestamp",
+            when(
+                col("event_timestamp").isNull(),
+                col("Timestamp") - F.expr("INTERVAL 65 SECONDS")
+            ).otherwise(col("event_timestamp"))
+        )
+
+        df_combined = df_combined.filter(col("event_timestamp") < col("Timestamp"))
+        
         
         # Paso 4: Usamos Window para quedarnos con la fila más reciente antes de `first_holding_time`
         w2 = Window.partitionBy("Callsign", "Timestamp", "Runway").orderBy(col("event_timestamp").desc())
@@ -654,7 +671,6 @@ class Pipeline:
             "time_since_last_event_seconds",
             unix_timestamp("Timestamp") - unix_timestamp("event_timestamp")
         )
-        
         return df_final
     
     #### 16. Extraemos la hora, día de la semana y si es festivo o no
@@ -671,11 +687,20 @@ class Pipeline:
     
     #### 17. Extraemos la aerolínea
     #### 18. Renombramos y reordenamos columnas
-    def cleanColumns(self, df_final):
-        """Renombra y reordena las columnas del DataFrame final."""
-        # Suponiendo que df es tu DataFrame original
-        df_final_clean = df_final.select(
-            F.col('takeoff time').alias('takeoff_time'),
+    def cleanColumns(self, df_final, scenario=False):
+        """Renombra y reordena las columnas del DataFrame final.
+
+        Args:
+            df_final: DataFrame a limpiar.
+            scenario (bool): Si True, usa 'takeoff time' como takeoff_time; si False, usa 'first_airborne_time'.
+        """
+        
+        select_exprs = []
+
+        if not scenario:
+            select_exprs.append(F.col('takeoff time').alias('takeoff_time'))
+
+        select_exprs += [
             F.col('Timestamp').alias('timestamp'),
             F.col('ICAO').alias('icao'),
             F.col('Callsign').alias('callsign'),
@@ -697,16 +722,23 @@ class Pipeline:
             F.col('IsHoliday').alias('is_holiday'),
             F.col('event_timestamp'),
             F.col('first_holding_time'),
-            F.col('first_airborne_time'),
+        ]
+
+        if not scenario:
+            select_exprs.append(F.col('first_airborne_time'))
+
+        select_exprs += [
             F.col('first_on_ground_time'),
             'Z1', 'KA6', 'KA8', 'K3', 'K2', 'K1', 'Y1', 'Y2', 'Y3', 'Y7', 'Z6', 'Z4', 'Z2', 
             'Z3', 'LF', 'L1', 'LA', 'LB', 'LC', 'LD', 'LE', '36R_18L', '32R_14L', '36L_18R', '32L_14R'   
-        )
-    
+        ]
+
+        df_final_clean = df_final.select(*select_exprs)
+
         return df_final_clean
     
     # Aplicamos el pipeline
-    def apply_pipeline(self, df):
+    def apply_pipeline(self, df, scenario=False):
         """
         Aplica el pipeline de enriquecimiento de datos a un DataFrame de PySpark."""
         # 1.
@@ -731,7 +763,7 @@ class Pipeline:
 
         # 5.
         df_with_hp = self.assignHoldingPoint(df_pos_callsign)
-        df_with_hp.show()
+        # OKEY
 
         # 6.
         df_with_hp_tc = df_with_hp.join(df_types, on="ICAO", how="inner")
@@ -739,18 +771,21 @@ class Pipeline:
     
         # 7.
         df_valid_flights = self.filterFlights(df_with_hp_tc)
+        
        
         # 8.
-        df_takeoff_segment = self.filterPositions(df_valid_flights)
-    
+        df_takeoff_segment = self.filterPositions(df_valid_flights, scenario)
+        
+
         # 9.
         df_with_velocities = self.mergePositionsVelocities(df_takeoff_segment, df_speed)
-    
+        
+
         # 10. 
         df_important_takeoffs = self.importantTakeoffs(df_with_velocities)
     
         # 11.
-        dfB = self.calculateHoldingTime(df_important_takeoffs)
+        dfB = self.calculateHoldingTime(df_important_takeoffs, scenario)
 
         # 12.
         status_by_interval_final, dfA = self.occupaidEach10s(dfA)
@@ -762,12 +797,6 @@ class Pipeline:
         # 14.
         dfE = self.eventsMinuteRate(dfD)
 
-        print(dfA.count())
-        print(dfB.count())
-        print(dfC.count())
-        print(dfD.count())
-        print(dfE.count())
-
         # 15.
         dfA.persist(StorageLevel.MEMORY_AND_DISK)
         dfB.persist(StorageLevel.MEMORY_AND_DISK)
@@ -775,23 +804,15 @@ class Pipeline:
         dfD.persist(StorageLevel.MEMORY_AND_DISK)
         dfE.persist(StorageLevel.MEMORY_AND_DISK)
         df_final = self.combineBCDE(dfB, dfC, dfD, dfE)
-        print("after 15")
-        df_final.show()
         
         # 16.
         df_final = self.dateColumns(df_final)
-        print("after 16")
-        df_final.show()
  
         # 17.
         df_final = df_final.withColumn("operator", F.substring("Callsign", 1, 3))
-        print("after 17")
-        df_final.show()
     
         # 18.
-        df_final_clean = self.cleanColumns(df_final)
-        print("after 18")
-        df_final_clean.show()
+        df_final_clean = self.cleanColumns(df_final, scenario)
 
 
         """
