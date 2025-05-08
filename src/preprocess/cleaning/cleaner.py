@@ -50,7 +50,7 @@ class Cleaner:
 
         # Eliminamos todas las columnas marcadas
         variables_eliminar = eliminar_no_varianza + eliminar_correlacion + eliminar_otras
-        df = df.drop(columns=variables_eliminar, axis=1)
+        df = df.drop(columns=variables_eliminar, axis=1, errors='ignore')
 
         # Convertimos 'timestamp' a tipo datetime si aún no lo es
         df['timestamp'] = pd.to_datetime(df['timestamp'])

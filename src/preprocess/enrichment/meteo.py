@@ -19,14 +19,11 @@ class MeteoDataset:
         Maneja errores si el archivo no se encuentra o hay otros problemas.
         """
         try:
-            meteo_df = pd.read_parquet(path)
+            meteo_df = pd.read_csv("../src/open-meteo-40.53N3.56W602m-2.csv", skiprows=2)
             meteo_df['time'] = pd.to_datetime(meteo_df['time'])
             return meteo_df
         except FileNotFoundError:
             print(f"Error: El archivo de meteorología en '{path}' no se encontró.")
-            return None
-        except Exception as e:
-            print(f"Error al cargar el archivo de meteorología: {e}")
             return None
 
     def merge(self, df, on='time', how='inner'):
